@@ -6,4 +6,8 @@ public class User
     public string Username { get; set; }
     public string Password { get; set; }
     public string Email { get; set; }
+    
+    public ICollection<Project> Projects { get; set; }
+    public ICollection<TaskItem> Tasks { get; set; }
+    public ICollection<Comment> Comments { get; set; }
 }
