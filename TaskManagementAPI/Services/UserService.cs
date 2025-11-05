@@ -21,18 +21,36 @@ public class UserService(TaskManagementDbContext db) : IUserService
             .FirstOrDefaultAsync();
     }
 
-    public async Task Save(User user)
+    public async Task Create(UserCreateDto dto)
     {
-        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
-        if (existingUser != null)
+        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Username == dto.Username);
+        if (existingUser == null)
         {
-            existingUser.Username = user.Username;
-            existingUser.Email = user.Email;
+            var user = new User
+            {
+                Username = dto.Username,
+                Email = dto.Email,
+                Password = dto.Password // Consider hashing before saving
+            };
+            await db.Users.AddAsync(user);
+            await db.SaveChangesAsync();
         }
         else
         {
-            await db.Users.AddAsync(user);
+            throw new Exception("Username already exists");
         }
+    }
+    
+    public async Task Update(int id, UserUpdateDto dto)
+    {
+        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        if (existingUser == null) throw new Exception("User not found");
+
+        existingUser.Username = dto.Username;
+        existingUser.Email = dto.Email;
+        if (!string.IsNullOrEmpty(dto.Password))
+            existingUser.Password = dto.Password; // TODO Hashing
+
         await db.SaveChangesAsync();
     }
 
