@@ -10,6 +10,8 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
     public DbSet<Comment> Comments { get; set; }
     public DbSet<TaskItem> Tasks { get; set; }
     public DbSet<Status> Status { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+    public DbSet<ProjectVisibility> ProjectVisibility { get; set; }
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -20,6 +22,8 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
         builder.Entity<Comment>().ToTable("Comments");
         builder.Entity<User>().ToTable("Users");
         builder.Entity<Status>().ToTable("Status");
+        builder.Entity<Notification>().ToTable("Notifications");
+        builder.Entity<ProjectVisibility>().ToTable("ProjectVisibility");
         
         // SEEDING
         
@@ -37,6 +41,19 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
             // for user 2
             new Project {Id = 2, Name = "Fix up house", Description = "Plan for house remodel", UserId = 2},
             new Project { Id = 3, Name = "Turn into Batman", Description = "Plan to become the Dark Knight", UserId = 2}
+        );
+        
+        // Project visibility
+        builder.Entity<ProjectVisibility>().HasData(
+            // All projects available to admin
+            new ProjectVisibility { Id = 1, ProjectId = 1, UserId = 1},
+            new ProjectVisibility { Id = 2, ProjectId = 2, UserId = 1},
+            new ProjectVisibility { Id = 3, ProjectId = 3, UserId = 1},
+            
+            // Projects avaiable to project owner 
+            new ProjectVisibility { Id = 4, ProjectId = 1, UserId = 3},
+            new ProjectVisibility { Id = 5, ProjectId = 2, UserId = 2},
+            new ProjectVisibility { Id = 6, ProjectId = 3, UserId = 2}
         );
         
         // Status
@@ -65,6 +82,11 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
         builder.Entity<Comment>().HasData(
             new Comment {Id = 1, TaskItemId = 5, UserId = 1, Text = "This is stupid"}
         );
+        
+        // Notifications for user 1
+        builder.Entity<Notification>().HasData(
+            new Notification {Id = 1, ProjectId = 1, UserId = 3}
+            );
         
         // Define foreign keys
         builder.Entity<Project>()
@@ -96,5 +118,29 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
             .HasOne(c => c.User)
             .WithMany(u => u.Comments)
             .HasForeignKey(c => c.UserId);
+        
+        builder.Entity<ProjectVisibility>()
+            .HasOne(pv => pv.Project)
+            .WithMany(p => p.ProjectVisibility)
+            .HasForeignKey(pv => pv.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<ProjectVisibility>()
+            .HasOne(pv => pv.User)
+            .WithMany(u => u.ProjectVisibility)
+            .HasForeignKey(pv => pv.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.Entity<Notification>()
+            .HasOne(n => n.Project)
+            .WithMany(p => p.Notifications)
+            .HasForeignKey(n => n.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

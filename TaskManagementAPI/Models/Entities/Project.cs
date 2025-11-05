@@ -10,4 +10,6 @@ public class Project
     
     public User User { get; set; }
     public ICollection<TaskItem> Tasks { get; set; }
+    public ICollection<ProjectVisibility> ProjectVisibility { get; set; }
+    public ICollection<Notification> Notifications { get; set; }
 }

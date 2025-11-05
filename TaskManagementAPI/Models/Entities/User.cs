@@ -10,4 +10,6 @@ public class User
     public ICollection<Project> Projects { get; set; }
     public ICollection<TaskItem> Tasks { get; set; }
     public ICollection<Comment> Comments { get; set; }
+    public ICollection<ProjectVisibility> ProjectVisibility { get; set; }
+    public ICollection<Notification> Notifications { get; set; }
 }
