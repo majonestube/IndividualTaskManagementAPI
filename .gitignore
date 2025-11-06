@@ -1,0 +1,49 @@
+# Ignorerer .NET byggeartefakter
+**/bin/
+**/obj/
+# IDE-spesifikke filer
+# Rider/IntelliJ
+.idea/
+*.iml
+# Visual Studio
+.vs/
+*.user
+*.suo
+# VS Code
+.vscode/
+# OS-spesifikke søppelfiler
+.DS_Store
+Thumbs.db
+# Database-filer
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+# Logger og midlertidige filer
+*.log
+*.tmp
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+**/packages/
+# Kompilator/cache-artefakter
+*.cache
+*.ilk
+*.pdb
+*.obj
+*.dll
+*.exe
+*.mdb
+*.pidb
+*.sbr
+*.tlh
+*.tli
+# Brukergenererte lokalmiljøfiler
+*.userprefs
+*.orig
+
+**/publish/
+
+
