@@ -5,9 +5,14 @@ namespace TaskManagementAPI.Services;
 
 public interface IUserService
 {
+    // Hent alle brukere
     Task<List<UserDto>> GetUsers();
-    Task<User?> GetUserById(int id);
-    Task Create(UserCreateDto dto);
-    Task Update(int id, UserUpdateDto dto);
+    // Hent bruker etter id
+    Task<UserDto?> GetUserById(int id);
+    // Opprett ny bruker
+    Task<UserDto> Create(UserCreateDto dto);
+    // Oppdater eksisterende bruker
+    Task<UserDto?> Update(int id, UserUpdateDto dto);
+    // Slett bruker
     Task<bool> Delete(int id);
 }

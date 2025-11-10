@@ -1,71 +1,96 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
 using TaskManagementAPI.Services;
 
 namespace TaskManagementAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController : ControllerBase
 {
-    // Get all users
+    private readonly IUserService _userService;
+
+    public UserController(IUserService userService)
+    {
+        _userService = userService;
+    }
+
+    // Henter alle brukere
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        try
-        {
-            var users = await userService.GetUsers();
-            return Ok(users);
-        }
-        catch
-        {
-            return NotFound();
-        }
+        var users = await _userService.GetUsers();
+        return Ok(users); // 200: OK
     }
-    
-    // Get user by id
-    [HttpGet("{id}")]
+
+    // Henter bruker etter id
+    [HttpGet("{id:int}", Name = "GetUserById")]
     public async Task<IActionResult> GetUser(int id)
     {
-        try
+        var user = await _userService.GetUserById(id);
+        if (user == null)
         {
-            var user = await userService.GetUserById(id);
-            if (user == null)
-            {
-                return BadRequest("User not found");
-            }
-            
-            return Ok(user);
+            return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
         }
-        catch
-        {
-            return NotFound();
-        }
+
+        return Ok(user);
     }
-    
-    // Create new user
+
+    // Oppretter ny bruker
     [HttpPost]
     public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
     {
-        await userService.Create(dto);
-        return Ok("User created");
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState); // 400: Ugyldig modell
+        }
+
+        try
+        {
+            var createdUser = await _userService.Create(dto);
+            return CreatedAtRoute("GetUserById", new { id = createdUser.Id }, createdUser); // 201: Opprettet
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message); // 400: Valideringsfeil
+        }
     }
-    
-    // Update user
+
+    // Oppdaterer bruker
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto dto)
     {
-        // TODO can we check that ids match? 
-        await userService.Update(id, dto);
-        
-        return Ok("User updated");
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        try
+        {
+            var updatedUser = await _userService.Update(id, dto);
+            if (updatedUser == null)
+            {
+                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+            }
+
+            return Ok(updatedUser); // 200: OK
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
+    // Sletter bruker
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var success = await userService.Delete(id);
-        return success ? NoContent() : BadRequest("User not found");
+        var success = await _userService.Delete(id);
+        if (!success)
+        {
+            return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+        }
+
+        return NoContent(); // 204: Ingen innhold
     }
 }
