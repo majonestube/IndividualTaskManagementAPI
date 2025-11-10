@@ -7,20 +7,13 @@ namespace TaskManagementAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TasksController : ControllerBase
+public class TasksController(ITaskService taskService) : ControllerBase
 {
-    private readonly ITaskService _taskService;
-
-    public TasksController(ITaskService taskService)
-    {
-        _taskService = taskService;
-    }
-
     // Henter oppgaver for et gitt prosjekt
     [HttpGet("project/{projectId:int}")]
     public async Task<IActionResult> GetForProject(int projectId)
     {
-        var result = await _taskService.GetTasksForProject(projectId);
+        var result = await taskService.GetTasksForProject(projectId);
         return Ok(result); // 200: OK
     }
 
@@ -28,7 +21,7 @@ public class TasksController : ControllerBase
     [HttpGet("{id:int}", Name = "GetTaskById")]
     public async Task<IActionResult> GetById(int id)
     {
-        var task = await _taskService.GetById(id);
+        var task = await taskService.GetById(id);
         if (task == null)
         {
             return NotFound(); // 404: Ikke funnet
@@ -48,7 +41,7 @@ public class TasksController : ControllerBase
 
         try
         {
-            await _taskService.Create(task);
+            await taskService.Create(task);
             return CreatedAtRoute("GetTaskById", new { id = task.Id }, task); // 201: Opprettet
         }
         catch (Exception ex)
@@ -73,7 +66,7 @@ public class TasksController : ControllerBase
 
         try
         {
-            var updated = await _taskService.Update(task);
+            var updated = await taskService.Update(task);
             if (!updated)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -91,7 +84,7 @@ public class TasksController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _taskService.Delete(id);
+        var deleted = await taskService.Delete(id);
         if (!deleted)
         {
             return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -106,7 +99,7 @@ public class TasksController : ControllerBase
     {
         try
         {
-            var ok = await _taskService.UpdateStatus(id, statusId);
+            var ok = await taskService.UpdateStatus(id, statusId);
             if (!ok)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -126,7 +119,7 @@ public class TasksController : ControllerBase
     {
         try
         {
-            var ok = await _taskService.AssignUser(id, userId);
+            var ok = await taskService.AssignUser(id, userId);
             if (!ok)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
