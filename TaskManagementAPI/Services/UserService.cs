@@ -5,18 +5,11 @@ using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services;
 
-public class UserService : IUserService
+public class UserService(TaskManagementDbContext db) : IUserService
 {
-    private readonly TaskManagementDbContext _db;
-
-    public UserService(TaskManagementDbContext db)
-    {
-        _db = db;
-    }
-
     public async Task<List<UserDto>> GetUsers()
     {
-        var users = await _db.Users
+        var users = await db.Users
             .AsNoTracking()
             .Select(u => new UserDto
             {
@@ -31,7 +24,7 @@ public class UserService : IUserService
 
     public async Task<UserDto?> GetUserById(int id)
     {
-        var user = await _db.Users
+        var user = await db.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == id);
 
@@ -40,7 +33,7 @@ public class UserService : IUserService
 
     public async Task<UserDto> Create(UserCreateDto dto)
     {
-        var existingUser = await _db.Users
+        var existingUser = await db.Users
             .FirstOrDefaultAsync(u => u.Username.ToLower() == dto.Username.ToLower());
 
         if (existingUser != null)
@@ -55,15 +48,15 @@ public class UserService : IUserService
             Password = dto.Password // TODO: Hash passord før lagring
         };
 
-        await _db.Users.AddAsync(user);
-        await _db.SaveChangesAsync();
+        await db.Users.AddAsync(user);
+        await db.SaveChangesAsync();
 
         return UserToDto(user);
     }
 
     public async Task<UserDto?> Update(int id, UserUpdateDto dto)
     {
-        var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (existingUser == null)
         {
             return null;
@@ -76,21 +69,21 @@ public class UserService : IUserService
             existingUser.Password = dto.Password; // TODO: Hash passord før lagring
         }
 
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         return UserToDto(existingUser);
     }
 
     public async Task<bool> Delete(int id)
     {
-        var existingUser = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (existingUser == null)
         {
             return false;
         }
 
-        _db.Users.Remove(existingUser);
-        await _db.SaveChangesAsync();
+        db.Users.Remove(existingUser);
+        await db.SaveChangesAsync();
         return true;
     }
 

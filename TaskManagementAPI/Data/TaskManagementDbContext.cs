@@ -50,7 +50,7 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
             new ProjectVisibility { Id = 2, ProjectId = 2, UserId = 1},
             new ProjectVisibility { Id = 3, ProjectId = 3, UserId = 1},
             
-            // Projects avaiable to project owner 
+            // Projects available to project owner 
             new ProjectVisibility { Id = 4, ProjectId = 1, UserId = 3},
             new ProjectVisibility { Id = 5, ProjectId = 2, UserId = 2},
             new ProjectVisibility { Id = 6, ProjectId = 3, UserId = 2}

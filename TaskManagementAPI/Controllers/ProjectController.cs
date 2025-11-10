@@ -7,20 +7,13 @@ namespace TaskManagementAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController : ControllerBase
+public class ProjectController(IProjectService projectService) : ControllerBase
 {
-    private readonly IProjectService _projectService;
-
-    public ProjectsController(IProjectService projectService)
-    {
-        _projectService = projectService;
-    }
-
     // Henter prosjekter for en gitt bruker
     [HttpGet("user/{userId:int}")]
     public async Task<IActionResult> GetForUser(int userId)
     {
-        var result = await _projectService.GetProjectsForUser(userId);
+        var result = await projectService.GetProjectsForUser(userId);
         return Ok(result); // 200: OK
     }
 
@@ -28,7 +21,7 @@ public class ProjectsController : ControllerBase
     [HttpGet("{id:int}", Name = "GetProjectById")]
     public async Task<IActionResult> GetById(int id)
     {
-        var project = await _projectService.GetById(id);
+        var project = await projectService.GetById(id);
         if (project == null)
         {
             return NotFound(); // 404: Ikke funnet
@@ -39,7 +32,7 @@ public class ProjectsController : ControllerBase
 
     // Oppretter et nytt prosjekt
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Project project)
+    public async Task<IActionResult> Create([FromBody] ProjectCreateDto project)
     {
         if (!ModelState.IsValid)
         {
@@ -48,8 +41,8 @@ public class ProjectsController : ControllerBase
 
         try
         {
-            await _projectService.Create(project);
-            return CreatedAtRoute("GetProjectById", new { id = project.Id }, project); // 201: Opprettet
+            await projectService.Create(project);
+            return Ok(project); // Ok
         }
         catch (Exception ex)
         {
@@ -73,7 +66,7 @@ public class ProjectsController : ControllerBase
 
         try
         {
-            var updated = await _projectService.Update(project);
+            var updated = await projectService.Update(project);
             if (!updated)
             {
                 return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
@@ -91,7 +84,7 @@ public class ProjectsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _projectService.Delete(id);
+        var deleted = await projectService.Delete(id);
         if (!deleted)
         {
             return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
