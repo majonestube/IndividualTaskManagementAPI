@@ -8,11 +8,11 @@ public interface ICommentService
     // Hent kommentarer for en gitt oppgave
     Task<List<CommentDto>> GetByTask(int taskItemId);
     // Hent kommentar etter id
-    Task<Comment?> GetById(int id);
+    Task<CommentDto?> GetById(int id);
     // Opprett ny kommentar
-    Task Create(Comment comment);
+    Task Create(int userId, int taskId, CommentCreateDto comment);
     // Oppdater kommentar
-    Task<bool> Update(Comment comment);
+    Task<bool> Update(int commentId, CommentCreateDto comment);
     // Slett kommentar
     Task<bool> Delete(int id);
 }

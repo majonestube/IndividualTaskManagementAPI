@@ -7,20 +7,13 @@ namespace TaskManagementAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CommentsController : ControllerBase
+public class CommentsController(ICommentService commentService) : ControllerBase
 {
-    private readonly ICommentService _commentService;
-
-    public CommentsController(ICommentService commentService)
-    {
-        _commentService = commentService;
-    }
-
     // Henter kommentarer for en gitt oppgave
     [HttpGet("task/{taskItemId:int}")]
     public async Task<IActionResult> GetForTask(int taskItemId)
     {
-        var result = await _commentService.GetByTask(taskItemId);
+        var result = await commentService.GetByTask(taskItemId);
         return Ok(result); // 200: OK
     }
 
@@ -28,7 +21,7 @@ public class CommentsController : ControllerBase
     [HttpGet("{id:int}", Name = "GetCommentById")]
     public async Task<IActionResult> GetById(int id)
     {
-        var comment = await _commentService.GetById(id);
+        var comment = await commentService.GetById(id);
         if (comment == null)
         {
             return NotFound(); // 404: Ikke funnet
@@ -38,8 +31,8 @@ public class CommentsController : ControllerBase
     }
 
     // Oppretter en ny kommentar
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Comment comment)
+    [HttpPost("{taskId:int}/user/{userId:int}")]
+    public async Task<IActionResult> Create(int taskId, int userId, [FromBody] CommentCreateDto comment)
     {
         if (!ModelState.IsValid)
         {
@@ -48,8 +41,9 @@ public class CommentsController : ControllerBase
 
         try
         {
-            await _commentService.Create(comment);
-            return CreatedAtRoute("GetCommentById", new { id = comment.Id }, comment); // 201: Opprettet
+            //TODO int userId = GetCurrentUserId();
+            await commentService.Create(userId, taskId, comment);
+            return Ok(comment);
         }
         catch (Exception ex)
         {
@@ -59,13 +53,8 @@ public class CommentsController : ControllerBase
 
     // Oppdaterer en kommentar
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] Comment comment)
+    public async Task<IActionResult> Update(int id, [FromBody] CommentCreateDto comment)
     {
-        if (id != comment.Id)
-        {
-            return BadRequest("Id i ruten samsvarer ikke med id i kroppen."); // 400: Ugyldig forespørsel
-        }
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -73,7 +62,7 @@ public class CommentsController : ControllerBase
 
         try
         {
-            var updated = await _commentService.Update(comment);
+            var updated = await commentService.Update(id, comment);
             if (!updated)
             {
                 return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
@@ -91,7 +80,7 @@ public class CommentsController : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _commentService.Delete(id);
+        var deleted = await commentService.Delete(id);
         if (!deleted)
         {
             return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet

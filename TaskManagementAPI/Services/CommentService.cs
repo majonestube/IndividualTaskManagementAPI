@@ -27,39 +27,49 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         return comments;
     }
 
-    public async Task<Comment?> GetById(int id)
+    public async Task<CommentDto?> GetById(int id)
     {
         // Henter kommentar etter id
-        return await db.Comments
+        var comment = await db.Comments
             .AsNoTracking()
             .Include(c => c.TaskItem)
             .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.Id == id);
+
+        return comment == null ? null : CommentToDto(comment);
     }
 
-    public async Task Create(Comment comment)
+    public async Task Create(int userId, int taskItemId, CommentCreateDto comment)
     {
         // Oppretter ny kommentar etter validering
-        var taskExists = await db.Tasks.AnyAsync(t => t.Id == comment.TaskItemId);
+        var taskExists = await db.Tasks.AnyAsync(t => t.Id == taskItemId);
         if (!taskExists)
         {
             throw new Exception("Ugyldig oppgave-id.");
         }
 
-        var userExists = await db.Users.AnyAsync(u => u.Id == comment.UserId);
+        var userExists = await db.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
         {
             throw new Exception("Ugyldig bruker-id.");
         }
 
-        await db.Comments.AddAsync(comment);
+        var newComment = new Comment
+        {
+            Text = comment.Text,
+            CreatedDate = DateTime.Now,
+            TaskItemId = taskItemId,
+            UserId = userId
+        };
+
+        await db.Comments.AddAsync(newComment);
         await db.SaveChangesAsync();
     }
 
-    public async Task<bool> Update(Comment comment)
+    public async Task<bool> Update(int commentId, CommentCreateDto comment)
     {
         // Oppdaterer eksisterende kommentar
-        var existing = await db.Comments.FirstOrDefaultAsync(c => c.Id == comment.Id);
+        var existing = await db.Comments.FirstOrDefaultAsync(c => c.Id == commentId);
         if (existing == null)
         {
             return false;
@@ -82,5 +92,16 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         db.Comments.Remove(comment);
         await db.SaveChangesAsync();
         return true;
+    }
+
+    private static CommentDto CommentToDto(Comment comment)
+    {
+        return new CommentDto
+        {
+            Text = comment.Text,
+            CreatedDate = comment.CreatedDate,
+            TaskItemName = comment.TaskItem?.Title ?? "Unknown title",
+            Username = comment.User?.Username ??  "Unknown username"
+        };
     }
 }
