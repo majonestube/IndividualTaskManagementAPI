@@ -50,7 +50,7 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
             new ProjectVisibility { Id = 2, ProjectId = 2, UserId = 1},
             new ProjectVisibility { Id = 3, ProjectId = 3, UserId = 1},
             
-            // Projects avaiable to project owner 
+            // Projects available to project owner 
             new ProjectVisibility { Id = 4, ProjectId = 1, UserId = 3},
             new ProjectVisibility { Id = 5, ProjectId = 2, UserId = 2},
             new ProjectVisibility { Id = 6, ProjectId = 3, UserId = 2}
@@ -85,7 +85,7 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
         
         // Notifications for user 1
         builder.Entity<Notification>().HasData(
-            new Notification {Id = 1, ProjectId = 1, UserId = 3}
+            new Notification {Id = 1, Message = "A new person has commented", Created = new DateTime(2025, 11, 11), IsRead = false, ProjectId = 1, TaskItemId = 2, UserId = 3}
             );
         
         // Define foreign keys
