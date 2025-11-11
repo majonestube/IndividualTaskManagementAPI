@@ -7,4 +7,5 @@ public class ProjectDto
     public DateTime Created { get; set; }
     public string Username { get; set; }
     public int TaskCount { get; set; }
+    public int UnreadNotificationsCount { get; set; }
 }

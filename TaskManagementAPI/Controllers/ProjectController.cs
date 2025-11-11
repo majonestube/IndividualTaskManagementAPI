@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
 using TaskManagementAPI.Services;
 
 namespace TaskManagementAPI.Controllers;

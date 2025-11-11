@@ -85,7 +85,7 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
         
         // Notifications for user 1
         builder.Entity<Notification>().HasData(
-            new Notification {Id = 1, ProjectId = 1, UserId = 3}
+            new Notification {Id = 1, Message = "A new person has commented", Created = new DateTime(2025, 11, 11), IsRead = false, ProjectId = 1, TaskItemId = 2, UserId = 3}
             );
         
         // Define foreign keys

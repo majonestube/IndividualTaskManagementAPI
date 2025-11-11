@@ -26,7 +26,8 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
                 Description = p.Description,
                 Created = p.Created,
                 Username = p.User.Username,
-                TaskCount = p.Tasks.Count()
+                TaskCount = p.Tasks.Count(),
+                UnreadNotificationsCount = p.Notifications.Count(n => !n.IsRead && n.UserId == userId)
             })
             .ToListAsync();
         
