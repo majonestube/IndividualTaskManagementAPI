@@ -32,7 +32,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
 
     // Oppretter en ny oppgave
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] TaskItem task)
+    public async Task<IActionResult> Create([FromBody] TaskItemCreateDto task)
     {
         if (!ModelState.IsValid)
         {
@@ -42,7 +42,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         try
         {
             await taskService.Create(task);
-            return CreatedAtRoute("GetTaskById", new { id = task.Id }, task); // 201: Opprettet
+            return Ok(task);
         }
         catch (Exception ex)
         {
@@ -52,13 +52,8 @@ public class TasksController(ITaskService taskService) : ControllerBase
 
     // Oppdaterer en eksisterende oppgave
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] TaskItem task)
+    public async Task<IActionResult> Update(int id, [FromBody] TaskItemCreateDto task)
     {
-        if (id != task.Id)
-        {
-            return BadRequest("Id i ruten samsvarer ikke med id i kroppen."); // 400: Ugyldig forespørsel
-        }
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -66,7 +61,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
 
         try
         {
-            var updated = await taskService.Update(task);
+            var updated = await taskService.Update(id, task);
             if (!updated)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -110,6 +105,21 @@ public class TasksController(ITaskService taskService) : ControllerBase
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
+        }
+    }
+    
+    // Get possible users for a task
+    [HttpGet("{taskId:int}/assign/possibleUsers")]
+    public async Task<IActionResult> AssignPossibleUsers(int taskId)
+    {
+        try
+        {
+            var users = await taskService.GetUsers(taskId);
+            return Ok(users);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
         }
     }
 

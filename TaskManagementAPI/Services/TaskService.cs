@@ -20,7 +20,7 @@ public class TaskService(TaskManagementDbContext db) : ITaskService
             {
                 Title = t.Title,
                 Description = t.Description,
-                Status = t.Status,
+                Status = t.Status.Name,
                 DueDate = t.DueDate,
                 ProjectName = t.Project.Name,
                 AssignedUserName = t.AssignedUser.Username
@@ -30,18 +30,20 @@ public class TaskService(TaskManagementDbContext db) : ITaskService
         return tasks;
     }
 
-    public async Task<TaskItem?> GetById(int id)
+    public async Task<TaskItemDto?> GetById(int id)
     {
         // Henter oppgave etter id
-        return await db.Tasks
+        var task = await db.Tasks
             .AsNoTracking()
             .Include(t => t.Status)
             .Include(t => t.Project)
             .Include(t => t.AssignedUser)
             .FirstOrDefaultAsync(t => t.Id == id);
+
+        return task == null ? null : TaskToDto(task);
     }
 
-    public async Task Create(TaskItem task)
+    public async Task Create(TaskItemCreateDto task)
     {
         // Oppretter ny oppgave etter validering
         var projectExists = await db.Projects.AnyAsync(p => p.Id == task.ProjectId);
@@ -62,14 +64,24 @@ public class TaskService(TaskManagementDbContext db) : ITaskService
             throw new Exception("Ugyldig status-id.");
         }
 
-        await db.Tasks.AddAsync(task);
+        var newTaskItem = new TaskItem
+        {
+            Title = task.Title,
+            Description = task.Description,
+            DueDate = task.DueDate,
+            StatusId = task.StatusId,
+            ProjectId = task.ProjectId,
+            AssignedUserId = task.AssignedUserId,
+        };
+
+        await db.Tasks.AddAsync(newTaskItem);
         await db.SaveChangesAsync();
     }
 
-    public async Task<bool> Update(TaskItem task)
+    public async Task<bool> Update(int id, TaskItemCreateDto task)
     {
         // Oppdaterer eksisterende oppgave
-        var existing = await db.Tasks.FirstOrDefaultAsync(t => t.Id == task.Id);
+        var existing = await db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         if (existing == null)
         {
             return false;
@@ -141,6 +153,31 @@ public class TaskService(TaskManagementDbContext db) : ITaskService
         return true;
     }
 
+    public async Task<List<UserDto>> GetUsers(int taskId)
+    {
+        var projectId = await db.Tasks
+            .Where(t => t.Id == taskId)
+            .Select(t => t.ProjectId)
+            .FirstOrDefaultAsync();
+        
+        var possibleUsers = await db.ProjectVisibility
+            .AsNoTracking()
+            .Where(pv => pv.ProjectId == projectId)
+            .Select(pv => pv.UserId)
+            .ToListAsync();
+
+        var users = await db.Users
+            .AsNoTracking()
+            .Where(u => possibleUsers.Contains(u.Id))
+            .Select(u => new UserDto
+            {
+                Email = u.Email,
+                Username = u.Username,
+            })
+            .ToListAsync();
+        return users;
+    }
+
     public async Task<bool> AssignUser(int taskId, int userId)
     {
         // Tildeler oppgaven til en bruker
@@ -159,5 +196,18 @@ public class TaskService(TaskManagementDbContext db) : ITaskService
         task.AssignedUserId = userId;
         await db.SaveChangesAsync();
         return true;
+    }
+
+    private static TaskItemDto TaskToDto(TaskItem task)
+    {
+        return new TaskItemDto
+        {
+            Title = task.Title,
+            Description = task.Description,
+            Status = task.Status?.Name ?? "Unknown status",
+            DueDate = task.DueDate.Date,
+            ProjectName = task.Project?.Name ?? "Unknown project name",
+            AssignedUserName = task.AssignedUser?.Username ?? "Unknown user",
+        };
     }
 }
