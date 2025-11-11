@@ -7,6 +7,32 @@ namespace TaskManagementAPI.Services;
 
 public class ProjectService(TaskManagementDbContext db) : IProjectService
 {
+    public async Task<List<ProjectDto>> GetAllVisibleProjects(int userId)
+    {
+        var visibleProjectIds = await db.ProjectVisibility
+            .AsNoTracking()
+            .Where(pv => pv.UserId == userId)
+            .Select(pv => pv.ProjectId)
+            .ToListAsync();
+        
+        var projects = await db.Projects
+            .AsNoTracking()
+            .Include(p => p.User)
+            .Include(p => p.Tasks)
+            .Where(p => visibleProjectIds.Contains(p.Id))
+            .Select(p => new ProjectDto
+            {
+                Name = p.Name,
+                Description = p.Description,
+                Created = p.Created,
+                Username = p.User.Username,
+                TaskCount = p.Tasks.Count()
+            })
+            .ToListAsync();
+        
+        return projects;
+    }
+
     public async Task<List<ProjectDto>> GetProjectsForUser(int userId)
     {
         // Henter prosjekter for en bruker og mapper til DTO
@@ -28,13 +54,16 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return projects;
     }
 
-    public async Task<Project?> GetById(int id)
+    public async Task<ProjectDto?> GetById(int id)
     {
         // Henter prosjekt etter id
-        return await db.Projects
+        var project = await db.Projects
             .AsNoTracking()
             .Include(p => p.User)
+            .Include(p => p.Tasks)
             .FirstOrDefaultAsync(p => p.Id == id);
+        
+        return project == null ? null : ProjectToDto(project);
     }
 
     public async Task<ProjectDto> Create(ProjectCreateDto project)
@@ -59,10 +88,10 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return ProjectToDto(newProject);
     }
 
-    public async Task<bool> Update(Project project)
+    public async Task<bool> Update(int id, ProjectCreateDto project)
     {
         // Oppdaterer eksisterende prosjekt
-        var existing = await db.Projects.FirstOrDefaultAsync(p => p.Id == project.Id);
+        var existing = await db.Projects.FirstOrDefaultAsync(p => p.Id == id);
         if (existing == null)
         {
             return false;
@@ -96,8 +125,8 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             Name = project.Name,
             Description = project.Description,
             Created = project.Created,
-            Username = project.User.Username,
-            TaskCount = project.Tasks.Count
+            Username = project.User?.Username ?? "Unknown",
+            TaskCount = project.Tasks?.Count ?? 0
         };
     }
 }

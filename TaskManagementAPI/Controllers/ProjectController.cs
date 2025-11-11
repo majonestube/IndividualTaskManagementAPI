@@ -9,8 +9,17 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController(IProjectService projectService) : ControllerBase
 {
-    // Henter prosjekter for en gitt bruker
+    // Get all visible projects for the user
     [HttpGet("user/{userId:int}")]
+    public async Task<IActionResult> GetVisibleProjects(int userId)
+    {
+        var result = await projectService.GetAllVisibleProjects(userId);
+        return Ok(result);
+    }
+    
+    
+    // Henter prosjekter for en gitt bruker
+    [HttpGet("user/owner/{userId:int}")]
     public async Task<IActionResult> GetForUser(int userId)
     {
         var result = await projectService.GetProjectsForUser(userId);
@@ -52,13 +61,8 @@ public class ProjectController(IProjectService projectService) : ControllerBase
 
     // Oppdaterer et eksisterende prosjekt
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] Project project)
+    public async Task<IActionResult> Update(int id, [FromBody] ProjectCreateDto project)
     {
-        if (id != project.Id)
-        {
-            return BadRequest("Id i ruten samsvarer ikke med id i kroppen."); // 400: Ugyldig forespørsel
-        }
-
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -66,7 +70,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
 
         try
         {
-            var updated = await projectService.Update(project);
+            var updated = await projectService.Update(id, project);
             if (!updated)
             {
                 return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
