@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
 
@@ -8,8 +9,9 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class NotificationController(INotificationService notificationService) : ControllerBase
 {
-    [HttpGet("notifications/user/{userId:int}")]
-    public async Task<IActionResult> GetNotificationsForUser(int userId)
+    [Authorize]
+    [HttpGet("notifications/user/{userId}")]
+    public async Task<IActionResult> GetNotificationsForUser(string userId)
     {
         try
         {
@@ -22,8 +24,9 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
-    [HttpPost("{userId:int}")]
-    public async Task<IActionResult> AddNotification(int userId, [FromBody] NotificationCreateDto dto)
+    [Authorize]
+    [HttpPost("{userId}")]
+    public async Task<IActionResult> AddNotification(string userId, [FromBody] NotificationCreateDto dto)
     {
         try
         {
@@ -36,6 +39,7 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
+    [Authorize]
     [HttpPut("{id:int}/read")]
     public async Task<IActionResult> MarkAsRead(int id)
     {
@@ -43,6 +47,7 @@ public class NotificationController(INotificationService notificationService) : 
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpPut("{id:int}/unread")]
     public async Task<IActionResult> MarkAsUnread(int id)
     {

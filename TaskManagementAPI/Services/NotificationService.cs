@@ -7,7 +7,7 @@ namespace TaskManagementAPI.Services;
 
 public class NotificationService(TaskManagementDbContext db) : INotificationService
 {
-    public async Task<List<NotificationDto>> GetNotificationsForUser(int userId)
+    public async Task<List<NotificationDto>> GetNotificationsForUser(string userId)
     {
         var notifications = await db.Notifications
             .AsNoTracking()
@@ -28,7 +28,7 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
     }
     
     
-    public async Task<NotificationDto> AddNotification(int projectId, int? taskId, int userId, string message)
+    public async Task<NotificationDto> AddNotification(int projectId, int? taskId, string userId, string message)
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Id == projectId);
         if (!projectExists) throw new Exception("Invalid project ID");

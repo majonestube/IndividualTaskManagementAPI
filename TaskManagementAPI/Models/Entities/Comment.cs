@@ -1,4 +1,6 @@
-﻿namespace TaskManagementAPI.Models.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace TaskManagementAPI.Models.Entities;
 
 public class Comment
 {
@@ -9,6 +11,6 @@ public class Comment
     public int TaskItemId { get; set; }
     public TaskItem TaskItem { get; set; }
     
-    public int UserId { get; set; }
-    public User User { get; set; }
+    public string UserId { get; set; }
+    public IdentityUser User { get; set; }
 }

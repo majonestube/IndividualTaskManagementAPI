@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
@@ -9,8 +10,9 @@ namespace TaskManagementAPI.Controllers;
 public class ProjectController(IProjectService projectService) : ControllerBase
 {
     // Get all visible projects for the user
-    [HttpGet("user/{userId:int}")]
-    public async Task<IActionResult> GetVisibleProjects(int userId)
+    [Authorize]
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetVisibleProjects(string userId)
     {
         var result = await projectService.GetAllVisibleProjects(userId);
         return Ok(result);
@@ -18,14 +20,16 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     
     
     // Henter prosjekter for en gitt bruker
-    [HttpGet("user/owner/{userId:int}")]
-    public async Task<IActionResult> GetForUser(int userId)
+    [Authorize]
+    [HttpGet("user/owner/{userId}")]
+    public async Task<IActionResult> GetForUser(string userId)
     {
         var result = await projectService.GetProjectsForUser(userId);
         return Ok(result); // 200: OK
     }
 
     // Henter enkelt prosjekt etter id
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetProjectById")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -39,6 +43,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     }
 
     // Oppretter et nytt prosjekt
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] ProjectCreateDto project)
     {
@@ -59,6 +64,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     }
 
     // Oppdaterer et eksisterende prosjekt
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] ProjectCreateDto project)
     {
@@ -84,6 +90,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     }
 
     // Sletter et prosjekt
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {

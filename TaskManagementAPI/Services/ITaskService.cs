@@ -20,7 +20,7 @@ public interface ITaskService
     // Get users with access to project
     Task<List<UserDto>> GetUsers(int projectId);
     // Tildel oppgave til bruker
-    Task<bool> AssignUser(int taskId, int userId);
+    Task<bool> AssignUser(int taskId, string userId);
 }
 
 
