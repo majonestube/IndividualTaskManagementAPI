@@ -7,7 +7,7 @@ namespace TaskManagementAPI.Services;
 
 public class ProjectService(TaskManagementDbContext db) : IProjectService
 {
-    public async Task<List<ProjectDto>> GetAllVisibleProjects(int userId)
+    public async Task<List<ProjectDto>> GetAllVisibleProjects(string userId)
     {
         var visibleProjectIds = await db.ProjectVisibility
             .AsNoTracking()
@@ -25,7 +25,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
                 Name = p.Name,
                 Description = p.Description,
                 Created = p.Created,
-                Username = p.User.Username,
+                Username = p.User.UserName,
                 TaskCount = p.Tasks.Count(),
                 UnreadNotificationsCount = p.Notifications.Count(n => !n.IsRead && n.UserId == userId)
             })
@@ -34,7 +34,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return projects;
     }
 
-    public async Task<List<ProjectDto>> GetProjectsForUser(int userId)
+    public async Task<List<ProjectDto>> GetProjectsForUser(string userId)
     {
         // Henter prosjekter for en bruker og mapper til DTO
         var projects = await db.Projects
@@ -47,7 +47,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
                 Name = p.Name,
                 Description = p.Description,
                 Created = p.Created,
-                Username = p.User.Username,
+                Username = p.User.UserName,
                 TaskCount = p.Tasks.Count()
             })
             .ToListAsync();
@@ -126,7 +126,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             Name = project.Name,
             Description = project.Description,
             Created = project.Created,
-            Username = project.User?.Username ?? "Unknown",
+            Username = project.User?.UserName ?? "Unknown",
             TaskCount = project.Tasks?.Count ?? 0
         };
     }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.Services;
@@ -16,6 +17,11 @@ builder.Services.AddSwaggerGen();
 //db
 builder.Services.AddDbContext<TaskManagementDbContext>(options => 
     options.UseSqlite("Data Source=TaskManagement.db"));
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<TaskManagementDbContext>()
+    .AddDefaultTokenProviders();
+
 
 // Add service folder
 builder.Services.AddScoped<IUserService, UserService>();

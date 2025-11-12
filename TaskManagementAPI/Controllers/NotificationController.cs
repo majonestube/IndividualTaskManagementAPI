@@ -8,8 +8,8 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class NotificationController(INotificationService notificationService) : ControllerBase
 {
-    [HttpGet("notifications/user/{userId:int}")]
-    public async Task<IActionResult> GetNotificationsForUser(int userId)
+    [HttpGet("notifications/user/{userId}")]
+    public async Task<IActionResult> GetNotificationsForUser(string userId)
     {
         try
         {
@@ -22,8 +22,8 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
-    [HttpPost("{userId:int}")]
-    public async Task<IActionResult> AddNotification(int userId, [FromBody] NotificationCreateDto dto)
+    [HttpPost("{userId}")]
+    public async Task<IActionResult> AddNotification(string userId, [FromBody] NotificationCreateDto dto)
     {
         try
         {

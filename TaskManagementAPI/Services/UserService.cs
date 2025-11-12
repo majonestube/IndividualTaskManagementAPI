@@ -1,99 +1,106 @@
-﻿using Microsoft.EntityFrameworkCore;
-using TaskManagementAPI.Data;
+﻿using Microsoft.AspNetCore.Identity;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services;
 
-public class UserService(TaskManagementDbContext db) : IUserService
+public class UserService(UserManager<IdentityUser> userManager) : IUserService
 {
     public async Task<List<UserDto>> GetUsers()
     {
-        var users = await db.Users
-            .AsNoTracking()
+        var users = userManager.Users
             .Select(u => new UserDto
             {
                 Id = u.Id,
-                Username = u.Username,
-                Email = u.Email
+                Username = u.UserName!,
+                Email = u.Email!
             })
-            .ToListAsync();
+            .ToList();
 
         return users;
     }
 
-    public async Task<UserDto?> GetUserById(int id)
+    public async Task<UserDto?> GetUserById(string id)
     {
-        var user = await db.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == id);
-
+        var user = await userManager.FindByIdAsync(id);
         return user == null ? null : UserToDto(user);
     }
 
     public async Task<UserDto> Create(UserCreateDto dto)
     {
-        var existingUser = await db.Users
-            .FirstOrDefaultAsync(u => u.Username.ToLower() == dto.Username.ToLower());
-
+        var existingUser = await userManager.FindByNameAsync(dto.Username);
         if (existingUser != null)
         {
-            throw new Exception("Brukernavn finnes allerede."); // 409: Konflikt
+            throw new Exception("Brukernavn finnes allerede.");
         }
 
-        var user = new User
+        var user = new IdentityUser
         {
-            Username = dto.Username,
-            Email = dto.Email,
-            Password = dto.Password // TODO: Hash passord før lagring
+            UserName = dto.Username,
+            Email = dto.Email
         };
 
-        await db.Users.AddAsync(user);
-        await db.SaveChangesAsync();
+        var result = await userManager.CreateAsync(user, dto.Password);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            throw new Exception($"Kunne ikke opprette bruker: {errors}");
+        }
 
         return UserToDto(user);
     }
 
-    public async Task<UserDto?> Update(int id, UserUpdateDto dto)
+    public async Task<UserDto?> Update(string id, UserUpdateDto dto)
     {
-        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-        if (existingUser == null)
+        var user = await userManager.FindByIdAsync(id);
+        if (user == null)
         {
             return null;
         }
 
-        existingUser.Username = dto.Username;
-        existingUser.Email = dto.Email;
-        if (!string.IsNullOrEmpty(dto.Password))
+        user.UserName = dto.Username;
+        user.Email = dto.Email;
+
+        var updateResult = await userManager.UpdateAsync(user);
+        if (!updateResult.Succeeded)
         {
-            existingUser.Password = dto.Password; // TODO: Hash passord før lagring
+            var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+            throw new Exception($"Kunne ikke oppdatere bruker: {errors}");
         }
 
-        await db.SaveChangesAsync();
+        if (!string.IsNullOrEmpty(dto.Password))
+        {
+            var token = await userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await userManager.ResetPasswordAsync(user, token, dto.Password);
 
-        return UserToDto(existingUser);
+            if (!passwordResult.Succeeded)
+            {
+                var errors = string.Join(", ", passwordResult.Errors.Select(e => e.Description));
+                throw new Exception($"Kunne ikke oppdatere passord: {errors}");
+            }
+        }
+
+        return UserToDto(user);
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(string id)
     {
-        var existingUser = await db.Users.FirstOrDefaultAsync(u => u.Id == id);
-        if (existingUser == null)
+        var user = await userManager.FindByIdAsync(id);
+        if (user == null)
         {
             return false;
         }
 
-        db.Users.Remove(existingUser);
-        await db.SaveChangesAsync();
-        return true;
+        var result = await userManager.DeleteAsync(user);
+        return result.Succeeded;
     }
 
-    private static UserDto UserToDto(User user)
+    private static UserDto UserToDto(IdentityUser user)
     {
         return new UserDto
         {
             Id = user.Id,
-            Username = user.Username,
-            Email = user.Email
+            Username = user.UserName!,
+            Email = user.Email!
         };
     }
 }

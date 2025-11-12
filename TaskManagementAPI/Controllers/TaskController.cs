@@ -124,8 +124,8 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Tildeler oppgaven til en bruker
-    [HttpPut("{id:int}/assign/{userId:int}")]
-    public async Task<IActionResult> AssignUser(int id, int userId)
+    [HttpPut("{id:int}/assign/{userId}")]
+    public async Task<IActionResult> AssignUser(int id, string userId)
     {
         try
         {

@@ -20,7 +20,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
                 Text = c.Text,
                 CreatedDate = c.CreatedDate,
                 TaskItemName = c.TaskItem.Title,
-                Username = c.User.Username
+                Username = c.User.UserName
             })
             .ToListAsync();
 
@@ -39,7 +39,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         return comment == null ? null : CommentToDto(comment);
     }
 
-    public async Task Create(int userId, int taskItemId, CommentCreateDto comment)
+    public async Task Create(string userId, int taskItemId, CommentCreateDto comment)
     {
         // Oppretter ny kommentar etter validering
         var taskExists = await db.Tasks.AnyAsync(t => t.Id == taskItemId);
@@ -101,7 +101,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
             Text = comment.Text,
             CreatedDate = comment.CreatedDate,
             TaskItemName = comment.TaskItem?.Title ?? "Unknown title",
-            Username = comment.User?.Username ??  "Unknown username"
+            Username = comment.User?.UserName ??  "Unknown username"
         };
     }
 }

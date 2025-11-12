@@ -9,8 +9,8 @@ namespace TaskManagementAPI.Controllers;
 public class ProjectController(IProjectService projectService) : ControllerBase
 {
     // Get all visible projects for the user
-    [HttpGet("user/{userId:int}")]
-    public async Task<IActionResult> GetVisibleProjects(int userId)
+    [HttpGet("user/{userId}")]
+    public async Task<IActionResult> GetVisibleProjects(string userId)
     {
         var result = await projectService.GetAllVisibleProjects(userId);
         return Ok(result);
@@ -18,8 +18,8 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     
     
     // Henter prosjekter for en gitt bruker
-    [HttpGet("user/owner/{userId:int}")]
-    public async Task<IActionResult> GetForUser(int userId)
+    [HttpGet("user/owner/{userId}")]
+    public async Task<IActionResult> GetForUser(string userId)
     {
         var result = await projectService.GetProjectsForUser(userId);
         return Ok(result); // 200: OK

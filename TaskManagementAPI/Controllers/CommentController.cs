@@ -31,8 +31,8 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     }
 
     // Oppretter en ny kommentar
-    [HttpPost("{taskId:int}/user/{userId:int}")]
-    public async Task<IActionResult> Create(int taskId, int userId, [FromBody] CommentCreateDto comment)
+    [HttpPost("{taskId:int}/user/{userId}")]
+    public async Task<IActionResult> Create(int taskId, string userId, [FromBody] CommentCreateDto comment)
     {
         if (!ModelState.IsValid)
         {
@@ -41,7 +41,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
 
         try
         {
-            //TODO int userId = GetCurrentUserId();
+            //TODO string userId = GetCurrentUserId();
             await commentService.Create(userId, taskId, comment);
             return Ok(comment);
         }

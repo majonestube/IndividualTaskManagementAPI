@@ -6,28 +6,21 @@ namespace TaskManagementAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController : ControllerBase
+public class UserController(IUserService userService) : ControllerBase
 {
-    private readonly IUserService _userService;
-
-    public UserController(IUserService userService)
-    {
-        _userService = userService;
-    }
-
     // Henter alle brukere
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await _userService.GetUsers();
+        var users = await userService.GetUsers();
         return Ok(users); // 200: OK
     }
 
     // Henter bruker etter id
-    [HttpGet("{id:int}", Name = "GetUserById")]
-    public async Task<IActionResult> GetUser(int id)
+    [HttpGet("{id}", Name = "GetUserById")]
+    public async Task<IActionResult> GetUser(string id)
     {
-        var user = await _userService.GetUserById(id);
+        var user = await userService.GetUserById(id);
         if (user == null)
         {
             return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
@@ -47,7 +40,7 @@ public class UserController : ControllerBase
 
         try
         {
-            var createdUser = await _userService.Create(dto);
+            var createdUser = await userService.Create(dto);
             return CreatedAtRoute("GetUserById", new { id = createdUser.Id }, createdUser); // 201: Opprettet
         }
         catch (Exception ex)
@@ -57,8 +50,8 @@ public class UserController : ControllerBase
     }
 
     // Oppdaterer bruker
-    [HttpPut("{id:int}")]
-    public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateDto dto)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto dto)
     {
         if (!ModelState.IsValid)
         {
@@ -67,7 +60,7 @@ public class UserController : ControllerBase
 
         try
         {
-            var updatedUser = await _userService.Update(id, dto);
+            var updatedUser = await userService.Update(id, dto);
             if (updatedUser == null)
             {
                 return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
@@ -82,10 +75,10 @@ public class UserController : ControllerBase
     }
 
     // Sletter bruker
-    [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteUser(int id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteUser(string id)
     {
-        var success = await _userService.Delete(id);
+        var success = await userService.Delete(id);
         if (!success)
         {
             return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet

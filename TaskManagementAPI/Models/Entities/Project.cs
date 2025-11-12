@@ -1,4 +1,6 @@
-﻿namespace TaskManagementAPI.Models.Entities;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace TaskManagementAPI.Models.Entities;
 
 public class Project
 {
@@ -6,9 +8,9 @@ public class Project
     public string Name { get; set; }
     public string Description { get; set; }
     public DateTime Created { get; set; } = DateTime.Now;
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     
-    public User User { get; set; }
+    public IdentityUser User { get; set; }
     public ICollection<TaskItem> Tasks { get; set; }
     public ICollection<ProjectVisibility> ProjectVisibility { get; set; }
     public ICollection<Notification> Notifications { get; set; }
