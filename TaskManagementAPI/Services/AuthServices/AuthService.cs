@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using TaskManagementAPI.Data;
 using TaskManagementAPI.Models.DTO;
 
 namespace TaskManagementAPI.Services.AuthServices;
@@ -10,9 +11,6 @@ namespace TaskManagementAPI.Services.AuthServices;
 public class AuthService(UserManager<IdentityUser> userManager, IConfiguration config)
     : IAuthService
 {
-    //private readonly UserManager<IdentityUser> _userManager = userManager;
-    //private readonly IConfiguration _config = config;
-    
     public async Task<bool> RegisterUser(LoginDto user)
     {
         var identityUser = new IdentityUser
