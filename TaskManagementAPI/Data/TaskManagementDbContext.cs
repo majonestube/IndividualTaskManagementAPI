@@ -70,6 +70,16 @@ public class TaskManagementDbContext(DbContextOptions<TaskManagementDbContext> o
         // Users
         builder.Entity<IdentityUser>().HasData(adminUser, martyUser, randomUser);
         
+        // Roles
+        builder.Entity<IdentityRole>().HasData(
+            new IdentityRole { Id = "role-admin", Name = "Admin", NormalizedName = "ADMIN" }
+        );
+
+        // Assign role to admin
+        builder.Entity<IdentityUserRole<string>>().HasData(
+            new IdentityUserRole<string> { RoleId = "role-admin", UserId = "user-admin" }
+        );
+        
         // Projects
         builder.Entity<Project>().HasData(
             // for user 3

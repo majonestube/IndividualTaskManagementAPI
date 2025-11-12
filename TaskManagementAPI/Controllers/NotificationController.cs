@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
 
@@ -8,6 +9,7 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class NotificationController(INotificationService notificationService) : ControllerBase
 {
+    [Authorize]
     [HttpGet("notifications/user/{userId}")]
     public async Task<IActionResult> GetNotificationsForUser(string userId)
     {
@@ -22,6 +24,7 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
+    [Authorize]
     [HttpPost("{userId}")]
     public async Task<IActionResult> AddNotification(string userId, [FromBody] NotificationCreateDto dto)
     {
@@ -36,6 +39,7 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
+    [Authorize]
     [HttpPut("{id:int}/read")]
     public async Task<IActionResult> MarkAsRead(int id)
     {
@@ -43,6 +47,7 @@ public class NotificationController(INotificationService notificationService) : 
         return success ? NoContent() : NotFound();
     }
 
+    [Authorize]
     [HttpPut("{id:int}/unread")]
     public async Task<IActionResult> MarkAsUnread(int id)
     {

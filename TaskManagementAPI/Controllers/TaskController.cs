@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
@@ -10,6 +11,7 @@ namespace TaskManagementAPI.Controllers;
 public class TasksController(ITaskService taskService) : ControllerBase
 {
     // Henter oppgaver for et gitt prosjekt
+    [Authorize]
     [HttpGet("project/{projectId:int}")]
     public async Task<IActionResult> GetForProject(int projectId)
     {
@@ -18,6 +20,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Henter enkelt oppgave etter id
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetTaskById")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -31,6 +34,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Oppretter en ny oppgave
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] TaskItemCreateDto task)
     {
@@ -51,6 +55,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Oppdaterer en eksisterende oppgave
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] TaskItemCreateDto task)
     {
@@ -76,6 +81,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Sletter en oppgave
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
@@ -89,6 +95,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Oppdaterer status på oppgaven
+    [Authorize]
     [HttpPut("{id:int}/status/{statusId:int}")]
     public async Task<IActionResult> UpdateStatus(int id, int statusId)
     {
@@ -109,6 +116,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
     
     // Get possible users for a task
+    [Authorize]
     [HttpGet("{taskId:int}/assign/possibleUsers")]
     public async Task<IActionResult> AssignPossibleUsers(int taskId)
     {
@@ -124,6 +132,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     }
 
     // Tildeler oppgaven til en bruker
+    [Authorize]
     [HttpPut("{id:int}/assign/{userId}")]
     public async Task<IActionResult> AssignUser(int id, string userId)
     {

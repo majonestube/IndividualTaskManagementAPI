@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
 
@@ -9,6 +10,7 @@ namespace TaskManagementAPI.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     // Henter alle brukere
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
@@ -17,6 +19,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     // Henter bruker etter id
+    [Authorize]
     [HttpGet("{id}", Name = "GetUserById")]
     public async Task<IActionResult> GetUser(string id)
     {
@@ -29,27 +32,8 @@ public class UserController(IUserService userService) : ControllerBase
         return Ok(user);
     }
 
-    // Oppretter ny bruker
-    [HttpPost]
-    public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
-    {
-        if (!ModelState.IsValid)
-        {
-            return BadRequest(ModelState); // 400: Ugyldig modell
-        }
-
-        try
-        {
-            var createdUser = await userService.Create(dto);
-            return CreatedAtRoute("GetUserById", new { id = createdUser.Id }, createdUser); // 201: Opprettet
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message); // 400: Valideringsfeil
-        }
-    }
-
     // Oppdaterer bruker
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(string id, [FromBody] UserUpdateDto dto)
     {
@@ -75,6 +59,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     // Sletter bruker
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {

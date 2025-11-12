@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
@@ -10,6 +11,7 @@ namespace TaskManagementAPI.Controllers;
 public class CommentsController(ICommentService commentService) : ControllerBase
 {
     // Henter kommentarer for en gitt oppgave
+    [Authorize]
     [HttpGet("task/{taskItemId:int}")]
     public async Task<IActionResult> GetForTask(int taskItemId)
     {
@@ -18,6 +20,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     }
 
     // Henter enkel kommentar etter id
+    [Authorize]
     [HttpGet("{id:int}", Name = "GetCommentById")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -31,6 +34,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     }
 
     // Oppretter en ny kommentar
+    [Authorize]
     [HttpPost("{taskId:int}/user/{userId}")]
     public async Task<IActionResult> Create(int taskId, string userId, [FromBody] CommentCreateDto comment)
     {
@@ -52,6 +56,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     }
 
     // Oppdaterer en kommentar
+    [Authorize]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] CommentCreateDto comment)
     {
@@ -77,6 +82,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     }
 
     // Sletter en kommentar
+    [Authorize]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
