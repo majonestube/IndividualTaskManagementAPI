@@ -9,7 +9,7 @@ public interface ICommentService
     // Hent kommentar etter id
     Task<CommentDto?> GetById(int id);
     // Opprett ny kommentar
-    Task Create(string userId, CommentCreateDto comment);
+    Task Create(string userId, int taskItemId, CommentCreateDto comment);
     // Oppdater kommentar
     Task<bool> Update(CommentDto comment, string userId);
     // Slett kommentar

@@ -47,31 +47,31 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         return comment == null ? null : CommentToDto(comment);
     }
 
-    public async Task Create(string userId, CommentCreateDto comment)
+    public async Task Create(string userId, int taskItemId, CommentCreateDto comment)
     {
         // Oppretter ny kommentar etter validering
-        if (!await CanAccessProject(comment.TaskItemId, userId))
+        if (!await CanAccessProject(taskItemId, userId))
         {
             throw new UnauthorizedAccessException("User cannot access this project");
         }
         
-        var taskExists = await _db.Tasks.AnyAsync(t => t.Id == comment.TaskItemId);
+        var taskExists = await _db.Tasks.AnyAsync(t => t.Id == taskItemId);
         if (!taskExists)
         {
-            throw new Exception("Ugyldig oppgave-id.");
+            throw new BadHttpRequestException("Ugyldig oppgave-id.");
         }
 
         var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
         {
-            throw new Exception("Ugyldig bruker-id.");
+            throw new UnauthorizedAccessException("Ugyldig bruker-id.");
         }
 
         var newComment = new Comment
         {
             Text = comment.Text,
             CreatedDate = DateTime.Now,
-            TaskItemId = comment.TaskItemId,
+            TaskItemId = taskItemId,
             UserId = userId
         };
 

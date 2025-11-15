@@ -12,21 +12,44 @@ public class ProjectController(IProjectService projectService) : ControllerBase
 {
     // Get all visible projects for the user
     [Authorize]
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetVisibleProjects(string userId)
+    [HttpGet]
+    public async Task<IActionResult> GetVisibleProjects()
     {
-        var result = await projectService.GetAllVisibleProjects(userId);
-        return Ok(result);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
+
+        try
+        {
+            var result = await projectService.GetAllVisibleProjects(userId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
-    
     
     // Henter prosjekter for en gitt bruker
     [Authorize]
-    [HttpGet("user/owner/{userId}")]
-    public async Task<IActionResult> GetForUser(string userId)
+    [HttpGet("/owner")]
+    public async Task<IActionResult> GetForUser()
     {
-        var result = await projectService.GetProjectsForUser(userId);
-        return Ok(result); // 200: OK
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
+
+        try
+        {
+            var result = await projectService.GetProjectsForUser(userId);
+            return Ok(result); // 200: OK
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
 
     // Henter enkelt prosjekt etter id

@@ -19,9 +19,17 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         {
             return Unauthorized();
         }
+
+        try
+        {
+            var result = await commentService.GetByTask(taskItemId, userId);
+            return Ok(result); // 200: OK
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
         
-        var result = await commentService.GetByTask(taskItemId, userId);
-        return Ok(result); // 200: OK
     }
 
     // Henter enkel kommentar etter id
@@ -56,7 +64,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         
         try
         {
-            await commentService.Create(userId, comment);
+            await commentService.Create(userId, taskId, comment);
             return Ok(comment);
         }
         catch (Exception ex)
@@ -107,13 +115,21 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         {
             return Unauthorized();
         }
-        
-        var deleted = await commentService.Delete(id, userId);
-        if (!deleted)
-        {
-            return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
-        }
 
-        return NoContent();
+        try
+        {
+            var deleted = await commentService.Delete(id, userId);
+            if (!deleted)
+            {
+                return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
 }

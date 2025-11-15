@@ -73,7 +73,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         var userExists = await db.Users.AnyAsync(u => u.Id == project.UserId);
         if (!userExists)
         {
-            throw new Exception("Ugyldig bruker-id.");
+            throw new UnauthorizedAccessException("Ugyldig bruker-id.");
         }
 
         var newProject = new Project

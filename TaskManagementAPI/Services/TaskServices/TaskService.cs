@@ -58,7 +58,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
     {
         var projectId = task.ProjectId;
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
-        if (!projectExists) throw new Exception("Ugyldig prosjekt-id.");
+        if (!projectExists) throw new BadHttpRequestException("Ugyldig prosjekt-id.");
         
         var canAccess = await CanAccessProject(projectId, userId);
         if (!canAccess)
@@ -99,7 +99,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         existing.DueDate = task.DueDate;
 
         var statusExists = await _db.Status.AnyAsync(s => s.Id == task.StatusId);
-        if (!statusExists) throw new Exception("Ugyldig status-id.");
+        if (!statusExists) throw new BadHttpRequestException("Ugyldig status-id.");
         existing.StatusId = task.StatusId;
 
         var user = await _userManager.FindByIdAsync(task.AssignedUserId);
@@ -107,7 +107,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         existing.AssignedUserId = task.AssignedUserId;
 
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == task.ProjectId);
-        if (!projectExists) throw new Exception("Ugyldig prosjekt-id.");
+        if (!projectExists) throw new BadHttpRequestException("Ugyldig prosjekt-id.");
         existing.ProjectId = task.ProjectId;
 
         await _db.SaveChangesAsync();

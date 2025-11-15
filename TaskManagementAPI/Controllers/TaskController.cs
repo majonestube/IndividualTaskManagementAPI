@@ -21,8 +21,16 @@ public class TasksController(ITaskService taskService) : ControllerBase
         {
             return Unauthorized();
         }
-        var result = await taskService.GetTasksForProject(projectId, userId);
-        return Ok(result); // 200: OK
+
+        try
+        {
+            var result = await taskService.GetTasksForProject(projectId, userId);
+            return Ok(result); // 200: OK
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     // Henter enkelt oppgave etter id
@@ -108,14 +116,22 @@ public class TasksController(ITaskService taskService) : ControllerBase
         {
             return Unauthorized();
         }
-        
-        var deleted = await taskService.Delete(id, userId);
-        if (!deleted)
-        {
-            return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
-        }
 
-        return NoContent();
+        try
+        {
+            var deleted = await taskService.Delete(id, userId);
+            if (!deleted)
+            {
+                return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
 
     // Oppdaterer status på oppgaven
