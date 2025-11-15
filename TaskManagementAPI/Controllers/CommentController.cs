@@ -12,9 +12,15 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     // Henter kommentarer for en gitt oppgave
     [Authorize]
     [HttpGet("task/{taskItemId:int}")]
-    public async Task<IActionResult> GetForTask(int taskItemId)
+    public async Task<IActionResult> GetByTask(int taskItemId)
     {
-        var result = await commentService.GetByTask(taskItemId);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var result = await commentService.GetByTask(taskItemId, userId);
         return Ok(result); // 200: OK
     }
 
@@ -34,18 +40,23 @@ public class CommentsController(ICommentService commentService) : ControllerBase
 
     // Oppretter en ny kommentar
     [Authorize]
-    [HttpPost("{taskId:int}/user/{userId}")]
-    public async Task<IActionResult> Create(int taskId, string userId, [FromBody] CommentCreateDto comment)
+    [HttpPost("{taskId:int}")]
+    public async Task<IActionResult> Create(int taskId, [FromBody] CommentCreateDto comment)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState); // 400: Ugyldig modell
         }
 
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
         try
         {
-            //TODO string userId = GetCurrentUserId();
-            await commentService.Create(userId, taskId, comment);
+            await commentService.Create(userId, comment);
             return Ok(comment);
         }
         catch (Exception ex)
@@ -57,16 +68,22 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     // Oppdaterer en kommentar
     [Authorize]
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] CommentCreateDto comment)
+    public async Task<IActionResult> Update(int id, [FromBody] CommentDto comment)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
+        
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
 
         try
         {
-            var updated = await commentService.Update(id, comment);
+            var updated = await commentService.Update(comment, userId);
             if (!updated)
             {
                 return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
@@ -85,7 +102,13 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await commentService.Delete(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var deleted = await commentService.Delete(id, userId);
         if (!deleted)
         {
             return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
