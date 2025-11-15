@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.ProjectServices;
 
 namespace TaskManagementAPI.Controllers;
 
@@ -11,21 +12,44 @@ public class ProjectController(IProjectService projectService) : ControllerBase
 {
     // Get all visible projects for the user
     [Authorize]
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetVisibleProjects(string userId)
+    [HttpGet]
+    public async Task<IActionResult> GetVisibleProjects()
     {
-        var result = await projectService.GetAllVisibleProjects(userId);
-        return Ok(result);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
+
+        try
+        {
+            var result = await projectService.GetAllVisibleProjects(userId);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
-    
     
     // Henter prosjekter for en gitt bruker
     [Authorize]
-    [HttpGet("user/owner/{userId}")]
-    public async Task<IActionResult> GetForUser(string userId)
+    [HttpGet("/owner")]
+    public async Task<IActionResult> GetForUser()
     {
-        var result = await projectService.GetProjectsForUser(userId);
-        return Ok(result); // 200: OK
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
+
+        try
+        {
+            var result = await projectService.GetProjectsForUser(userId);
+            return Ok(result); // 200: OK
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
 
     // Henter enkelt prosjekt etter id
@@ -72,10 +96,14 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         {
             return BadRequest(ModelState);
         }
+        
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
 
         try
         {
-            var updated = await projectService.Update(id, project);
+            var updated = await projectService.Update(id, project, userId);
             if (!updated)
             {
                 return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
@@ -94,7 +122,13 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await projectService.Delete(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var deleted = await projectService.Delete(id, userId);
         if (!deleted)
         {
             return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet

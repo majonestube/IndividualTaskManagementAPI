@@ -1,7 +1,6 @@
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.ProjectServices;
 
 public interface IProjectService
 {
@@ -14,9 +13,9 @@ public interface IProjectService
     // Opprett nytt prosjekt basert på entiteten
     Task<ProjectDto> Create(ProjectCreateDto project);
     // Oppdater eksisterende prosjekt basert på entiteten
-    Task<bool> Update(int id, ProjectCreateDto project);
+    Task<bool> Update(int id, ProjectCreateDto project, string userId);
     // Slett prosjekt
-    Task<bool> Delete(int id);
+    Task<bool> Delete(int id, string userId);
 }
 
 

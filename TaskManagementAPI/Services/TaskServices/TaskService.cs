@@ -4,15 +4,21 @@ using TaskManagementAPI.Data;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.TaskServices;
 
 public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> userManager) : ITaskService
 {
     private readonly TaskManagementDbContext _db = db;
     private readonly UserManager<IdentityUser> _userManager = userManager;
 
-    public async Task<List<TaskItemDto>> GetTasksForProject(int projectId)
+    public async Task<List<TaskItemDto>> GetTasksForProject(int projectId, string userId)
     {
+        var canAccess = await CanAccessProject(projectId, userId);
+        if (!canAccess)
+        {
+            throw new UnauthorizedAccessException("User cannot access this project");
+        }
+        
         var tasks = await _db.Tasks
             .AsNoTracking()
             .Include(t => t.Status)
@@ -21,11 +27,14 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
             .Where(t => t.ProjectId == projectId)
             .Select(t => new TaskItemDto
             {
+                Id  = t.Id,
                 Title = t.Title,
                 Description = t.Description,
                 Status = t.Status.Name,
                 DueDate = t.DueDate,
+                ProjectId = t.Project.Id,
                 ProjectName = t.Project.Name,
+                AssignedUserId = t.AssignedUser.Id,
                 AssignedUserName = t.AssignedUser.UserName
             })
             .ToListAsync();
@@ -45,13 +54,17 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return task == null ? null : TaskToDto(task);
     }
 
-    public async Task Create(TaskItemCreateDto task)
+    public async Task Create(TaskItemCreateDto task, string userId)
     {
-        var projectExists = await _db.Projects.AnyAsync(p => p.Id == task.ProjectId);
-        if (!projectExists) throw new Exception("Ugyldig prosjekt-id.");
-
-        var user = await _userManager.FindByIdAsync(task.AssignedUserId);
-        if (user == null) throw new Exception("Ugyldig bruker-id.");
+        var projectId = task.ProjectId;
+        var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
+        if (!projectExists) throw new BadHttpRequestException("Ugyldig prosjekt-id.");
+        
+        var canAccess = await CanAccessProject(projectId, userId);
+        if (!canAccess)
+        {
+            throw new UnauthorizedAccessException("User cannot access this project");
+        }
 
         var statusExists = await _db.Status.AnyAsync(s => s.Id == task.StatusId);
         if (!statusExists) throw new Exception("Ugyldig status-id.");
@@ -70,8 +83,14 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         await _db.SaveChangesAsync();
     }
 
-    public async Task<bool> Update(int id, TaskItemCreateDto task)
+    public async Task<bool> Update(int id, TaskItemCreateDto task, string userId)
     {
+        var isOwner = await IsTaskOwner(id, userId);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("User cannot access this task");
+        }
+        
         var existing = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         if (existing == null) return false;
 
@@ -80,7 +99,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         existing.DueDate = task.DueDate;
 
         var statusExists = await _db.Status.AnyAsync(s => s.Id == task.StatusId);
-        if (!statusExists) throw new Exception("Ugyldig status-id.");
+        if (!statusExists) throw new BadHttpRequestException("Ugyldig status-id.");
         existing.StatusId = task.StatusId;
 
         var user = await _userManager.FindByIdAsync(task.AssignedUserId);
@@ -88,15 +107,21 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         existing.AssignedUserId = task.AssignedUserId;
 
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == task.ProjectId);
-        if (!projectExists) throw new Exception("Ugyldig prosjekt-id.");
+        if (!projectExists) throw new BadHttpRequestException("Ugyldig prosjekt-id.");
         existing.ProjectId = task.ProjectId;
 
         await _db.SaveChangesAsync();
         return true;
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id, string userId)
     {
+        var isOwner = await IsTaskOwner(id, userId);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("User cannot access this task");
+        }
+        
         var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return false;
 
@@ -105,9 +130,15 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return true;
     }
 
-    public async Task<bool> UpdateStatus(int taskId, int statusId)
+    public async Task<bool> UpdateStatus(int id, int statusId, string userId)
     {
-        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+        var isOwner = await IsTaskOwner(id, userId);
+        if (!isOwner)
+        {
+            throw new UnauthorizedAccessException("User cannot access this task");
+        }
+        
+        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
         if (task == null) return false;
 
         var statusExists = await _db.Status.AnyAsync(s => s.Id == statusId);
@@ -145,7 +176,6 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
                 });
             }
         }
-
         return users;
     }
 
@@ -162,15 +192,38 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return true;
     }
 
+    public async Task<bool> IsTaskOwner(int taskId, string userId)
+    {
+        var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
+        if (task == null) return false;
+        return task.AssignedUserId == userId;
+    }
+
+    public async Task<bool> CanAccessProject(int taskId, string userId)
+    {
+        var projectId = await _db.Tasks
+            .Where(t => t.Id == taskId)
+            .Select(t => t.ProjectId)
+            .FirstOrDefaultAsync();
+        if (projectId == null) return false;
+        
+        return await _db.ProjectVisibility
+            .AsNoTracking()
+            .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == userId);
+    }
+
     private static TaskItemDto TaskToDto(TaskItem task)
     {
         return new TaskItemDto
         {
+            Id = task.Id,
             Title = task.Title,
-            Description = task.Description,
+            Description = task.Description ?? "",
             Status = task.Status?.Name ?? "Unknown status",
             DueDate = task.DueDate.Date,
+            ProjectId = task.ProjectId,
             ProjectName = task.Project?.Name ?? "Unknown project name",
+            AssignedUserId = task.AssignedUserId,
             AssignedUserName = task.AssignedUser?.UserName ?? "Unknown user"
         };
     }

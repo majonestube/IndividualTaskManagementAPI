@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using TaskManagementAPI.Models.DTO;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.UserServices;
 
 public class UserService(UserManager<IdentityUser> userManager) : IUserService
 {
