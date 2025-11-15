@@ -3,7 +3,7 @@ using TaskManagementAPI.Data;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.ProjectServices;
 
 public class ProjectService(TaskManagementDbContext db) : IProjectService
 {
@@ -89,7 +89,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return ProjectToDto(newProject);
     }
 
-    public async Task<bool> Update(int id, ProjectCreateDto project)
+    public async Task<bool> Update(int id, ProjectCreateDto project, string userId)
     {
         // Oppdaterer eksisterende prosjekt
         var existing = await db.Projects.FirstOrDefaultAsync(p => p.Id == id);
@@ -98,6 +98,10 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             return false;
         }
 
+        if (existing.UserId != userId)
+        {
+            throw new UnauthorizedAccessException();
+        }
         existing.Name = project.Name;
         existing.Description = project.Description;
         existing.UserId = project.UserId;
@@ -105,7 +109,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return true;
     }
 
-    public async Task<bool> Delete(int id)
+    public async Task<bool> Delete(int id, string userId)
     {
         // Sletter prosjekt hvis det finnes
         var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id);
@@ -114,6 +118,11 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             return false;
         }
 
+        if (project.UserId != userId)
+        {
+            throw new UnauthorizedAccessException();
+        }
+        
         db.Projects.Remove(project);
         await db.SaveChangesAsync();
         return true;

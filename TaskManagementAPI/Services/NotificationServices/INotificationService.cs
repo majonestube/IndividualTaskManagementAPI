@@ -1,6 +1,6 @@
 ﻿using TaskManagementAPI.Models.DTO;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.NotificationServices;
 
 public interface INotificationService
 {

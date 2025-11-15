@@ -7,6 +7,11 @@ using Microsoft.OpenApi.Models;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.AuthServices;
+using TaskManagementAPI.Services.CommentServices;
+using TaskManagementAPI.Services.NotificationServices;
+using TaskManagementAPI.Services.ProjectServices;
+using TaskManagementAPI.Services.TaskServices;
+using TaskManagementAPI.Services.UserServices;
 
 var builder = WebApplication.CreateBuilder(args);
 

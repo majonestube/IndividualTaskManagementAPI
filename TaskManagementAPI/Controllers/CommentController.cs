@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
-using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.CommentServices;
 
 namespace TaskManagementAPI.Controllers;
 

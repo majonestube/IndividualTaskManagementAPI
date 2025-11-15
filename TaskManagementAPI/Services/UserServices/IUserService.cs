@@ -1,7 +1,6 @@
 ﻿using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
 
-namespace TaskManagementAPI.Services;
+namespace TaskManagementAPI.Services.UserServices;
 
 public interface IUserService
 {
