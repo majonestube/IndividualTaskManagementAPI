@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementAPI", "TaskManagementAPI\TaskManagementAPI.csproj", "{7D7D8DBB-5820-4B3C-96BA-C2786ACFCFC9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementAPITests", "TaskManagementAPITests\TaskManagementAPITests.csproj", "{17FE9353-E274-40B4-BBA1-88A63DD20B8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementAPI.Tests", "TaskManagementAPI.Tests\TaskManagementAPI.Tests.csproj", "{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{7D7D8DBB-5820-4B3C-96BA-C2786ACFCFC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D7D8DBB-5820-4B3C-96BA-C2786ACFCFC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D7D8DBB-5820-4B3C-96BA-C2786ACFCFC9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17FE9353-E274-40B4-BBA1-88A63DD20B8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17FE9353-E274-40B4-BBA1-88A63DD20B8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17FE9353-E274-40B4-BBA1-88A63DD20B8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17FE9353-E274-40B4-BBA1-88A63DD20B8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
