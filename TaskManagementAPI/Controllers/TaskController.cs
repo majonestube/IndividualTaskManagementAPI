@@ -16,7 +16,12 @@ public class TasksController(ITaskService taskService) : ControllerBase
     [HttpGet("project/{projectId:int}")]
     public async Task<IActionResult> GetForProject(int projectId)
     {
-        var result = await taskService.GetTasksForProject(projectId);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        var result = await taskService.GetTasksForProject(projectId, userId);
         return Ok(result); // 200: OK
     }
 
@@ -44,9 +49,15 @@ public class TasksController(ITaskService taskService) : ControllerBase
             return BadRequest(ModelState); // 400: Ugyldig modell
         }
 
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
         try
         {
-            await taskService.Create(task);
+            await taskService.Create(task, userId);
             return Ok(task);
         }
         catch (Exception ex)
@@ -65,9 +76,15 @@ public class TasksController(ITaskService taskService) : ControllerBase
             return BadRequest(ModelState);
         }
 
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
         try
         {
-            var updated = await taskService.Update(id, task);
+            var updated = await taskService.Update(id, task, userId);
             if (!updated)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -86,7 +103,13 @@ public class TasksController(ITaskService taskService) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await taskService.Delete(id);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        var deleted = await taskService.Delete(id, userId);
         if (!deleted)
         {
             return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
@@ -100,9 +123,15 @@ public class TasksController(ITaskService taskService) : ControllerBase
     [HttpPut("{id:int}/status/{statusId:int}")]
     public async Task<IActionResult> UpdateStatus(int id, int statusId)
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
         try
         {
-            var ok = await taskService.UpdateStatus(id, statusId);
+            var ok = await taskService.UpdateStatus(id, statusId, userId);
             if (!ok)
             {
                 return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
