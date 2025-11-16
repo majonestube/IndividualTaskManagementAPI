@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.UserServices;
 
 namespace TaskManagementAPI.Controllers;
@@ -16,7 +15,7 @@ public class UserController(IUserService userService) : ControllerBase
     public async Task<IActionResult> GetUsers()
     {
         var users = await userService.GetUsers();
-        return Ok(users); // 200: OK
+        return Ok(users);
     }
 
     // Henter bruker etter id
@@ -27,7 +26,7 @@ public class UserController(IUserService userService) : ControllerBase
         var user = await userService.GetUserById(id);
         if (user == null)
         {
-            return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+            return NotFound($"Ingen bruker med id {id} funnet."); 
         }
 
         return Ok(user);
@@ -52,10 +51,10 @@ public class UserController(IUserService userService) : ControllerBase
             var updatedUser = await userService.Update(id, dto, userId);
             if (updatedUser == null)
             {
-                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen bruker med id {id} funnet.");
             }
 
-            return Ok(updatedUser); // 200: OK
+            return Ok(updatedUser);
         }
         catch (Exception ex)
         {
@@ -77,10 +76,10 @@ public class UserController(IUserService userService) : ControllerBase
             var success = await userService.Delete(id, userId);
             if (!success)
             {
-                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen bruker med id {id} funnet."); 
             }
 
-            return NoContent(); // 204: Ingen innhold 
+            return NoContent(); 
         } catch (Exception ex) 
         {
             return BadRequest(ex.Message);
@@ -88,6 +87,7 @@ public class UserController(IUserService userService) : ControllerBase
         
     }
     
+    // Slett bruker som admin
     [Authorize(Roles = "Admin")]
     [HttpDelete("admin/{id}")]
     public async Task<IActionResult> DeleteUserAsAdmin(string id)
@@ -97,10 +97,10 @@ public class UserController(IUserService userService) : ControllerBase
             var success = await userService.DeleteAsAdmin(id);
             if (!success)
             {
-                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen bruker med id {id} funnet."); 
             }
 
-            return NoContent(); // 204: Ingen innhold
+            return NoContent(); 
         }
         catch (Exception ex)
         {

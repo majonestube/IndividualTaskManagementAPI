@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.NotificationServices;
 
 namespace TaskManagementAPI.Controllers;
@@ -10,10 +9,17 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class NotificationController(INotificationService notificationService) : ControllerBase
 {
+    // Hent varsler for innlogget bruker
     [Authorize]
-    [HttpGet("notifications/user/{userId}")]
-    public async Task<IActionResult> GetNotificationsForUser(string userId)
+    [HttpGet("notifications/user/")]
+    public async Task<IActionResult> GetNotificationsForUser()
     {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
         try
         {
             var notifications = await notificationService.GetNotificationsForUser(userId);
@@ -25,6 +31,7 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
+    // Legger til varsler for alle med tilgang til prosjektet
     [HttpPost]
     public async Task<IActionResult> AddNotification([FromBody] NotificationCreateDto dto)
     {
@@ -32,6 +39,7 @@ public class NotificationController(INotificationService notificationService) : 
         return success ? NoContent() : BadRequest();
     }
     
+    // Merk varsel som lest
     [Authorize]
     [HttpPut("{id:int}/read")]
     public async Task<IActionResult> MarkAsRead(int id)
@@ -40,6 +48,7 @@ public class NotificationController(INotificationService notificationService) : 
         return success ? NoContent() : NotFound();
     }
 
+    // Merk varsel om ulest
     [Authorize]
     [HttpPut("{id:int}/unread")]
     public async Task<IActionResult> MarkAsUnread(int id)

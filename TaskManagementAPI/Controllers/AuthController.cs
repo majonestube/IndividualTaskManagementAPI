@@ -19,7 +19,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
             return Conflict(new
             {
                 IsSuccess = false,
-                Message = "User already exists. Please log in instead."
+                Message = "Bruker eksisterer allerede. Vennligst logg inn i stedet."
             });
         }
 
@@ -28,14 +28,14 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
             return Ok(new
             {
                 IsSuccess = true,
-                Message = "User registered successfully!"
+                Message = "Bruker registrert!"
             });
         }
         
         return BadRequest(new
         {
             IsSuccess = false,
-            Message = "Invalid username or password." 
+            Message = "Ugyldig brukernavn eller passord." 
         });
     }
 
@@ -48,7 +48,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
             return BadRequest(new
             {
                 IsSuccess = false,
-                Message = "User does not exist."
+                Message = "Bruker eksisterer ikke."
             });
         }
         
@@ -57,7 +57,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
             return BadRequest(new
             {
                 IsSuccess = false,
-                Message = "Invalid ModelState..."
+                Message = "Ugyldig ModelState..."
             });
         }
 
@@ -66,7 +66,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
             return BadRequest(new
             {
                 IsSuccess = false,
-                Message = "Invalid username or password."
+                Message = "Ugyldig brukernavn eller passord."
             });
         }
 
@@ -74,7 +74,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
         {
             IsSuccess = true,
             Token = authService.GenerateTokenString(identityUser),
-            Message = "User successfully logged in!"
+            Message = "Bruker logget inn!"
         });
     }
 }

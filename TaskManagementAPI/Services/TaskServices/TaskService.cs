@@ -16,7 +16,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var canAccess = await CanAccessProject(projectId, userId);
         if (!canAccess)
         {
-            throw new UnauthorizedAccessException("User cannot access this project");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
         }
         
         var tasks = await _db.Tasks
@@ -63,7 +63,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var canAccess = await CanAccessProject(projectId, userId);
         if (!canAccess)
         {
-            throw new UnauthorizedAccessException("User cannot access this project");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
         }
 
         var statusExists = await _db.Status.AnyAsync(s => s.Id == task.StatusId);
@@ -88,7 +88,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var isOwner = await IsTaskOwner(id, userId);
         if (!isOwner)
         {
-            throw new UnauthorizedAccessException("User cannot access this task");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til oppgaven");
         }
         
         var existing = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
@@ -119,7 +119,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var isOwner = await IsTaskOwner(id, userId);
         if (!isOwner)
         {
-            throw new UnauthorizedAccessException("User cannot access this task");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til oppgaven");
         }
         
         var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
@@ -135,7 +135,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var isOwner = await IsTaskOwner(id, userId);
         if (!isOwner)
         {
-            throw new UnauthorizedAccessException("User cannot access this task");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til oppgaven");
         }
         
         var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == id);
@@ -192,6 +192,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return true;
     }
 
+    // Sjekker om bruker eier oppgaven
     public async Task<bool> IsTaskOwner(int taskId, string userId)
     {
         var task = await _db.Tasks.FirstOrDefaultAsync(t => t.Id == taskId);
@@ -199,6 +200,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return task.AssignedUserId == userId;
     }
 
+    // Sjekker om bruker har tilgang til prosjektet
     public async Task<bool> CanAccessProject(int taskId, string userId)
     {
         var projectId = await _db.Tasks
