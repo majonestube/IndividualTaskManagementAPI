@@ -11,7 +11,7 @@ namespace TaskManagementAPI.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     // Henter alle brukere
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {

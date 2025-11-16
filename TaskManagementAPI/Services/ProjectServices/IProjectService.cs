@@ -4,6 +4,8 @@ namespace TaskManagementAPI.Services.ProjectServices;
 
 public interface IProjectService
 {
+    // Get all visible projects
+    Task<List<ProjectDto>> GetAllProjects();
     // Get visible projects
     Task<List<ProjectDto>> GetAllVisibleProjects(string userId);
     // Hent alle prosjekter synlige/tilhørende en bruker
@@ -16,6 +18,8 @@ public interface IProjectService
     Task<bool> Update(int id, ProjectCreateDto project, string userId);
     // Slett prosjekt
     Task<bool> Delete(int id, string userId);
+    // Share project with other users
+    Task<bool> ShareProject(int projectId, string ownerUserId, string sharedUserId);
 }
 
 

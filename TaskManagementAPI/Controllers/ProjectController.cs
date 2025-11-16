@@ -10,9 +10,29 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController(IProjectService projectService) : ControllerBase
 {
+    // Get all projects
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetAllProjects()
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
+
+        try
+        {
+            var result = await projectService.GetAllProjects();
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+    }
+    
     // Get all visible projects for the user
     [Authorize]
-    [HttpGet]
+    [HttpGet("/visible")]
     public async Task<IActionResult> GetVisibleProjects()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -28,7 +48,6 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         {
             return BadRequest(ex.Message);
         }
-        
     }
     
     // Henter prosjekter for en gitt bruker
@@ -135,5 +154,31 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         }
 
         return NoContent();
+    }
+
+    [Authorize]
+    [HttpPost("{projectId:int}/share")]
+    public async Task<IActionResult> ShareProject(int projectId, [FromBody] ProjectShareDto projectShare)
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+
+        try
+        {
+            var result = await projectService.ShareProject(projectId, userId!, projectShare.sharedUserId);
+            if (!result)
+            {
+                return NotFound("Prosjektet ikke funnet");
+            }
+
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 }

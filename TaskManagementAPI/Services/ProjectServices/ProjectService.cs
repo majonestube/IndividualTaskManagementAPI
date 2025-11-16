@@ -7,6 +7,24 @@ namespace TaskManagementAPI.Services.ProjectServices;
 
 public class ProjectService(TaskManagementDbContext db) : IProjectService
 {
+    public async Task<List<ProjectDto>> GetAllProjects()
+    {
+        var projects = await db.Projects
+            .AsNoTracking()
+            .Include(p => p.User)
+            .Include(p => p.Tasks)
+            .Select(p => new ProjectDto
+            {
+                Name = p.Name,
+                Description = p.Description,
+                Created = p.Created,
+                Username = p.User.UserName,
+                TaskCount = p.Tasks.Count()
+            })
+            .ToListAsync();
+
+        return projects;
+    }
     public async Task<List<ProjectDto>> GetAllVisibleProjects(string userId)
     {
         var visibleProjectIds = await db.ProjectVisibility
@@ -84,7 +102,6 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         };
 
         await db.Projects.AddAsync(newProject);
-        await db.SaveChangesAsync();
     
         // Opprett ProjectVisibility for eieren
         var projectVisibility = new ProjectVisibility
@@ -135,6 +152,42 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         
         db.Projects.Remove(project);
         await db.SaveChangesAsync();
+        return true;
+    }
+
+    public async Task<bool> ShareProject(int projectId, string ownerUserId, string sharedUserId)
+    {
+        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+        if (project == null)
+        {
+            return false;
+        }
+        
+        if (project.UserId != ownerUserId)
+            throw new UnauthorizedAccessException("Kun prosjekteier kan dele prosjektet.");
+        
+        var userExists = await db.Users.AnyAsync(u => u.Id == ownerUserId);
+        if (!userExists)
+        {
+            throw new UnauthorizedAccessException("Ugyldig bruker-id.");
+        }
+        
+        var alreadyVisible = await db.ProjectVisibility
+            .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == sharedUserId);
+        if (alreadyVisible)
+        {
+            return true;
+        }
+
+        var visibility = new ProjectVisibility
+        {
+            ProjectId = projectId,
+            UserId = sharedUserId
+        };
+        
+        await db.ProjectVisibility.AddAsync(visibility);
+        await db.SaveChangesAsync();
+        
         return true;
     }
 
