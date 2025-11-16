@@ -73,7 +73,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
         return Ok(new
         {
             IsSuccess = true,
-            Token = authService.GenerateTokenString(identityUser),
+            Token = await authService.GenerateTokenString(identityUser),
             Message = "User successfully logged in!"
         });
     }

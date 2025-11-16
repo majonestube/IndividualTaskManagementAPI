@@ -47,6 +47,47 @@ public class TasksControllerTests
     }
 
     [Fact]
+    public async Task GetForProject_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var projectId = 1;
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.GetForProject(projectId);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
+    public async Task GetForProject_ShouldReturnBadRequest_WhenExceptionThrown()
+    {
+        // Arrange
+        var projectId = 1;
+        var userId = "user1";
+
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.GetTasksForProject(projectId, userId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _controller.GetForProject(projectId);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult!.Value.Should().Be("Test exception");
+    }
+
+    [Fact]
     public async Task GetById_ShouldReturnOk_WhenTaskExists()
     {
         // Arrange
@@ -137,6 +178,27 @@ public class TasksControllerTests
     }
 
     [Fact]
+    public async Task Create_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Create(task);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
     public async Task Update_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
@@ -212,6 +274,28 @@ public class TasksControllerTests
     }
 
     [Fact]
+    public async Task Update_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var taskId = 1;
+        var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Update(taskId, task);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
     public async Task Delete_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
@@ -245,6 +329,47 @@ public class TasksControllerTests
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var taskId = 1;
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Delete(taskId);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnBadRequest_WhenExceptionThrown()
+    {
+        // Arrange
+        var taskId = 1;
+        var userId = "user1";
+
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Delete(taskId, userId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _controller.Delete(taskId);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult!.Value.Should().Be("Test exception");
     }
 
     [Fact]
@@ -304,6 +429,28 @@ public class TasksControllerTests
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.Value.Should().Be("Test exception");
+    }
+
+    [Fact]
+    public async Task UpdateStatus_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var taskId = 1;
+        var statusId = 2;
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.UpdateStatus(taskId, statusId);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
     }
 
     [Fact]

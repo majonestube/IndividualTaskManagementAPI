@@ -47,6 +47,47 @@ public class CommentsControllerTests
     }
 
     [Fact]
+    public async Task GetByTask_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var taskItemId = 1;
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.GetByTask(taskItemId);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
+    public async Task GetByTask_ShouldReturnBadRequest_WhenExceptionThrown()
+    {
+        // Arrange
+        var taskItemId = 1;
+        var userId = "user1";
+
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.GetByTask(taskItemId, userId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _controller.GetByTask(taskItemId);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult!.Value.Should().Be("Test exception");
+    }
+
+    [Fact]
     public async Task GetById_ShouldReturnOk_WhenCommentExists()
     {
         // Arrange
@@ -142,6 +183,28 @@ public class CommentsControllerTests
     }
 
     [Fact]
+    public async Task Create_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var taskId = 1;
+        var comment = new CommentCreateDto { Text = "New comment" };
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Create(taskId, comment);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
     public async Task Update_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
@@ -219,6 +282,28 @@ public class CommentsControllerTests
     }
 
     [Fact]
+    public async Task Update_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var commentId = 1;
+        var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Update(commentId, comment);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
     public async Task Delete_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
@@ -252,6 +337,47 @@ public class CommentsControllerTests
 
         // Assert
         result.Should().BeOfType<NotFoundObjectResult>();
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnUnauthorized_WhenUserIdIsNull()
+    {
+        // Arrange
+        var commentId = 1;
+        
+        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        {
+            HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
+            {
+                User = new System.Security.Claims.ClaimsPrincipal()
+            }
+        };
+
+        // Act
+        var result = await _controller.Delete(commentId);
+
+        // Assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
+
+    [Fact]
+    public async Task Delete_ShouldReturnBadRequest_WhenExceptionThrown()
+    {
+        // Arrange
+        var commentId = 1;
+        var userId = "user1";
+
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Delete(commentId, userId))
+            .ThrowsAsync(new Exception("Test exception"));
+
+        // Act
+        var result = await _controller.Delete(commentId);
+
+        // Assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+        var badRequestResult = result as BadRequestObjectResult;
+        badRequestResult!.Value.Should().Be("Test exception");
     }
 }
 
