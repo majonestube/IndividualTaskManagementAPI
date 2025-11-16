@@ -38,6 +38,15 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
             .Where(pv => pv.ProjectId == projectId)
             .Select(pv => pv.UserId)
             .ToListAsync();
+        
+        if (taskId.HasValue)
+        {
+            var taskExists = await db.Tasks
+                .AnyAsync(t => t.Id == taskId.Value && t.ProjectId == projectId);
+
+            if (!taskExists)
+                return false; 
+        }
 
         foreach (var userId in userIds)
         {
