@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementAPI.Data;
 using TaskManagementAPI.Models.DTO;
@@ -5,9 +6,10 @@ using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services.ProjectServices;
 
-public class ProjectService(TaskManagementDbContext db) : IProjectService
+public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser> userManager) : IProjectService
 {
     private readonly TaskManagementDbContext _db = db;
+    private readonly UserManager<IdentityUser> _userManager = userManager;
     public async Task<List<ProjectDto>> GetAllProjects()
     {
         var projects = await _db.Projects
@@ -103,6 +105,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         };
 
         await _db.Projects.AddAsync(newProject);
+        await _db.SaveChangesAsync();
     
         // Opprett ProjectVisibility for eieren
         var projectVisibility = new ProjectVisibility
@@ -110,16 +113,21 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             ProjectId = newProject.Id,
             UserId = project.UserId
         };
-
-        // Make visible for the admin user
-        var adminProjectVisibility = new ProjectVisibility
+        
+        var admins = await _userManager.GetUsersInRoleAsync("Admin");
+        
+        // Gjør synlig for admin brukere
+        foreach (var admin in admins)
         {
-            ProjectId = newProject.Id,
-            UserId = "user-admin"
-        };
+            await _db.ProjectVisibility.AddAsync(new ProjectVisibility
+            {
+                ProjectId = newProject.Id,
+                UserId = admin.Id
+            });
+        }
     
         await _db.ProjectVisibility.AddAsync(projectVisibility);
-        await _db.ProjectVisibility.AddAsync(adminProjectVisibility);
+        
         await _db.SaveChangesAsync();
     
         return ProjectToDto(newProject);
@@ -164,6 +172,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         return true;
     }
 
+    // Deler prosjekt med gitt bruker
     public async Task<bool> ShareProject(int projectId, string ownerUserId, string sharedUserId)
     {
         var project = await _db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);

@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Models.Entities;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.TaskServices;
 
 namespace TaskManagementAPI.Controllers;
@@ -25,7 +23,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         try
         {
             var result = await taskService.GetTasksForProject(projectId, userId);
-            return Ok(result); // 200: OK
+            return Ok(result); 
         }
         catch (Exception ex)
         {
@@ -33,7 +31,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         }
     }
 
-    // Henter enkelt oppgave etter id
+    // Henter enkel oppgave etter id
     [Authorize]
     [HttpGet("{id:int}", Name = "GetTaskById")]
     public async Task<IActionResult> GetById(int id)
@@ -41,7 +39,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         var task = await taskService.GetById(id);
         if (task == null)
         {
-            return NotFound(); // 404: Ikke funnet
+            return NotFound(); 
         }
 
         return Ok(task);
@@ -54,7 +52,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState); // 400: Ugyldig modell
+            return BadRequest(ModelState); 
         }
 
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -70,7 +68,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message); // 400: Valideringsfeil
+            return BadRequest(ex.Message); 
         }
     }
 
@@ -95,10 +93,10 @@ public class TasksController(ITaskService taskService) : ControllerBase
             var updated = await taskService.Update(id, task, userId);
             if (!updated)
             {
-                return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen oppgave med id {id} funnet."); 
             }
 
-            return NoContent(); // 204: Ingen innhold
+            return NoContent(); 
         }
         catch (Exception ex)
         {
@@ -122,7 +120,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
             var deleted = await taskService.Delete(id, userId);
             if (!deleted)
             {
-                return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen oppgave med id {id} funnet."); 
             }
 
             return NoContent();
@@ -150,7 +148,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
             var ok = await taskService.UpdateStatus(id, statusId, userId);
             if (!ok)
             {
-                return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen oppgave med id {id} funnet."); 
             }
 
             return NoContent();
@@ -161,7 +159,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         }
     }
     
-    // Get possible users for a task
+    // Hent mulige brukere for en oppgave
     [Authorize]
     [HttpGet("{taskId:int}/assign/possibleUsers")]
     public async Task<IActionResult> AssignPossibleUsers(int taskId)
@@ -187,7 +185,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
             var ok = await taskService.AssignUser(id, userId);
             if (!ok)
             {
-                return NotFound($"Ingen oppgave med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen oppgave med id {id} funnet."); 
             }
 
             return NoContent();

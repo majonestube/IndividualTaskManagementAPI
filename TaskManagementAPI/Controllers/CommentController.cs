@@ -23,7 +23,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         try
         {
             var result = await commentService.GetByTask(taskItemId, userId);
-            return Ok(result); // 200: OK
+            return Ok(result); 
         }
         catch (Exception ex)
         {
@@ -40,7 +40,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         var comment = await commentService.GetById(id);
         if (comment == null)
         {
-            return NotFound(); // 404: Ikke funnet
+            return NotFound(); 
         }
 
         return Ok(comment);
@@ -53,7 +53,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState); // 400: Ugyldig modell
+            return BadRequest(ModelState); 
         }
 
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -69,7 +69,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message); // 400: Valideringsfeil
+            return BadRequest(ex.Message); 
         }
     }
 
@@ -94,10 +94,10 @@ public class CommentsController(ICommentService commentService) : ControllerBase
             var updated = await commentService.Update(comment, userId);
             if (!updated)
             {
-                return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen kommentar med id {id} funnet."); 
             }
 
-            return NoContent(); // 204: Ingen innhold
+            return NoContent(); 
         }
         catch (Exception ex)
         {
@@ -121,7 +121,7 @@ public class CommentsController(ICommentService commentService) : ControllerBase
             var deleted = await commentService.Delete(id, userId);
             if (!deleted)
             {
-                return NotFound($"Ingen kommentar med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen kommentar med id {id} funnet."); 
             }
 
             return NoContent();

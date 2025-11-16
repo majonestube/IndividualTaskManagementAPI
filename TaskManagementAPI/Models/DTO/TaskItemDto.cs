@@ -1,6 +1,4 @@
-﻿using TaskManagementAPI.Models.Entities;
-
-namespace TaskManagementAPI.Models.DTO;
+﻿namespace TaskManagementAPI.Models.DTO;
 
 public class TaskItemDto
 {

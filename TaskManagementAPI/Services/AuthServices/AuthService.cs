@@ -11,6 +11,8 @@ namespace TaskManagementAPI.Services.AuthServices;
 public class AuthService(UserManager<IdentityUser> userManager, IConfiguration config)
     : IAuthService
 {
+    private readonly UserManager<IdentityUser> _userManager = userManager;
+    private readonly IConfiguration _config = config;
     public async Task<bool> RegisterUser(LoginDto user)
     {
         var identityUser = new IdentityUser
@@ -19,18 +21,18 @@ public class AuthService(UserManager<IdentityUser> userManager, IConfiguration c
             Email = user.Username
         };
         
-        var result = await userManager.CreateAsync(identityUser, user.Password);
+        var result = await _userManager.CreateAsync(identityUser, user.Password);
         return result.Succeeded;
     }
     
     public async Task<bool> LoginUser(LoginDto user)
     {
-        var identityUser = await userManager.FindByNameAsync(user.Username);
+        var identityUser = await _userManager.FindByNameAsync(user.Username);
         if (identityUser is null)
         {
             return false;
         }
-        return await userManager.CheckPasswordAsync(identityUser, user.Password);
+        return await _userManager.CheckPasswordAsync(identityUser, user.Password);
     }
     
     public async Task<string> GenerateTokenString(IdentityUser user)
@@ -42,24 +44,23 @@ public class AuthService(UserManager<IdentityUser> userManager, IConfiguration c
             new Claim(ClaimTypes.NameIdentifier, user.Id)
         };
         
-        // get roles
-        var roles = await userManager.GetRolesAsync(user);
+        // hent roller
+        var roles = await _userManager.GetRolesAsync(user);
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var jwtKey = config.GetSection("Jwt:Key").Value;
+        var jwtKey = _config.GetSection("Jwt:Key").Value;
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512Signature);
 
         var securityToken = new JwtSecurityToken(
             claims: claims,
             expires: DateTime.Now.AddHours(2),
-            issuer: config.GetSection("Jwt:Issuer").Value,
-            audience: config.GetSection("Jwt:Audience").Value,
+            issuer: _config.GetSection("Jwt:Issuer").Value,
+            audience: _config.GetSection("Jwt:Audience").Value,
             signingCredentials: signingCredentials
         );
         
         var tokenString = new JwtSecurityTokenHandler().WriteToken(securityToken);
-        Console.Write("Bearer " + tokenString); // Just to print to terminal during testing/developing
         return tokenString;
     }
 }

@@ -12,7 +12,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
     {
         if (!await CanAccessProject(taskItemId, userId))
         {
-            throw new UnauthorizedAccessException("User cannot access this project");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
         }
         
         // Henter kommentarer for en oppgave og mapper til DTO
@@ -52,7 +52,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         // Oppretter ny kommentar etter validering
         if (!await CanAccessProject(taskItemId, userId))
         {
-            throw new UnauthorizedAccessException("User cannot access this project");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
         }
         
         var taskExists = await _db.Tasks.AnyAsync(t => t.Id == taskItemId);
@@ -84,7 +84,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         // Oppdaterer eksisterende kommentar
         if (!await IsCommentOwner(comment.Id, userId))
         {
-            throw new UnauthorizedAccessException("User cannot access this comment");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til denne kommentaren");
         }
         
         var existing = await _db.Comments.FirstOrDefaultAsync(c => c.Id == comment.Id);
@@ -103,7 +103,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         // Sletter kommentar hvis den finnes
         if (!await IsCommentOwner(id, userId))
         {
-            throw new UnauthorizedAccessException("User cannot access this comment");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang til denne kommentaren");
         }
         
         var comment = await _db.Comments.FirstOrDefaultAsync(c => c.Id == id);
@@ -117,6 +117,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         return true;
     }
     
+    // Sjekker om bruker eier kommentaren
     public async Task<bool> IsCommentOwner(int commentId, string userId)
     {
         var comment = await _db.Comments
@@ -126,6 +127,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         return comment != null && comment.UserId == userId;
     }
     
+    // Sjekker om bruker har tilgang til prosjektet
     private async Task<bool> CanAccessProject(int taskId, string userId)
     {
         var projectId = await _db.Tasks

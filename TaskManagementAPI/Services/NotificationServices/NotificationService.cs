@@ -8,6 +8,8 @@ namespace TaskManagementAPI.Services.NotificationServices;
 public class NotificationService(TaskManagementDbContext db) : INotificationService
 {
     private readonly TaskManagementDbContext _db = db;
+    
+    // Henter alle varslene til en bruker
     public async Task<List<NotificationDto>> GetNotificationsForUser(string userId)
     {
         var notifications = await _db.Notifications
@@ -28,7 +30,7 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
         return notifications;
     }
     
-    
+    // Legger til varsler til alle med tilgang til prosjektet
     public async Task<bool> AddNotification(int projectId, int? taskId, string message)
     {
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
@@ -68,6 +70,7 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
         return true;
     }
 
+    // Markerer varsel som lest
     public async Task<bool> MarkAsRead(int notificationId)
     {
         var notification = await _db.Notifications.FindAsync(notificationId);
@@ -78,6 +81,7 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
         return true;
     }
 
+    // Markerer varsel som ulest 
     public async Task<bool> MarkAsUnread(int notificationId)
     {
         var notification = await _db.Notifications.FindAsync(notificationId);

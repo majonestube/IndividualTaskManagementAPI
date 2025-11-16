@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.ProjectServices;
 
 namespace TaskManagementAPI.Controllers;
@@ -10,7 +9,7 @@ namespace TaskManagementAPI.Controllers;
 [Route("api/[controller]")]
 public class ProjectController(IProjectService projectService) : ControllerBase
 {
-    // Get all projects
+    // Hent alle prosjekter
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetAllProjects()
@@ -30,7 +29,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         }
     }
     
-    // Get all visible projects for the user
+    // Hent alle tilgjengelig prosjekter for innlogget bruker
     [Authorize]
     [HttpGet("/visible")]
     public async Task<IActionResult> GetVisibleProjects()
@@ -50,7 +49,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         }
     }
     
-    // Henter prosjekter for en gitt bruker
+    // Henter prosjekter innlogget bruker eier
     [Authorize]
     [HttpGet("/owner")]
     public async Task<IActionResult> GetForUser()
@@ -79,7 +78,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         var project = await projectService.GetById(id);
         if (project == null)
         {
-            return NotFound(); // 404: Ikke funnet
+            return NotFound(); 
         }
 
         return Ok(project);
@@ -92,17 +91,17 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest(ModelState); // 400: Ugyldig modell
+            return BadRequest(ModelState); 
         }
 
         try
         {
             await projectService.Create(project);
-            return Ok(project); // Ok
+            return Ok(project); 
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message); // 400: Valideringsfeil
+            return BadRequest(ex.Message); 
         }
     }
 
@@ -125,10 +124,10 @@ public class ProjectController(IProjectService projectService) : ControllerBase
             var updated = await projectService.Update(id, project, userId);
             if (!updated)
             {
-                return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
+                return NotFound($"Ingen prosjekt med id {id} funnet.");
             }
 
-            return NoContent(); // 204: Ingen innhold
+            return NoContent(); 
         }
         catch (Exception ex)
         {
@@ -150,12 +149,13 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         var deleted = await projectService.Delete(id, userId);
         if (!deleted)
         {
-            return NotFound($"Ingen prosjekt med id {id} funnet."); // 404: Ikke funnet
+            return NotFound($"Ingen prosjekt med id {id} funnet."); 
         }
 
         return NoContent();
     }
 
+    // Del prosjekt med ny bruker
     [Authorize]
     [HttpPost("{projectId:int}/share")]
     public async Task<IActionResult> ShareProject(int projectId, [FromBody] ProjectShareDto projectShare)
