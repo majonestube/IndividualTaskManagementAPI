@@ -69,7 +69,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
 
     public async Task<ProjectDto> Create(ProjectCreateDto project)
     {
-        // Oppretter nytt prosjekt etter enkel validering
+        // Oppretter nytt prosjekt
         var userExists = await db.Users.AnyAsync(u => u.Id == project.UserId);
         if (!userExists)
         {
@@ -85,7 +85,17 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
 
         await db.Projects.AddAsync(newProject);
         await db.SaveChangesAsync();
-        
+    
+        // Opprett ProjectVisibility for eieren
+        var projectVisibility = new ProjectVisibility
+        {
+            ProjectId = newProject.Id,
+            UserId = project.UserId
+        };
+    
+        await db.ProjectVisibility.AddAsync(projectVisibility);
+        await db.SaveChangesAsync();
+    
         return ProjectToDto(newProject);
     }
 
