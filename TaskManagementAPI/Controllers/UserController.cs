@@ -42,10 +42,14 @@ public class UserController(IUserService userService) : ControllerBase
         {
             return BadRequest(ModelState);
         }
+        
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
 
         try
         {
-            var updatedUser = await userService.Update(id, dto);
+            var updatedUser = await userService.Update(id, dto, userId);
             if (updatedUser == null)
             {
                 return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
@@ -64,12 +68,44 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(string id)
     {
-        var success = await userService.Delete(id);
-        if (!success)
-        {
-            return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
-        }
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
 
-        return NoContent(); // 204: Ingen innhold
+        try
+        {
+            var success = await userService.Delete(id, userId);
+            if (!success)
+            {
+                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+            }
+
+            return NoContent(); // 204: Ingen innhold 
+        } catch (Exception ex) 
+        {
+            return BadRequest(ex.Message);
+        }
+        
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("admin/{id}")]
+    public async Task<IActionResult> DeleteUserAsAdmin(string id)
+    {
+        try
+        {
+            var success = await userService.DeleteAsAdmin(id);
+            if (!success)
+            {
+                return NotFound($"Ingen bruker med id {id} funnet."); // 404: Ikke funnet
+            }
+
+            return NoContent(); // 204: Ingen innhold
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
     }
 }

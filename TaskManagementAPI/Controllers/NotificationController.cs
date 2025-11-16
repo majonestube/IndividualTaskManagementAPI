@@ -25,19 +25,11 @@ public class NotificationController(INotificationService notificationService) : 
         }
     }
     
-    [Authorize]
-    [HttpPost("{userId}")]
-    public async Task<IActionResult> AddNotification(string userId, [FromBody] NotificationCreateDto dto)
+    [HttpPost]
+    public async Task<IActionResult> AddNotification([FromBody] NotificationCreateDto dto)
     {
-        try
-        {
-            var notification = await notificationService.AddNotification(dto.ProjectId, dto.TaskItemId, userId, dto.Message);
-            return Ok(notification);
-        }
-        catch (Exception e)
-        {
-            return BadRequest(e.Message);
-        }
+        var success = await notificationService.AddNotification(dto.ProjectId, dto.TaskItemId, dto.Message);
+        return success ? NoContent() : BadRequest();
     }
     
     [Authorize]

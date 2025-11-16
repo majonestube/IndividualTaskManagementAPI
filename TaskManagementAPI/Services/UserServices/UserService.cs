@@ -25,38 +25,15 @@ public class UserService(UserManager<IdentityUser> userManager) : IUserService
         return user == null ? null : UserToDto(user);
     }
 
-    public async Task<UserDto> Create(UserCreateDto dto)
+    public async Task<UserDto?> Update(string id, UserUpdateDto dto, string userId)
     {
-        var existingUser = await userManager.FindByNameAsync(dto.Username);
-        if (existingUser != null)
+        if (userId != id)
         {
-            throw new Exception("Brukernavn finnes allerede.");
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang");
         }
-
-        var user = new IdentityUser
-        {
-            UserName = dto.Username,
-            Email = dto.Email
-        };
-
-        var result = await userManager.CreateAsync(user, dto.Password);
-        if (!result.Succeeded)
-        {
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            throw new Exception($"Kunne ikke opprette bruker: {errors}");
-        }
-
-        return UserToDto(user);
-    }
-
-    public async Task<UserDto?> Update(string id, UserUpdateDto dto)
-    {
+        
         var user = await userManager.FindByIdAsync(id);
-        if (user == null)
-        {
-            return null;
-        }
-
+        
         user.UserName = dto.Username;
         user.Email = dto.Email;
 
@@ -82,7 +59,24 @@ public class UserService(UserManager<IdentityUser> userManager) : IUserService
         return UserToDto(user);
     }
 
-    public async Task<bool> Delete(string id)
+    public async Task<bool> Delete(string id, string userId)
+    {
+        if (userId != id)
+        {
+            throw new UnauthorizedAccessException("Bruker har ikke tilgang");
+        }
+        
+        var user = await userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return false;
+        }
+
+        var result = await userManager.DeleteAsync(user);
+        return result.Succeeded;
+    }
+    
+    public async Task<bool> DeleteAsAdmin(string id)
     {
         var user = await userManager.FindByIdAsync(id);
         if (user == null)

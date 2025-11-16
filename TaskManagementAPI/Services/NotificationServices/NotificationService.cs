@@ -28,35 +28,34 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
     }
     
     
-    public async Task<NotificationDto> AddNotification(int projectId, int? taskId, string userId, string message)
+    public async Task<bool> AddNotification(int projectId, int? taskId, string message)
     {
         var projectExists = await db.Projects.AnyAsync(p => p.Id == projectId);
-        if (!projectExists) throw new Exception("Invalid project ID");
+        if (!projectExists) return false;
 
-        var userExists = await db.Users.AnyAsync(u => u.Id == userId);
-        if (!userExists) throw new Exception("Invalid user ID");
+        var userIds = await db.ProjectVisibility
+            .AsNoTracking()
+            .Where(pv => pv.ProjectId == projectId)
+            .Select(pv => pv.UserId)
+            .ToListAsync();
 
-        var newNotification = new Notification
+        foreach (var userId in userIds)
         {
-            ProjectId = projectId,
-            TaskItemId = taskId,
-            UserId = userId,
-            Message = message,
-            Created = DateTime.UtcNow,
-            IsRead = false
-        };
-
-        await db.Notifications.AddAsync(newNotification);
+            var newNotification = new Notification
+            {
+                ProjectId = projectId,
+                TaskItemId = taskId,
+                UserId = userId,
+                Message = message,
+                Created = DateTime.UtcNow,
+                IsRead = false
+            };
+            await db.Notifications.AddAsync(newNotification);
+        }
+        
         await db.SaveChangesAsync();
 
-        return new NotificationDto
-        {
-            ProjectName = (await db.Projects.FindAsync(projectId))?.Name ?? "Unknown",
-            TaskName = taskId.HasValue ? (await db.Tasks.FindAsync(taskId.Value))?.Title ?? "" : "",
-            Message = message,
-            Created = newNotification.Created,
-            IsRead = false
-        };
+        return true;
     }
 
     public async Task<bool> MarkAsRead(int notificationId)

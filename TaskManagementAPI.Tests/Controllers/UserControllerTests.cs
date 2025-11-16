@@ -101,7 +101,7 @@ public class UserControllerTests
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
         var updatedUser = new UserDto { Id = userId, Username = "user1", Email = "updated@test.com" };
 
-        _userServiceMock.Setup(x => x.Update(userId, updateDto))
+        _userServiceMock.Setup(x => x.Update(userId, updateDto, userId))
             .ReturnsAsync(updatedUser);
 
         // Act
@@ -120,7 +120,7 @@ public class UserControllerTests
         var userId = "nonexistent";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
 
-        _userServiceMock.Setup(x => x.Update(userId, updateDto))
+        _userServiceMock.Setup(x => x.Update(userId, updateDto, userId))
             .ReturnsAsync((UserDto?)null);
 
         // Act
@@ -137,7 +137,7 @@ public class UserControllerTests
         var userId = "user1";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
 
-        _userServiceMock.Setup(x => x.Update(userId, updateDto))
+        _userServiceMock.Setup(x => x.Update(userId, updateDto,userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
@@ -155,7 +155,7 @@ public class UserControllerTests
         // Arrange
         var userId = "user1";
 
-        _userServiceMock.Setup(x => x.Delete(userId))
+        _userServiceMock.Setup(x => x.Delete(userId, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -171,7 +171,7 @@ public class UserControllerTests
         // Arrange
         var userId = "nonexistent";
 
-        _userServiceMock.Setup(x => x.Delete(userId))
+        _userServiceMock.Setup(x => x.Delete(userId, userId))
             .ReturnsAsync(false);
 
         // Act

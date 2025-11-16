@@ -109,8 +109,16 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             ProjectId = newProject.Id,
             UserId = project.UserId
         };
+
+        // Make visible for the admin user
+        var adminProjectVisibility = new ProjectVisibility
+        {
+            ProjectId = newProject.Id,
+            UserId = "user-admin"
+        };
     
         await db.ProjectVisibility.AddAsync(projectVisibility);
+        await db.ProjectVisibility.AddAsync(adminProjectVisibility);
         await db.SaveChangesAsync();
     
         return ProjectToDto(newProject);

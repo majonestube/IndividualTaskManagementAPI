@@ -8,10 +8,10 @@ public interface IUserService
     Task<List<UserDto>> GetUsers();
     // Hent bruker etter id
     Task<UserDto?> GetUserById(string id);
-    // Opprett ny bruker
-    Task<UserDto> Create(UserCreateDto dto);
     // Oppdater eksisterende bruker
-    Task<UserDto?> Update(string id, UserUpdateDto dto);
+    Task<UserDto?> Update(string id, UserUpdateDto dto, string userId);
     // Slett bruker
-    Task<bool> Delete(string id);
+    Task<bool> Delete(string id, string userId);
+    // Delete as admin
+    Task<bool> DeleteAsAdmin(string id);
 }
