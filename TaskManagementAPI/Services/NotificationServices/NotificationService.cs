@@ -7,9 +7,10 @@ namespace TaskManagementAPI.Services.NotificationServices;
 
 public class NotificationService(TaskManagementDbContext db) : INotificationService
 {
+    private readonly TaskManagementDbContext _db = db;
     public async Task<List<NotificationDto>> GetNotificationsForUser(string userId)
     {
-        var notifications = await db.Notifications
+        var notifications = await _db.Notifications
             .AsNoTracking()
             .Include(n => n.Project)
             .Where(n => n.UserId == userId)
@@ -30,10 +31,10 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
     
     public async Task<bool> AddNotification(int projectId, int? taskId, string message)
     {
-        var projectExists = await db.Projects.AnyAsync(p => p.Id == projectId);
+        var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
         if (!projectExists) return false;
 
-        var userIds = await db.ProjectVisibility
+        var userIds = await _db.ProjectVisibility
             .AsNoTracking()
             .Where(pv => pv.ProjectId == projectId)
             .Select(pv => pv.UserId)
@@ -41,7 +42,7 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
         
         if (taskId.HasValue)
         {
-            var taskExists = await db.Tasks
+            var taskExists = await _db.Tasks
                 .AnyAsync(t => t.Id == taskId.Value && t.ProjectId == projectId);
 
             if (!taskExists)
@@ -59,31 +60,31 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
                 Created = DateTime.UtcNow,
                 IsRead = false
             };
-            await db.Notifications.AddAsync(newNotification);
+            await _db.Notifications.AddAsync(newNotification);
         }
         
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
 
         return true;
     }
 
     public async Task<bool> MarkAsRead(int notificationId)
     {
-        var notification = await db.Notifications.FindAsync(notificationId);
+        var notification = await _db.Notifications.FindAsync(notificationId);
         if (notification == null) return false;
 
         notification.IsRead = true;
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> MarkAsUnread(int notificationId)
     {
-        var notification = await db.Notifications.FindAsync(notificationId);
+        var notification = await _db.Notifications.FindAsync(notificationId);
         if (notification == null) return false;
 
         notification.IsRead = false;
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         return true;
     }
 }

@@ -7,9 +7,10 @@ namespace TaskManagementAPI.Services.ProjectServices;
 
 public class ProjectService(TaskManagementDbContext db) : IProjectService
 {
+    private readonly TaskManagementDbContext _db = db;
     public async Task<List<ProjectDto>> GetAllProjects()
     {
-        var projects = await db.Projects
+        var projects = await _db.Projects
             .AsNoTracking()
             .Include(p => p.User)
             .Include(p => p.Tasks)
@@ -27,13 +28,13 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
     }
     public async Task<List<ProjectDto>> GetAllVisibleProjects(string userId)
     {
-        var visibleProjectIds = await db.ProjectVisibility
+        var visibleProjectIds = await _db.ProjectVisibility
             .AsNoTracking()
             .Where(pv => pv.UserId == userId)
             .Select(pv => pv.ProjectId)
             .ToListAsync();
         
-        var projects = await db.Projects
+        var projects = await _db.Projects
             .AsNoTracking()
             .Include(p => p.User)
             .Include(p => p.Tasks)
@@ -55,7 +56,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
     public async Task<List<ProjectDto>> GetProjectsForUser(string userId)
     {
         // Henter prosjekter for en bruker og mapper til DTO
-        var projects = await db.Projects
+        var projects = await _db.Projects
             .AsNoTracking()
             .Include(p => p.User)
             .Include(p => p.Tasks)
@@ -76,7 +77,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
     public async Task<ProjectDto?> GetById(int id)
     {
         // Henter prosjekt etter id
-        var project = await db.Projects
+        var project = await _db.Projects
             .AsNoTracking()
             .Include(p => p.User)
             .Include(p => p.Tasks)
@@ -88,7 +89,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
     public async Task<ProjectDto> Create(ProjectCreateDto project)
     {
         // Oppretter nytt prosjekt
-        var userExists = await db.Users.AnyAsync(u => u.Id == project.UserId);
+        var userExists = await _db.Users.AnyAsync(u => u.Id == project.UserId);
         if (!userExists)
         {
             throw new UnauthorizedAccessException("Ugyldig bruker-id.");
@@ -101,7 +102,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             UserId = project.UserId,
         };
 
-        await db.Projects.AddAsync(newProject);
+        await _db.Projects.AddAsync(newProject);
     
         // Opprett ProjectVisibility for eieren
         var projectVisibility = new ProjectVisibility
@@ -117,9 +118,9 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             UserId = "user-admin"
         };
     
-        await db.ProjectVisibility.AddAsync(projectVisibility);
-        await db.ProjectVisibility.AddAsync(adminProjectVisibility);
-        await db.SaveChangesAsync();
+        await _db.ProjectVisibility.AddAsync(projectVisibility);
+        await _db.ProjectVisibility.AddAsync(adminProjectVisibility);
+        await _db.SaveChangesAsync();
     
         return ProjectToDto(newProject);
     }
@@ -127,7 +128,7 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
     public async Task<bool> Update(int id, ProjectCreateDto project, string userId)
     {
         // Oppdaterer eksisterende prosjekt
-        var existing = await db.Projects.FirstOrDefaultAsync(p => p.Id == id);
+        var existing = await _db.Projects.FirstOrDefaultAsync(p => p.Id == id);
         if (existing == null)
         {
             return false;
@@ -140,14 +141,14 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         existing.Name = project.Name;
         existing.Description = project.Description;
         existing.UserId = project.UserId;
-        await db.SaveChangesAsync();
+        await _db.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> Delete(int id, string userId)
     {
         // Sletter prosjekt hvis det finnes
-        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == id);
+        var project = await _db.Projects.FirstOrDefaultAsync(p => p.Id == id);
         if (project == null)
         {
             return false;
@@ -158,14 +159,14 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             throw new UnauthorizedAccessException();
         }
         
-        db.Projects.Remove(project);
-        await db.SaveChangesAsync();
+        _db.Projects.Remove(project);
+        await _db.SaveChangesAsync();
         return true;
     }
 
     public async Task<bool> ShareProject(int projectId, string ownerUserId, string sharedUserId)
     {
-        var project = await db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
+        var project = await _db.Projects.FirstOrDefaultAsync(p => p.Id == projectId);
         if (project == null)
         {
             return false;
@@ -174,13 +175,13 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
         if (project.UserId != ownerUserId)
             throw new UnauthorizedAccessException("Kun prosjekteier kan dele prosjektet.");
         
-        var userExists = await db.Users.AnyAsync(u => u.Id == ownerUserId);
+        var userExists = await _db.Users.AnyAsync(u => u.Id == ownerUserId);
         if (!userExists)
         {
             throw new UnauthorizedAccessException("Ugyldig bruker-id.");
         }
         
-        var alreadyVisible = await db.ProjectVisibility
+        var alreadyVisible = await _db.ProjectVisibility
             .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == sharedUserId);
         if (alreadyVisible)
         {
@@ -193,8 +194,8 @@ public class ProjectService(TaskManagementDbContext db) : IProjectService
             UserId = sharedUserId
         };
         
-        await db.ProjectVisibility.AddAsync(visibility);
-        await db.SaveChangesAsync();
+        await _db.ProjectVisibility.AddAsync(visibility);
+        await _db.SaveChangesAsync();
         
         return true;
     }
