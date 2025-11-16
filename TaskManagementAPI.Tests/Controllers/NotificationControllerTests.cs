@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.NotificationServices;
 using Xunit;
 
 namespace TaskManagementAPI.Tests.Controllers;

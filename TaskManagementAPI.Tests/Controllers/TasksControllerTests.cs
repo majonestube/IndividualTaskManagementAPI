@@ -4,6 +4,8 @@ using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.TaskServices;
+using TaskManagementAPI.Tests.Helpers;
 using Xunit;
 
 namespace TaskManagementAPI.Tests.Controllers;
@@ -24,13 +26,15 @@ public class TasksControllerTests
     {
         // Arrange
         var projectId = 1;
+        var userId = "user1";
         var tasks = new List<TaskItemDto>
         {
             new TaskItemDto { Title = "Task 1", Description = "Description 1", Status = "ToDo" },
             new TaskItemDto { Title = "Task 2", Description = "Description 2", Status = "InProgress" }
         };
 
-        _taskServiceMock.Setup(x => x.GetTasksForProject(projectId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.GetTasksForProject(projectId, userId))
             .ReturnsAsync(tasks);
 
         // Act
@@ -96,9 +100,11 @@ public class TasksControllerTests
     public async Task Create_ShouldReturnOk_WhenTaskCreated()
     {
         // Arrange
+        var userId = "user1";
         var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
 
-        _taskServiceMock.Setup(x => x.Create(task))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Create(task, userId))
             .Returns(Task.CompletedTask);
 
         // Act
@@ -114,9 +120,11 @@ public class TasksControllerTests
     public async Task Create_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
+        var userId = "user1";
         var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
 
-        _taskServiceMock.Setup(x => x.Create(task))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Create(task, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
@@ -149,9 +157,11 @@ public class TasksControllerTests
     {
         // Arrange
         var taskId = 1;
+        var userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
-        _taskServiceMock.Setup(x => x.Update(taskId, task))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Update(taskId, task, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -166,9 +176,11 @@ public class TasksControllerTests
     {
         // Arrange
         var taskId = 999;
+        var userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
-        _taskServiceMock.Setup(x => x.Update(taskId, task))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Update(taskId, task, userId))
             .ReturnsAsync(false);
 
         // Act
@@ -183,9 +195,11 @@ public class TasksControllerTests
     {
         // Arrange
         var taskId = 1;
+        var userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
-        _taskServiceMock.Setup(x => x.Update(taskId, task))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Update(taskId, task, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
@@ -202,8 +216,10 @@ public class TasksControllerTests
     {
         // Arrange
         var taskId = 1;
+        var userId = "user1";
 
-        _taskServiceMock.Setup(x => x.Delete(taskId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Delete(taskId, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -218,8 +234,10 @@ public class TasksControllerTests
     {
         // Arrange
         var taskId = 999;
+        var userId = "user1";
 
-        _taskServiceMock.Setup(x => x.Delete(taskId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.Delete(taskId, userId))
             .ReturnsAsync(false);
 
         // Act
@@ -235,8 +253,10 @@ public class TasksControllerTests
         // Arrange
         var taskId = 1;
         var statusId = 2;
+        var userId = "user1";
 
-        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -252,8 +272,10 @@ public class TasksControllerTests
         // Arrange
         var taskId = 999;
         var statusId = 2;
+        var userId = "user1";
 
-        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
             .ReturnsAsync(false);
 
         // Act
@@ -269,8 +291,10 @@ public class TasksControllerTests
         // Arrange
         var taskId = 1;
         var statusId = 2;
+        var userId = "user1";
 
-        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act

@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.ProjectServices;
+using TaskManagementAPI.Tests.Helpers;
 using Xunit;
 
 namespace TaskManagementAPI.Tests.Controllers;
@@ -30,11 +31,12 @@ public class ProjectControllerTests
             new ProjectDto { Name = "Project 2", Description = "Description 2", Username = "user2" }
         };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.GetAllVisibleProjects(userId))
             .ReturnsAsync(projects);
 
         // Act
-        var result = await _controller.GetVisibleProjects(userId);
+        var result = await _controller.GetVisibleProjects();
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
@@ -52,11 +54,12 @@ public class ProjectControllerTests
             new ProjectDto { Name = "Project 1", Description = "Description 1", Username = "user1" }
         };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.GetProjectsForUser(userId))
             .ReturnsAsync(projects);
 
         // Act
-        var result = await _controller.GetForUser(userId);
+        var result = await _controller.GetForUser();
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
@@ -172,9 +175,11 @@ public class ProjectControllerTests
     {
         // Arrange
         var projectId = 1;
+        var userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
-        _projectServiceMock.Setup(x => x.Update(projectId, project))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _projectServiceMock.Setup(x => x.Update(projectId, project, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -189,9 +194,11 @@ public class ProjectControllerTests
     {
         // Arrange
         var projectId = 999;
+        var userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
-        _projectServiceMock.Setup(x => x.Update(projectId, project))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _projectServiceMock.Setup(x => x.Update(projectId, project, userId))
             .ReturnsAsync(false);
 
         // Act
@@ -206,9 +213,11 @@ public class ProjectControllerTests
     {
         // Arrange
         var projectId = 1;
+        var userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
-        _projectServiceMock.Setup(x => x.Update(projectId, project))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _projectServiceMock.Setup(x => x.Update(projectId, project, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
@@ -225,8 +234,10 @@ public class ProjectControllerTests
     {
         // Arrange
         var projectId = 1;
+        var userId = "user1";
 
-        _projectServiceMock.Setup(x => x.Delete(projectId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _projectServiceMock.Setup(x => x.Delete(projectId, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -241,8 +252,10 @@ public class ProjectControllerTests
     {
         // Arrange
         var projectId = 999;
+        var userId = "user1";
 
-        _projectServiceMock.Setup(x => x.Delete(projectId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _projectServiceMock.Setup(x => x.Delete(projectId, userId))
             .ReturnsAsync(false);
 
         // Act

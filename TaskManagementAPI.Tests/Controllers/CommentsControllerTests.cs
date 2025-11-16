@@ -4,6 +4,8 @@ using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services;
+using TaskManagementAPI.Services.CommentServices;
+using TaskManagementAPI.Tests.Helpers;
 using Xunit;
 
 namespace TaskManagementAPI.Tests.Controllers;
@@ -24,17 +26,19 @@ public class CommentsControllerTests
     {
         // Arrange
         var taskItemId = 1;
+        var userId = "user1";
         var comments = new List<CommentDto>
         {
             new CommentDto { Text = "Test comment 1", Username = "user1" },
             new CommentDto { Text = "Test comment 2", Username = "user2" }
         };
 
-        _commentServiceMock.Setup(x => x.GetByTask(taskItemId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.GetByTask(taskItemId, userId))
             .ReturnsAsync(comments);
 
         // Act
-        var result = await _controller.GetForTask(taskItemId);
+        var result = await _controller.GetByTask(taskItemId);
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
@@ -85,10 +89,11 @@ public class CommentsControllerTests
         var userId = "user1";
         var comment = new CommentCreateDto { Text = "" };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _controller.ModelState.AddModelError("Text", "Text is required");
 
         // Act
-        var result = await _controller.Create(taskId, userId, comment);
+        var result = await _controller.Create(taskId, comment);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
@@ -102,11 +107,12 @@ public class CommentsControllerTests
         var userId = "user1";
         var comment = new CommentCreateDto { Text = "New comment" };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.Create(userId, taskId, comment))
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _controller.Create(taskId, userId, comment);
+        var result = await _controller.Create(taskId, comment);
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
@@ -122,11 +128,12 @@ public class CommentsControllerTests
         var userId = "user1";
         var comment = new CommentCreateDto { Text = "New comment" };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.Create(userId, taskId, comment))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
-        var result = await _controller.Create(taskId, userId, comment);
+        var result = await _controller.Create(taskId, comment);
 
         // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
@@ -139,8 +146,10 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 1;
-        var comment = new CommentCreateDto { Text = "" };
+        var userId = "user1";
+        var comment = new CommentDto { Id = commentId, Text = "", TaskItemId = 1, Username = "user1" };
 
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         _controller.ModelState.AddModelError("Text", "Text is required");
 
         // Act
@@ -155,9 +164,11 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 1;
-        var comment = new CommentCreateDto { Text = "Updated comment" };
+        var userId = "user1";
+        var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
-        _commentServiceMock.Setup(x => x.Update(commentId, comment))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Update(comment, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -172,9 +183,11 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 999;
-        var comment = new CommentCreateDto { Text = "Updated comment" };
+        var userId = "user1";
+        var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
-        _commentServiceMock.Setup(x => x.Update(commentId, comment))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Update(comment, userId))
             .ReturnsAsync(false);
 
         // Act
@@ -189,9 +202,11 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 1;
-        var comment = new CommentCreateDto { Text = "Updated comment" };
+        var userId = "user1";
+        var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
-        _commentServiceMock.Setup(x => x.Update(commentId, comment))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Update(comment, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act
@@ -208,8 +223,10 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 1;
+        var userId = "user1";
 
-        _commentServiceMock.Setup(x => x.Delete(commentId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Delete(commentId, userId))
             .ReturnsAsync(true);
 
         // Act
@@ -224,8 +241,10 @@ public class CommentsControllerTests
     {
         // Arrange
         var commentId = 999;
+        var userId = "user1";
 
-        _commentServiceMock.Setup(x => x.Delete(commentId))
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        _commentServiceMock.Setup(x => x.Delete(commentId, userId))
             .ReturnsAsync(false);
 
         // Act
