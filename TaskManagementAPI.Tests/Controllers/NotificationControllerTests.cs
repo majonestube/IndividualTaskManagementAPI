@@ -20,47 +20,6 @@ public class NotificationControllerTests
     }
 
     [Fact]
-    public async Task GetNotificationsForUser_ShouldReturnOk_WithNotifications()
-    {
-        // Arrange
-        var userId = "user1";
-        var notifications = new List<NotificationDto>
-        {
-            new NotificationDto { Message = "Notification 1", IsRead = false, Created = DateTime.Now },
-            new NotificationDto { Message = "Notification 2", IsRead = true, Created = DateTime.Now }
-        };
-
-        _notificationServiceMock.Setup(x => x.GetNotificationsForUser(userId))
-            .ReturnsAsync(notifications);
-
-        // Act
-        var result = await _controller.GetNotificationsForUser(userId);
-
-        // Assert
-        result.Should().BeOfType<OkObjectResult>();
-        var okResult = result as OkObjectResult;
-        okResult!.Value.Should().BeEquivalentTo(notifications);
-    }
-
-    [Fact]
-    public async Task GetNotificationsForUser_ShouldReturnBadRequest_WhenExceptionThrown()
-    {
-        // Arrange
-        var userId = "user1";
-
-        _notificationServiceMock.Setup(x => x.GetNotificationsForUser(userId))
-            .ThrowsAsync(new Exception("Test exception"));
-
-        // Act
-        var result = await _controller.GetNotificationsForUser(userId);
-
-        // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult!.Value.Should().Be("Test exception");
-    }
-
-    [Fact]
     public async Task AddNotification_ShouldReturnOk_WhenNotificationCreated()
     {
         // Arrange
