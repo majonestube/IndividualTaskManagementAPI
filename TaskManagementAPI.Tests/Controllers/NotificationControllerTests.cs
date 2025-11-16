@@ -64,41 +64,30 @@ public class NotificationControllerTests
     public async Task AddNotification_ShouldReturnOk_WhenNotificationCreated()
     {
         // Arrange
-        var userId = "user1";
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
             TaskItemId = 1,
             Message = "New notification"
         };
-        var notification = new NotificationDto
-        {
-            Message = "New notification",
-            IsRead = false,
-            Created = DateTime.Now
-        };
 
         _notificationServiceMock.Setup(x => x.AddNotification(
                 createDto.ProjectId,
                 createDto.TaskItemId,
-                userId,
                 createDto.Message))
-            .ReturnsAsync(notification);
+            .ReturnsAsync(true);
 
         // Act
-        var result = await _controller.AddNotification(userId, createDto);
+        var result = await _controller.AddNotification(createDto);
 
         // Assert
-        result.Should().BeOfType<OkObjectResult>();
-        var okResult = result as OkObjectResult;
-        okResult!.Value.Should().BeEquivalentTo(notification);
+        result.Should().BeOfType<NoContentResult>();
     }
 
     [Fact]
     public async Task AddNotification_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
@@ -109,17 +98,14 @@ public class NotificationControllerTests
         _notificationServiceMock.Setup(x => x.AddNotification(
                 createDto.ProjectId,
                 createDto.TaskItemId,
-                userId,
                 createDto.Message))
-            .ThrowsAsync(new Exception("Test exception"));
+            .ReturnsAsync(false);
 
         // Act
-        var result = await _controller.AddNotification(userId, createDto);
+        var result = await _controller.AddNotification(createDto);
 
         // Assert
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult!.Value.Should().Be("Test exception");
+        result.Should().BeOfType<BadRequestResult>();
     }
 
     [Fact]
