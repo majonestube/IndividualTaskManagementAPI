@@ -71,7 +71,7 @@ public class NotificationControllerTests
     public async Task MarkAsRead_ShouldReturnNoContent_WhenSucceeds()
     {
         // Arrange
-        var notificationId = 1;
+        const int notificationId = 1;
 
         _notificationServiceMock.Setup(x => x.MarkAsRead(notificationId))
             .ReturnsAsync(true);
@@ -87,7 +87,7 @@ public class NotificationControllerTests
     public async Task MarkAsRead_ShouldReturnNotFound_WhenNotificationDoesNotExist()
     {
         // Arrange
-        var notificationId = 999;
+        const int notificationId = 999;
 
         _notificationServiceMock.Setup(x => x.MarkAsRead(notificationId))
             .ReturnsAsync(false);
@@ -103,7 +103,7 @@ public class NotificationControllerTests
     public async Task MarkAsUnread_ShouldReturnNoContent_WhenSucceeds()
     {
         // Arrange
-        var notificationId = 1;
+        const int notificationId = 1;
 
         _notificationServiceMock.Setup(x => x.MarkAsUnread(notificationId))
             .ReturnsAsync(true);
@@ -119,7 +119,7 @@ public class NotificationControllerTests
     public async Task MarkAsUnread_ShouldReturnNotFound_WhenNotificationDoesNotExist()
     {
         // Arrange
-        var notificationId = 999;
+        const int notificationId = 999;
 
         _notificationServiceMock.Setup(x => x.MarkAsUnread(notificationId))
             .ReturnsAsync(false);

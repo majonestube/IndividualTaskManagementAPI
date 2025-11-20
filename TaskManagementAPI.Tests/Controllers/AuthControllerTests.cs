@@ -148,7 +148,7 @@ public class AuthControllerTests
         // Arrange
         var loginDto = new LoginDto { Username = "testuser", Password = "password123" };
         var existingUser = new IdentityUser { UserName = "testuser" };
-        var token = "test-token-string";
+        const string token = "test-token-string";
 
         _userManagerMock.Setup(x => x.FindByNameAsync(loginDto.Username))
             .ReturnsAsync(existingUser);

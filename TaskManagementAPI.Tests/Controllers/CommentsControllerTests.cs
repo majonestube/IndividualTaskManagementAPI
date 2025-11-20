@@ -25,8 +25,8 @@ public class CommentsControllerTests
     public async Task GetForTask_ShouldReturnOk_WithComments()
     {
         // Arrange
-        var taskItemId = 1;
-        var userId = "user1";
+        const int taskItemId = 1;
+        const string userId = "user1";
         var comments = new List<CommentDto>
         {
             new CommentDto { Text = "Test comment 1", Username = "user1" },
@@ -50,9 +50,9 @@ public class CommentsControllerTests
     public async Task GetByTask_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var taskItemId = 1;
+        const int taskItemId = 1;
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -71,8 +71,8 @@ public class CommentsControllerTests
     public async Task GetByTask_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskItemId = 1;
-        var userId = "user1";
+        const int taskItemId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.GetByTask(taskItemId, userId))
@@ -91,7 +91,7 @@ public class CommentsControllerTests
     public async Task GetById_ShouldReturnOk_WhenCommentExists()
     {
         // Arrange
-        var commentId = 1;
+        const int commentId = 1;
         var comment = new CommentDto { Text = "Test comment", Username = "user1" };
 
         _commentServiceMock.Setup(x => x.GetById(commentId))
@@ -110,7 +110,7 @@ public class CommentsControllerTests
     public async Task GetById_ShouldReturnNotFound_WhenCommentDoesNotExist()
     {
         // Arrange
-        var commentId = 999;
+        const int commentId = 999;
 
         _commentServiceMock.Setup(x => x.GetById(commentId))
             .ReturnsAsync((CommentDto?)null);
@@ -126,8 +126,8 @@ public class CommentsControllerTests
     public async Task Create_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
         var comment = new CommentCreateDto { Text = "" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -144,8 +144,8 @@ public class CommentsControllerTests
     public async Task Create_ShouldReturnOk_WhenCommentCreated()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
         var comment = new CommentCreateDto { Text = "New comment" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -165,8 +165,8 @@ public class CommentsControllerTests
     public async Task Create_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
         var comment = new CommentCreateDto { Text = "New comment" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -186,10 +186,10 @@ public class CommentsControllerTests
     public async Task Create_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         var comment = new CommentCreateDto { Text = "New comment" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -208,8 +208,8 @@ public class CommentsControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
-        var commentId = 1;
-        var userId = "user1";
+        const int commentId = 1;
+        const string userId = "user1";
         var comment = new CommentDto { Id = commentId, Text = "", TaskItemId = 1, Username = "user1" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -226,8 +226,8 @@ public class CommentsControllerTests
     public async Task Update_ShouldReturnNoContent_WhenUpdateSucceeds()
     {
         // Arrange
-        var commentId = 1;
-        var userId = "user1";
+        const int commentId = 1;
+        const string userId = "user1";
         var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -245,8 +245,8 @@ public class CommentsControllerTests
     public async Task Update_ShouldReturnNotFound_WhenCommentDoesNotExist()
     {
         // Arrange
-        var commentId = 999;
-        var userId = "user1";
+        const int commentId = 999;
+        const string userId = "user1";
         var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -264,8 +264,8 @@ public class CommentsControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var commentId = 1;
-        var userId = "user1";
+        const int commentId = 1;
+        const string userId = "user1";
         var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -285,10 +285,10 @@ public class CommentsControllerTests
     public async Task Update_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var commentId = 1;
+        const int commentId = 1;
         var comment = new CommentDto { Id = commentId, Text = "Updated comment", TaskItemId = 1, Username = "user1" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -307,8 +307,8 @@ public class CommentsControllerTests
     public async Task Delete_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
-        var commentId = 1;
-        var userId = "user1";
+        const int commentId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.Delete(commentId, userId))
@@ -325,8 +325,8 @@ public class CommentsControllerTests
     public async Task Delete_ShouldReturnNotFound_WhenCommentDoesNotExist()
     {
         // Arrange
-        var commentId = 999;
-        var userId = "user1";
+        const int commentId = 999;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.Delete(commentId, userId))
@@ -343,9 +343,9 @@ public class CommentsControllerTests
     public async Task Delete_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var commentId = 1;
+        const int commentId = 1;
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -364,8 +364,8 @@ public class CommentsControllerTests
     public async Task Delete_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var commentId = 1;
-        var userId = "user1";
+        const int commentId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _commentServiceMock.Setup(x => x.Delete(commentId, userId))

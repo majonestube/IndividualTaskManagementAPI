@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.UserServices;
 using TaskManagementAPI.Tests.Helpers;
 using Xunit;
@@ -47,7 +46,7 @@ public class UserControllerTests
     public async Task GetUser_ShouldReturnOk_WhenUserExists()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var user = new UserDto { Id = userId, Username = "user1", Email = "user1@test.com" };
 
         _userServiceMock.Setup(x => x.GetUserById(userId))
@@ -66,7 +65,7 @@ public class UserControllerTests
     public async Task GetUser_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         // Arrange
-        var userId = "nonexistent";
+        const string userId = "nonexistent";
 
         _userServiceMock.Setup(x => x.GetUserById(userId))
             .ReturnsAsync((UserDto?)null);
@@ -82,7 +81,7 @@ public class UserControllerTests
     public async Task UpdateUser_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var updateDto = new UserUpdateDto { Email = "invalid-email" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -99,7 +98,7 @@ public class UserControllerTests
     public async Task UpdateUser_ShouldReturnOk_WhenUpdateSucceeds()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
         var updatedUser = new UserDto { Id = userId, Username = "user1", Email = "updated@test.com" };
 
@@ -120,7 +119,7 @@ public class UserControllerTests
     public async Task UpdateUser_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         // Arrange
-        var userId = "nonexistent";
+        const string userId = "nonexistent";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -138,7 +137,7 @@ public class UserControllerTests
     public async Task UpdateUser_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -158,7 +157,7 @@ public class UserControllerTests
     public async Task DeleteUser_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _userServiceMock.Setup(x => x.Delete(userId, userId))
@@ -175,7 +174,7 @@ public class UserControllerTests
     public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         // Arrange
-        var userId = "nonexistent";
+        const string userId = "nonexistent";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _userServiceMock.Setup(x => x.Delete(userId, userId))
@@ -192,7 +191,7 @@ public class UserControllerTests
     public async Task DeleteUser_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _userServiceMock.Setup(x => x.Delete(userId, userId))
@@ -211,10 +210,10 @@ public class UserControllerTests
     public async Task UpdateUser_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var updateDto = new UserUpdateDto { Email = "updated@test.com" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -233,9 +232,9 @@ public class UserControllerTests
     public async Task DeleteUser_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -254,7 +253,7 @@ public class UserControllerTests
     public async Task DeleteUserAsAdmin_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         _userServiceMock.Setup(x => x.DeleteAsAdmin(userId))
             .ReturnsAsync(true);
@@ -270,7 +269,7 @@ public class UserControllerTests
     public async Task DeleteUserAsAdmin_ShouldReturnNotFound_WhenUserDoesNotExist()
     {
         // Arrange
-        var userId = "nonexistent";
+        const string userId = "nonexistent";
 
         _userServiceMock.Setup(x => x.DeleteAsAdmin(userId))
             .ReturnsAsync(false);
@@ -286,7 +285,7 @@ public class UserControllerTests
     public async Task DeleteUserAsAdmin_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         _userServiceMock.Setup(x => x.DeleteAsAdmin(userId))
             .ThrowsAsync(new Exception("Test exception"));

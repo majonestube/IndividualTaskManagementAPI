@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Models.DTO;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.TaskServices;
 using TaskManagementAPI.Tests.Helpers;
 using Xunit;
@@ -25,8 +24,8 @@ public class TasksControllerTests
     public async Task GetForProject_ShouldReturnOk_WithTasks()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
+        const int projectId = 1;
+        const string userId = "user1";
         var tasks = new List<TaskItemDto>
         {
             new TaskItemDto { Title = "Task 1", Description = "Description 1", Status = "ToDo" },
@@ -50,9 +49,9 @@ public class TasksControllerTests
     public async Task GetForProject_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var projectId = 1;
+        const int projectId = 1;
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -71,8 +70,8 @@ public class TasksControllerTests
     public async Task GetForProject_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
+        const int projectId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.GetTasksForProject(projectId, userId))
@@ -91,7 +90,7 @@ public class TasksControllerTests
     public async Task GetById_ShouldReturnOk_WhenTaskExists()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         var task = new TaskItemDto { Title = "Task 1", Description = "Description 1", Status = "ToDo" };
 
         _taskServiceMock.Setup(x => x.GetById(taskId))
@@ -110,7 +109,7 @@ public class TasksControllerTests
     public async Task GetById_ShouldReturnNotFound_WhenTaskDoesNotExist()
     {
         // Arrange
-        var taskId = 999;
+        const int taskId = 999;
 
         _taskServiceMock.Setup(x => x.GetById(taskId))
             .ReturnsAsync((TaskItemDto?)null);
@@ -141,7 +140,7 @@ public class TasksControllerTests
     public async Task Create_ShouldReturnOk_WhenTaskCreated()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -161,7 +160,7 @@ public class TasksControllerTests
     public async Task Create_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -183,7 +182,7 @@ public class TasksControllerTests
         // Arrange
         var task = new TaskItemCreateDto { Title = "New Task", Description = "Description" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -202,7 +201,7 @@ public class TasksControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         var task = new TaskItemCreateDto { Title = "" };
 
         _controller.ModelState.AddModelError("Title", "Title is required");
@@ -218,8 +217,8 @@ public class TasksControllerTests
     public async Task Update_ShouldReturnNoContent_WhenUpdateSucceeds()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -237,8 +236,8 @@ public class TasksControllerTests
     public async Task Update_ShouldReturnNotFound_WhenTaskDoesNotExist()
     {
         // Arrange
-        var taskId = 999;
-        var userId = "user1";
+        const int taskId = 999;
+        const string userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -256,8 +255,8 @@ public class TasksControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -277,10 +276,10 @@ public class TasksControllerTests
     public async Task Update_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         var task = new TaskItemCreateDto { Title = "Updated Task", Description = "Updated Description" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -299,8 +298,8 @@ public class TasksControllerTests
     public async Task Delete_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.Delete(taskId, userId))
@@ -317,8 +316,8 @@ public class TasksControllerTests
     public async Task Delete_ShouldReturnNotFound_WhenTaskDoesNotExist()
     {
         // Arrange
-        var taskId = 999;
-        var userId = "user1";
+        const int taskId = 999;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.Delete(taskId, userId))
@@ -335,9 +334,9 @@ public class TasksControllerTests
     public async Task Delete_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -356,8 +355,8 @@ public class TasksControllerTests
     public async Task Delete_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.Delete(taskId, userId))
@@ -376,9 +375,9 @@ public class TasksControllerTests
     public async Task UpdateStatus_ShouldReturnNoContent_WhenUpdateSucceeds()
     {
         // Arrange
-        var taskId = 1;
-        var statusId = 2;
-        var userId = "user1";
+        const int taskId = 1;
+        const int statusId = 2;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
@@ -395,9 +394,9 @@ public class TasksControllerTests
     public async Task UpdateStatus_ShouldReturnNotFound_WhenTaskDoesNotExist()
     {
         // Arrange
-        var taskId = 999;
-        var statusId = 2;
-        var userId = "user1";
+        const int taskId = 999;
+        const int statusId = 2;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
@@ -414,9 +413,9 @@ public class TasksControllerTests
     public async Task UpdateStatus_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
-        var statusId = 2;
-        var userId = "user1";
+        const int taskId = 1;
+        const int statusId = 2;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _taskServiceMock.Setup(x => x.UpdateStatus(taskId, statusId, userId))
@@ -435,10 +434,10 @@ public class TasksControllerTests
     public async Task UpdateStatus_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var taskId = 1;
-        var statusId = 2;
+        const int taskId = 1;
+        const int statusId = 2;
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -457,7 +456,7 @@ public class TasksControllerTests
     public async Task AssignPossibleUsers_ShouldReturnOk_WithUsers()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
         var users = new List<UserDto>
         {
             new UserDto { Id = "user1", Username = "user1", Email = "user1@test.com" },
@@ -480,7 +479,7 @@ public class TasksControllerTests
     public async Task AssignPossibleUsers_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
+        const int taskId = 1;
 
         _taskServiceMock.Setup(x => x.GetUsers(taskId))
             .ThrowsAsync(new Exception("Test exception"));
@@ -498,8 +497,8 @@ public class TasksControllerTests
     public async Task AssignUser_ShouldReturnNoContent_WhenAssignmentSucceeds()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
 
         _taskServiceMock.Setup(x => x.AssignUser(taskId, userId))
             .ReturnsAsync(true);
@@ -515,8 +514,8 @@ public class TasksControllerTests
     public async Task AssignUser_ShouldReturnNotFound_WhenTaskDoesNotExist()
     {
         // Arrange
-        var taskId = 999;
-        var userId = "user1";
+        const int taskId = 999;
+        const string userId = "user1";
 
         _taskServiceMock.Setup(x => x.AssignUser(taskId, userId))
             .ReturnsAsync(false);
@@ -532,8 +531,8 @@ public class TasksControllerTests
     public async Task AssignUser_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var taskId = 1;
-        var userId = "user1";
+        const int taskId = 1;
+        const string userId = "user1";
 
         _taskServiceMock.Setup(x => x.AssignUser(taskId, userId))
             .ThrowsAsync(new Exception("Test exception"));

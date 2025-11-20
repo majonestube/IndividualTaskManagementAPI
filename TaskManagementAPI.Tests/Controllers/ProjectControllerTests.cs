@@ -24,7 +24,7 @@ public class ProjectControllerTests
     public async Task GetAllProjects_ShouldReturnOk_WithProjects()
     {
         // Arrange
-        var userId = "admin1";
+        const string userId = "admin1";
         var projects = new List<ProjectDto>
         {
             new ProjectDto { Name = "Project 1", Description = "Description 1", Username = "user1" },
@@ -67,7 +67,7 @@ public class ProjectControllerTests
     public async Task GetAllProjects_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "admin1";
+        const string userId = "admin1";
 
         ControllerTestHelpers.SetUserClaimsWithAdminRole(_controller, userId);
         _projectServiceMock.Setup(x => x.GetAllProjects())
@@ -86,7 +86,7 @@ public class ProjectControllerTests
     public async Task GetVisibleProjects_ShouldReturnOk_WithProjects()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var projects = new List<ProjectDto>
         {
             new ProjectDto { Name = "Project 1", Description = "Description 1", Username = "user1" },
@@ -110,7 +110,7 @@ public class ProjectControllerTests
     public async Task GetVisibleProjects_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -129,7 +129,7 @@ public class ProjectControllerTests
     public async Task GetVisibleProjects_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.GetAllVisibleProjects(userId))
@@ -148,7 +148,7 @@ public class ProjectControllerTests
     public async Task GetForUser_ShouldReturnOk_WithProjects()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
         var projects = new List<ProjectDto>
         {
             new ProjectDto { Name = "Project 1", Description = "Description 1", Username = "user1" }
@@ -190,7 +190,7 @@ public class ProjectControllerTests
     public async Task GetForUser_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var userId = "user1";
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.GetProjectsForUser(userId))
@@ -209,7 +209,7 @@ public class ProjectControllerTests
     public async Task GetById_ShouldReturnOk_WhenProjectExists()
     {
         // Arrange
-        var projectId = 1;
+        const int projectId = 1;
         var project = new ProjectDto { Name = "Project 1", Description = "Description 1", Username = "user1" };
 
         _projectServiceMock.Setup(x => x.GetById(projectId))
@@ -228,7 +228,7 @@ public class ProjectControllerTests
     public async Task GetById_ShouldReturnNotFound_WhenProjectDoesNotExist()
     {
         // Arrange
-        var projectId = 999;
+        const int projectId = 999;
 
         _projectServiceMock.Setup(x => x.GetById(projectId))
             .ReturnsAsync((ProjectDto?)null);
@@ -296,7 +296,7 @@ public class ProjectControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange
-        var projectId = 1;
+        const int projectId = 1;
         var project = new ProjectCreateDto { Name = "" };
 
         _controller.ModelState.AddModelError("Name", "Name is required");
@@ -312,8 +312,8 @@ public class ProjectControllerTests
     public async Task Update_ShouldReturnNoContent_WhenUpdateSucceeds()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
+        const int projectId = 1;
+        const string userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -331,8 +331,8 @@ public class ProjectControllerTests
     public async Task Update_ShouldReturnNotFound_WhenProjectDoesNotExist()
     {
         // Arrange
-        var projectId = 999;
-        var userId = "user1";
+        const int projectId = 999;
+        const string userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -350,8 +350,8 @@ public class ProjectControllerTests
     public async Task Update_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
+        const int projectId = 1;
+        const string userId = "user1";
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -371,10 +371,10 @@ public class ProjectControllerTests
     public async Task Update_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var projectId = 1;
+        const int projectId = 1;
         var project = new ProjectCreateDto { Name = "Updated Project", Description = "Updated Description" };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -393,8 +393,8 @@ public class ProjectControllerTests
     public async Task Delete_ShouldReturnNoContent_WhenDeleteSucceeds()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
+        const int projectId = 1;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.Delete(projectId, userId))
@@ -411,8 +411,8 @@ public class ProjectControllerTests
     public async Task Delete_ShouldReturnNotFound_WhenProjectDoesNotExist()
     {
         // Arrange
-        var projectId = 999;
-        var userId = "user1";
+        const int projectId = 999;
+        const string userId = "user1";
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
         _projectServiceMock.Setup(x => x.Delete(projectId, userId))
@@ -429,10 +429,10 @@ public class ProjectControllerTests
     public async Task Delete_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var projectId = 1;
+        const int projectId = 1;
 
        
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -451,9 +451,9 @@ public class ProjectControllerTests
     public async Task ShareProject_ShouldReturnOk_WhenShareSucceeds()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
-        var sharedUserId = "user2";
+        const int projectId = 1;
+        const string userId = "user1";
+        const string sharedUserId = "user2";
         var projectShare = new ProjectShareDto { sharedUserId = sharedUserId };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -471,9 +471,9 @@ public class ProjectControllerTests
     public async Task ShareProject_ShouldReturnNotFound_WhenProjectDoesNotExist()
     {
         // Arrange
-        var projectId = 999;
-        var userId = "user1";
-        var sharedUserId = "user2";
+        const int projectId = 999;
+        const string userId = "user1";
+        const string sharedUserId = "user2";
         var projectShare = new ProjectShareDto { sharedUserId = sharedUserId };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
@@ -491,11 +491,11 @@ public class ProjectControllerTests
     public async Task ShareProject_ShouldReturnUnauthorized_WhenUserIdIsNull()
     {
         // Arrange
-        var projectId = 1;
-        var sharedUserId = "user2";
+        const int projectId = 1;
+        const string sharedUserId = "user2";
         var projectShare = new ProjectShareDto { sharedUserId = sharedUserId };
         
-        _controller.ControllerContext = new Microsoft.AspNetCore.Mvc.ControllerContext
+        _controller.ControllerContext = new ControllerContext
         {
             HttpContext = new Microsoft.AspNetCore.Http.DefaultHttpContext
             {
@@ -514,9 +514,9 @@ public class ProjectControllerTests
     public async Task ShareProject_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
-        var projectId = 1;
-        var userId = "user1";
-        var sharedUserId = "user2";
+        const int projectId = 1;
+        const string userId = "user1";
+        const string sharedUserId = "user2";
         var projectShare = new ProjectShareDto { sharedUserId = sharedUserId };
 
         ControllerTestHelpers.SetUserClaims(_controller, userId);
