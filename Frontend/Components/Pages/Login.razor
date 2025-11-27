@@ -3,7 +3,8 @@
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
 @inject NavigationManager Navigation
-
+@inject Services.AuthStateService AuthState
+@using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
 
@@ -60,6 +61,9 @@
         
         // store token in local storage
         await sessionStorage.SetAsync("authToken", token);
+
+        AuthState.SetLayout(typeof(AfterLoginLayout));
+        
 
         Navigation.NavigateTo("/");
     }
