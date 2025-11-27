@@ -1,0 +1,41 @@
+﻿@page "/Temp"
+@rendermode InteractiveServer
+@using MyShared.Models
+@inject IHttpClientFactory Http
+
+<h3>Projects</h3>
+
+@if (projects == null)
+{
+    <p>Loading...</p>
+}
+else if (projects.Length == 0)
+{
+    <p>No projects found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var project in projects)
+        {
+            <li>@project.Name (@project.TaskCount tasks)</li>
+        }
+    </ul>
+}
+
+@code {
+    private ProjectDto[]? projects;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var http = Http.CreateClient("TaskManagementAPI");
+            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/owner");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error calling API: " + ex.Message);
+        }
+    }
+}

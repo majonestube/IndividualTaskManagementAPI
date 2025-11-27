@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementAPI", "TaskMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaskManagementAPI.Tests", "TaskManagementAPI.Tests\TaskManagementAPI.Tests.csproj", "{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{57302C37-3EA9-4A60-ACAE-C90A17227A9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyShared", "MyShared\MyShared.csproj", "{B15C27FD-DC55-4CB5-A42E-3273EB9FF72E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6BA076CE-4A60-4D2C-A76B-5A2B88A84ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57302C37-3EA9-4A60-ACAE-C90A17227A9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57302C37-3EA9-4A60-ACAE-C90A17227A9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57302C37-3EA9-4A60-ACAE-C90A17227A9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57302C37-3EA9-4A60-ACAE-C90A17227A9D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B15C27FD-DC55-4CB5-A42E-3273EB9FF72E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B15C27FD-DC55-4CB5-A42E-3273EB9FF72E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B15C27FD-DC55-4CB5-A42E-3273EB9FF72E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B15C27FD-DC55-4CB5-A42E-3273EB9FF72E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
