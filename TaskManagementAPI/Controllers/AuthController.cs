@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MyShared.Models;
 using TaskManagementAPI.Services.AuthServices;
-using LoginDto = TaskManagementAPI.Models.DTO.LoginDto;
 
 namespace TaskManagementAPI.Controllers;
 
