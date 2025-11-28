@@ -7,18 +7,18 @@
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
 
-<h3>Logg inn</h3>
+<h3>Login page</h3>
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
     <p style="color:red">@errorMessage</p>
 }
 
-<input @bind="login.Username" placeholder="Brukernavn"/>
+<input @bind="login.Username" placeholder="Username"/>
 <br/>
-<input type="password" @bind="login.Password" placeholder="Passord"/>
+<input type="password" @bind="login.Password" placeholder="Password"/>
 <br/>
-<button @onclick="HandleLogin">Logg inn</button>
+<button @onclick="HandleLogin">Log in</button>
 
 <p>Don't have a user?</p>
 <NavLink href="/Register">Register instead</NavLink>
@@ -40,7 +40,7 @@
 
         if (!response.IsSuccessStatusCode)
         {
-            errorMessage = "Feil brukernavn eller passord";
+            errorMessage = "Incorrect username or password";
             return;
         }
 
@@ -60,7 +60,7 @@
         var token = root.GetProperty("token").GetProperty("result").GetString();
         if (string.IsNullOrEmpty(token))
         {
-            errorMessage = "Kunne ikke hente token";
+            errorMessage = "Could not get token";
             return;
         }
         
