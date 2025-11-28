@@ -1,5 +1,6 @@
 ﻿@page "/Temp"
 @rendermode InteractiveServer
+@using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
@@ -7,7 +8,7 @@
 @inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
-<h3>Projects</h3>
+<h3>My projects</h3>
 
 @if (loading)
 {
@@ -15,14 +16,14 @@
 }
 else if (projects == null || projects.Length == 0)
 {
-    <p>No projects found.</p>
+    <p>You are not the owner of any projects.</p>
 }
 else
 {
     <ul>
         @foreach (var project in projects)
         {
-            <li>@project.Name (@project.TaskCount tasks)</li>
+            <ProjectCard Project="project" />
         }
     </ul>
 }
