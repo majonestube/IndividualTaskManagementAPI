@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagementAPI.Models.DTO;
+using MyShared.Models;
 using TaskManagementAPI.Services.AuthServices;
 
 namespace TaskManagementAPI.Controllers;
@@ -69,11 +69,13 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
                 Message = "Ugyldig brukernavn eller passord."
             });
         }
+        
+        var tokenString = await authService.GenerateTokenString(identityUser);
 
-        return Ok(new
+        return Ok(new LoginResponse
         {
             IsSuccess = true,
-            Token = authService.GenerateTokenString(identityUser),
+            Token = tokenString,
             Message = "Bruker logget inn!"
         });
     }

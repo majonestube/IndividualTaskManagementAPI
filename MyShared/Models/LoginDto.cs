@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManagementAPI.Models.DTO;
+namespace MyShared.Models;
 
 public class LoginDto
 {

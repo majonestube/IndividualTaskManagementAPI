@@ -31,7 +31,7 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     
     // Hent alle tilgjengelig prosjekter for innlogget bruker
     [Authorize]
-    [HttpGet("/visible")]
+    [HttpGet("visible")]
     public async Task<IActionResult> GetVisibleProjects()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -51,10 +51,11 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     
     // Henter prosjekter innlogget bruker eier
     [Authorize]
-    [HttpGet("/owner")]
+    [HttpGet("owner")]
     public async Task<IActionResult> GetForUser()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        Console.WriteLine("UserId from token: " + userId);
         if (userId == null) 
             return Unauthorized();
 

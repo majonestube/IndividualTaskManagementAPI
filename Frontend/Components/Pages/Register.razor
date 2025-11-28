@@ -1,0 +1,64 @@
+﻿@page "/Register"
+@using MyShared.Models
+@rendermode InteractiveServer
+@inject IHttpClientFactory Http
+@inject NavigationManager Navigation
+
+<h3>Register</h3>
+
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+
+<input @bind="login.Username" placeholder="Username"/>
+<br/>
+<input type="password" @bind="login.Password" placeholder="Password"/>
+<br/>
+<input type="password" @bind="confirmPassword" placeholder="Confirm password"/>
+<br/>
+<button @onclick="HandleRegister">Register</button>
+
+<p>Already have a user?</p>
+<NavLink href="/Login">Log in instead</NavLink>
+
+@code {
+    private LoginDto login = new();
+    private string confirmPassword;
+    private string? errorMessage;
+
+    private async Task HandleRegister()
+    {
+        // check that the passwords match
+        if (login.Password != confirmPassword)
+        {
+            errorMessage = "Passwords must match";
+            return;
+        }
+        
+        var client = Http.CreateClient("TaskManagementAPI");
+        var response = await client.PostAsJsonAsync("api/auth/register", login);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            errorMessage = "Incorrect username or password";
+            return;
+        }
+
+        // get response
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        using var jsonDoc = await System.Text.Json.JsonDocument.ParseAsync(stream);
+
+        var root = jsonDoc.RootElement;
+        
+        // check if isSuccess is true
+        if (!root.GetProperty("isSuccess").GetBoolean())
+        {
+            errorMessage = root.GetProperty("message").GetString();
+            return;
+        }
+
+        Navigation.NavigateTo("/Login");
+    }
+}

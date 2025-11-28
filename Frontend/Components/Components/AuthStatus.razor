@@ -1,0 +1,33 @@
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage sessionStorage
+@inject NavigationManager Navigation
+
+@if (isLoggedIn)
+{
+    <a href="#" @onclick="Logout">Log out</a>
+}
+else
+{
+    <NavLink href="/Login">Log in / Register</NavLink>
+}
+
+@code {
+    private bool isLoggedIn;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
+            isLoggedIn = !string.IsNullOrEmpty(tokenResult.Value);
+            StateHasChanged();
+        }
+    }
+
+    private async Task Logout()
+    {
+        await sessionStorage.DeleteAsync("authToken");
+        isLoggedIn = false;
+        Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+    }
+}
