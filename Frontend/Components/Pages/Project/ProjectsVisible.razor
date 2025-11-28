@@ -26,7 +26,7 @@ else
 {
     @foreach (var project in projects)
     {
-        <ProjectCard Project="project" />
+        <ProjectVisibleCard Project="project" />
     }
 }
 
@@ -38,6 +38,12 @@ else
     {
         if (!firstRender) return;
 
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        loading = true;
         try
         {
             var tokenResult = await sessionStorage.GetAsync<string>("authToken");
