@@ -91,10 +91,10 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
         return project == null ? null : ProjectToDto(project);
     }
 
-    public async Task<ProjectDto> Create(ProjectCreateDto project)
+    public async Task<ProjectDto> Create(ProjectCreateDto project, string userId)
     {
         // Oppretter nytt prosjekt
-        var userExists = await _db.Users.AnyAsync(u => u.Id == project.UserId);
+        var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
         if (!userExists)
         {
             throw new UnauthorizedAccessException("Ugyldig bruker-id.");
@@ -104,18 +104,18 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
         {
             Name = project.Name,
             Description = project.Description,
-            UserId = project.UserId,
+            UserId = userId,
         };
 
         await _db.Projects.AddAsync(newProject);
         await _db.SaveChangesAsync();
     
         // Opprett ProjectVisibility for eieren
-        var projectVisibility = new ProjectVisibility
+        await _db.ProjectVisibility.AddAsync(new ProjectVisibility
         {
             ProjectId = newProject.Id,
-            UserId = project.UserId
-        };
+            UserId = userId
+        });
         
         var admins = await _userManager.GetUsersInRoleAsync("Admin");
         
@@ -128,8 +128,6 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
                 UserId = admin.Id
             });
         }
-    
-        await _db.ProjectVisibility.AddAsync(projectVisibility);
         
         await _db.SaveChangesAsync();
     

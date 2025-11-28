@@ -1,37 +1,38 @@
-﻿@page "/Project/{projectId:int}"
+﻿@page "/ProjectsVisible"
+@rendermode InteractiveServer
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
-@rendermode InteractiveServer
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
+<h3>Available projects</h3>
+
 @if (loading)
 {
     <p>Loading...</p>
-} else if (tasks == null)
+}
+else if (projects == null)
 {
-    <p>There was an error retrieving the tasks for this project</p>
-} else if (tasks.Length == 0)
+    <p>There was an error retrieving available projects</p>
+} 
+else if (projects.Length == 0)
 {
-    <p>There are no tasks in this project</p>
+    <p>You do not have access to any projects.</p>
 }
 else
 {
-    @foreach (var task in tasks)
+    @foreach (var project in projects)
     {
-        <TaskCard Task="task" />
+        <ProjectCard Project="project" />
     }
 }
 
 @code {
-    private TaskItemDto[]? tasks;
+    private ProjectDto[]? projects;
     private bool loading = true;
-    
-    [Parameter]
-    public int projectId { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -49,7 +50,7 @@ else
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
 
-            tasks = await http.GetFromJsonAsync<TaskItemDto[]>($"api/Tasks/project/{projectId}");
+            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
         }
         catch (Exception ex)
         {
@@ -61,5 +62,4 @@ else
             StateHasChanged();
         }
     }
-
 }

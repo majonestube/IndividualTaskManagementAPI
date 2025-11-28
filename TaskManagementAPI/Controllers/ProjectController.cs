@@ -55,7 +55,6 @@ public class ProjectController(IProjectService projectService) : ControllerBase
     public async Task<IActionResult> GetForUser()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        Console.WriteLine("UserId from token: " + userId);
         if (userId == null) 
             return Unauthorized();
 
@@ -94,10 +93,14 @@ public class ProjectController(IProjectService projectService) : ControllerBase
         {
             return BadRequest(ModelState); 
         }
+        
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null) 
+            return Unauthorized();
 
         try
         {
-            await projectService.Create(project);
+            await projectService.Create(project, userId);
             return Ok(project); 
         }
         catch (Exception ex)

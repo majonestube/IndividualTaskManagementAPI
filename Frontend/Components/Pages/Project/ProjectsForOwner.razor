@@ -1,10 +1,11 @@
-﻿@page "/Owner"
+﻿@page "/ProjectsForOwner"
 @rendermode InteractiveServer
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
 @inject IHttpClientFactory Http
+@inject NavigationManager Navigation
 @inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
@@ -30,6 +31,8 @@ else
     }
 }
 
+<button @onclick="GoToNewProject">New Project</button>
+
 @code {
     private ProjectDto[]? projects;
     private bool loading = true;
@@ -50,7 +53,6 @@ else
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
 
-            // TODO fix path?
             projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/owner");
         }
         catch (Exception ex)
@@ -62,5 +64,10 @@ else
             loading = false;
             StateHasChanged();
         }
+    }
+
+    private void GoToNewProject()
+    {
+        Navigation.NavigateTo("/NewProject");
     }
 }

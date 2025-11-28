@@ -12,7 +12,7 @@ public interface IProjectService
     // Hent prosjekt etter id
     Task<ProjectDto?> GetById(int id);
     // Opprett nytt prosjekt basert på entiteten
-    Task<ProjectDto> Create(ProjectCreateDto project);
+    Task<ProjectDto> Create(ProjectCreateDto project, string userId);
     // Oppdater eksisterende prosjekt basert på entiteten
     Task<bool> Update(int id, ProjectCreateDto project, string userId);
     // Slett prosjekt
