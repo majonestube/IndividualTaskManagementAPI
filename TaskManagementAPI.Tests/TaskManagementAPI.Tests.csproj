@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\MyShared\MyShared.csproj" />
         <ProjectReference Include="..\TaskManagementAPI\TaskManagementAPI.csproj" />
     </ItemGroup>
 
