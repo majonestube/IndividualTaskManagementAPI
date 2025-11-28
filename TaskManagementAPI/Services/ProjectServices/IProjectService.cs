@@ -1,6 +1,4 @@
 using MyShared.Models;
-using TaskManagementAPI.Models.DTO;
-
 namespace TaskManagementAPI.Services.ProjectServices;
 
 public interface IProjectService

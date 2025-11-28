@@ -2,12 +2,13 @@
 @using Microsoft.AspNetCore.Components
 
 
-<div class="project-card">
-    <h2>@Project?.Name</h2>
-    <p>Owner: @Project?.Username</p>
-    <p>Created: @Project?.Created</p>
-    <p>Description: @Project?.Description</p>
-</div>
+<NavLink class="project-card" href="/Project/@Project.Id">
+    <div class="project-card-headline">@Project?.Name</div>
+    <div class="project-card-owner">@Project?.Username</div>
+    <div class="project-card-created">Created: @Project?.Created</div>
+    <div class="project-card-description"><span class="fw-bolder">Description:</span> @Project?.Description</div>
+    <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
+</NavLink>
 
 @code {
     [Parameter]

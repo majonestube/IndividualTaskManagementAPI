@@ -1,0 +1,9 @@
+﻿@using MyShared.Models
+<div class="task-card">
+    <div>@Task.Title</div>
+</div>
+
+@code {
+    [Parameter]
+    public TaskItemDto Task { get; set; }
+}

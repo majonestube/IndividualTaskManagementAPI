@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MyShared.Models;
 using TaskManagementAPI.Data;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services.ProjectServices;
@@ -19,6 +18,7 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
             .Include(p => p.Tasks)
             .Select(p => new ProjectDto
             {
+                Id = p.Id,
                 Name = p.Name,
                 Description = p.Description,
                 Created = p.Created,
@@ -44,6 +44,7 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
             .Where(p => visibleProjectIds.Contains(p.Id))
             .Select(p => new ProjectDto
             {
+                Id = p.Id,
                 Name = p.Name,
                 Description = p.Description,
                 Created = p.Created,
@@ -66,6 +67,7 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
             .Where(p => p.UserId == userId)
             .Select(p => new ProjectDto
             {
+                Id = p.Id,
                 Name = p.Name,
                 Description = p.Description,
                 Created = p.Created,
@@ -214,6 +216,7 @@ public class ProjectService(TaskManagementDbContext db, UserManager<IdentityUser
     {
         return new ProjectDto
         {
+            Id = project.Id,
             Name = project.Name,
             Description = project.Description,
             Created = project.Created,

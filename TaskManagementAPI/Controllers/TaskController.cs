@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyShared.Models;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services.TaskServices;
 

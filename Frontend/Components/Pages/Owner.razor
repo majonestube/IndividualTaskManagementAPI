@@ -1,4 +1,4 @@
-﻿@page "/Temp"
+﻿@page "/Owner"
 @rendermode InteractiveServer
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
@@ -8,24 +8,26 @@
 @inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
-<h3>My projects</h3>
+<h3>Your projects</h3>
 
 @if (loading)
 {
     <p>Loading...</p>
 }
-else if (projects == null || projects.Length == 0)
+else if (projects == null)
+{
+    <p>There was an error retrieving your projects</p>
+} 
+else if (projects.Length == 0)
 {
     <p>You are not the owner of any projects.</p>
 }
 else
 {
-    <ul>
-        @foreach (var project in projects)
-        {
-            <ProjectCard Project="project" />
-        }
-    </ul>
+    @foreach (var project in projects)
+    {
+        <ProjectCard Project="project" />
+    }
 }
 
 @code {
