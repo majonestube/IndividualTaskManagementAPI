@@ -1,16 +1,20 @@
 ﻿@using MyShared.Models
 @using Microsoft.AspNetCore.Components
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@inject NavigationManager Navigation
 
 
-<NavLink class="project-card" href="/Project/@Project.Id">
+<div class="project-card" @onclick="() => GoToProject(Project.Id)">
     <div class="project-card-headline">@Project?.Name</div>
     <div class="project-card-owner">@Project?.Username</div>
     <div class="project-card-created">Created: @Project?.Created</div>
     <div class="project-card-description"><span class="fw-bolder">Description:</span> @Project?.Description</div>
     <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
-</NavLink>
+</div>
 
 @code {
     [Parameter]
     public ProjectDto Project { get; set; }
+
+    void GoToProject(int id) => Navigation.NavigateTo($"/Project/{Project.Id}");
 }
