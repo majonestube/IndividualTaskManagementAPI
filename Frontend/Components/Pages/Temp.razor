@@ -1,9 +1,11 @@
 ﻿@page "/Temp"
 @rendermode InteractiveServer
+@using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
+@layout AfterLoginLayout
 
 <h3>Projects</h3>
 
