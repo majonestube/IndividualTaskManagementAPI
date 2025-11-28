@@ -51,7 +51,7 @@ else
             }
 
             // TODO fix path?
-            projects = await http.GetFromJsonAsync<ProjectDto[]>("owner");
+            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/owner");
         }
         catch (Exception ex)
         {

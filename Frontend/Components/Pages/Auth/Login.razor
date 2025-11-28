@@ -57,7 +57,7 @@
         }
         
         // extract the token
-        var token = root.GetProperty("token").GetProperty("result").GetString();
+        var token = root.GetProperty("token").GetString();
         if (string.IsNullOrEmpty(token))
         {
             errorMessage = "Could not get token";
