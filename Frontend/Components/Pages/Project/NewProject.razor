@@ -26,6 +26,16 @@
 
     private async Task CreateProject()
     {
+        // check that requried fields are not empty
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(project.Name))
+        {
+            errorMessage = "Project name is required";
+            return;
+        }
+        
+        // create the project 
         try
         {
             var tokenResult = await sessionStorage.GetAsync<string>("authToken");
