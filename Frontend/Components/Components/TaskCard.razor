@@ -28,8 +28,9 @@
             <div class="task-card-username">@Task?.AssignedUserName</div>
         </div>
     </div>
-    <select class="task-card-status-select" 
-            @onchange="UpdateStatus">
+    <select class="task-card-status-select"
+            @onchange="UpdateStatus"
+            @onclick:stopPropagation="true">
         @if (statuses != null)
         {
             @foreach (var status in statuses)

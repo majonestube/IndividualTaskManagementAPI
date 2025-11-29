@@ -1,30 +1,46 @@
 ﻿@page "/Task/{taskId:int}"
 @rendermode InteractiveServer
+@using Frontend.Components.Layout
 @using Frontend.Services
 @using MyShared.Models
 @inject JwtHelper JwtHelper
-
-<h3>@task?.Title</h3>
+@layout AfterLoginLayout
 
 @if (loading)
 {
     <p>Loading...</p>
 }
-else 
+else if (task != null)
 {
-    <div class="task-description">@task?.Description</div>
-    <div>@task?.DueDate</div>
-    <div>@task?.AssignedUserName</div>
+    <div class="task-page">
+        <h2 class="task-page-title">@task.Title</h2>
+        
+        <div class="task-page-meta">
+            <span class="task-page-due @(IsOverdue() ? "overdue" : "")">
+                <i class="bi bi-calendar"></i> @task.DueDate.ToShortDateString()
+            </span>
+            <span class="task-page-assignee">
+                <i class="bi bi-person"></i> @task.AssignedUserName
+            </span>
+        </div>
 
-    if (comments != null)
-    {
-        foreach (var comment in comments)
+        <div class="task-page-description">
+            @task.Description
+        </div>
+
+        @if (comments != null && comments.Length > 0)
         {
-            <div>
-                <p>@comment.Text</p>
+            <h4 class="comments-header">Comments</h4>
+            <div class="comments-list">
+                @foreach (var comment in comments)
+                {
+                    <div class="comment">
+                        <p>@comment.Text</p>
+                    </div>
+                }
             </div>
         }
-    }
+    </div>
 }
 
 @code {
@@ -86,4 +102,15 @@ else
         }
     }
     
+    private bool IsOverdue()
+    {
+        if (task?.DueDate == null) return false;
+        return task.DueDate.Date < DateTime.Today;
+    }
+
+    private bool IsOwnerOfTask()
+    {
+        if (task?.AssignedUserId == null) return false;
+        return task.AssignedUserId == userId;
+    }
 }

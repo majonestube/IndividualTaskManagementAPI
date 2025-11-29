@@ -1,0 +1,52 @@
+﻿.task-page {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff; /* subtle background to separate from page */
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.task-page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.task-page-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+.task-page-due i,
+.task-page-assignee i {
+    margin-right: 6px;
+}
+
+.task-page-due.overdue {
+    color: red;
+    font-weight: bold;
+}
+
+.task-page-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.comments-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.comments-list .comment {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
