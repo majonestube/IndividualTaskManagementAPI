@@ -5,23 +5,36 @@
 @inject NavigationManager Navigation
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Mvc.ApplicationModels
 @using MyShared.Models
 
-<h3>Login page</h3>
-
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p style="color:red">@errorMessage</p>
-}
-
-<input @bind="login.Username" placeholder="Username"/>
-<br/>
-<input type="password" @bind="login.Password" placeholder="Password"/>
-<br/>
-<button @onclick="HandleLogin">Log in</button>
-
-<p>Don't have a user?</p>
-<NavLink href="/Register">Register instead</NavLink>
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%">
+        <h3 class="card-title text-center mb-4">Login</h3>
+        
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
+        
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input id="username" class="form-control rounded-pill" @bind="login.Username" placeholder="Enter your username" />
+        </div>
+        
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" type="password" class="form-control rounded-pill" @bind="login.Password" placeholder="Enter your password" />
+        </div>
+        
+        <button class="btn btn-primary w-100 rounded-pill mb-3" @onclick="HandleLogin">Log In</button>
+        
+        <div class="text-center">
+            <p class="mb-0">Don't have an account?</p>
+            <NavLink class="text-decoration-none fw-bold" href="/Register">Register instead</NavLink>
+        </div>
+    </div>
+</div>
 
 @code {
     [CascadingParameter] public Routes Router { get; set; }
