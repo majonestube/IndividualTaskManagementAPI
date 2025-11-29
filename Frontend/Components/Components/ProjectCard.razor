@@ -4,36 +4,42 @@
 @inject IJSRuntime JS
 @inject JwtHelper JwtHelper
 
-<div class="project-card position-relative" @onclick="() => GoToProject(Project.Id)">
-    <div class="project-card-headline d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center">
+<div class="project-card" @onclick="() => GoToProject(Project.Id)">
+    <div class="project-card-header">
+        <div class="project-card-title">
             @Project?.Name
             @if (Project?.UnreadNotificationsCount > 0)
             {
-                <span class="notifications-badge ms-2">@Project.UnreadNotificationsCount</span>
+                <span class="notifications-badge">@Project.UnreadNotificationsCount</span>
             }
         </div>
-        <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
-            <i class="bi bi-trash"></i>
-        </button>
+        @if (AllowDelete)
+        {
+            <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
+                <i class="bi bi-trash"></i>
+            </button>
+        }
     </div>
-    <div class="project-card-owner">@Project?.Username</div>
-    <div class="project-card-created">Created: @Project?.Created</div>
-    <div class="project-card-description"><span class="fw-bolder">Description:</span> @Project?.Description</div>
-    <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
+    <div class="project-card-body">
+        <div class="project-card-body-header">
+            <div class="project-card-owner">@Project?.Username</div>
+            <div class="project-card-created"> - @Project?.Created</div>
+        </div>
+        <div class="project-card-description">@Project?.Description</div>
+        <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
+    </div>
 </div>
 
 @code {
-    [Parameter]
-    public ProjectDto Project { get; set; }
-    
-    [Parameter]
-    public EventCallback OnDeleted { get; set; }
+    [Parameter] public ProjectDto Project { get; set; }
+    [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public bool AllowDelete { get; set; } = false;
 
     void GoToProject(int id) => Navigation.NavigateTo($"/Project/{Project.Id}");
 
     private async Task DeleteProject()
     {
+        if (!AllowDelete) return;
         if (!await JsConfirm("Are you sure you want to delete this project?")) return;
 
         try

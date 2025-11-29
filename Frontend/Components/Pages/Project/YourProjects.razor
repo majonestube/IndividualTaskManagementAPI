@@ -1,0 +1,15 @@
+﻿@page "/YourProjects"
+@rendermode InteractiveServer
+@using Frontend.Components.Components
+@using Frontend.Components.Layout
+@layout AfterLoginLayout
+
+<ProjectList
+    VisibleOrOwner="owner"
+    Heading="Your Projects"
+    AllowDelete="true"
+    ShowNewButton="true"
+    NewProjectRoute="/NewProject"
+    EmptyMessage="You are not the owner of any projects."
+    ErrorMessage="There was an error retrieving your projects."
+    ></ProjectList>
