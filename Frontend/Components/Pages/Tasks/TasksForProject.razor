@@ -1,6 +1,7 @@
 ﻿@page "/Project/{projectId:int}"
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
+@using Frontend.Services
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using MyShared.Models
@@ -26,7 +27,7 @@ else
 {
     @foreach (var task in tasks)
     {
-        <TaskCard Task="task" />
+        <TaskCard Task="task" userId="@userId"/>
     }
 }
 <button @onclick="() => GoToNewTask(project.Id)">New Task</button>
@@ -34,6 +35,7 @@ else
 @code {
     private TaskItemDto[]? tasks;
     private ProjectDto? project;
+    private string? userId;
     private bool loading = true;
     
     [Parameter]
@@ -44,11 +46,13 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-
+        
         try
         {
             var tokenResult = await sessionStorage.GetAsync<string>("authToken");
             var token = tokenResult.Value;
+
+            userId = JwtHelper.GetUserId(token);
 
             var http = Http.CreateClient("TaskManagementAPI");
             if (!string.IsNullOrEmpty(token))
@@ -70,5 +74,4 @@ else
             StateHasChanged();
         }
     }
-
 }
