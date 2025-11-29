@@ -24,16 +24,16 @@
     color: white;
 }
 
-.task-card.task-done .task-card-header {
-    background: linear-gradient(90deg, #0b6e11, #0a8c0c);
+.task-card.task-todo .task-card-header {
+    background: linear-gradient(90deg, #b64600, #ffb793);
 }
 
 .task-card.task-progress .task-card-header {
-    background: linear-gradient(90deg, #b64600, #0053c7);  
+    background: linear-gradient(90deg, #0c1f61, #5e73ca);
 }
 
-.task-card.task-todo .task-card-header {
-    background: linear-gradient(90deg, #112a87, #8a8a8a);  
+.task-card.task-done .task-card-header {
+    background: linear-gradient(90deg, #074a0b, #0b6e11);
 }
 
 .task-card-title {
@@ -67,6 +67,11 @@
 
 .task-card-date i {
     margin-right: 6px;
+}
+
+.task-card-username {
+    color: #666;
+    font-size: 0.85rem;
 }
 
 .task-card-status-select {

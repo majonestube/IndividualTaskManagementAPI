@@ -23,7 +23,7 @@
             <div class="task-card-date">
                 <i class="bi bi-calendar"></i>@Task?.DueDate.ToShortDateString()
             </div>
-            <div class="task-card-footer">@Task?.AssignedUserName</div>
+            <div class="task-card-username">@Task?.AssignedUserName</div>
         </div>
     </div>
     <select class="task-card-status-select" 
@@ -65,10 +65,10 @@
         StateHasChanged();
     }
 
-    private string GetStatusClass() => Task?.Status switch
+    private string GetStatusClass() => Task?.StatusId switch
     {
-        "Done" => "task-done",
-        "In progress" => "task-progress",
+        3 => "task-done",
+        2 => "task-progress",
         _ => "task-todo"
     };
 
