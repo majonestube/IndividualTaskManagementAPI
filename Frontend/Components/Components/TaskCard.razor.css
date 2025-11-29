@@ -69,6 +69,11 @@
     margin-right: 6px;
 }
 
+.overdue {
+    color: red;
+    font-weight: bold;
+}
+
 .task-card-username {
     color: #666;
     font-size: 0.85rem;

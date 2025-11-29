@@ -1,4 +1,4 @@
-using TaskManagementAPI.Models.DTO;
+using MyShared.Models;
 
 namespace TaskManagementAPI.Services.CommentServices;
 

@@ -1,0 +1,89 @@
+﻿@page "/Task/{taskId:int}"
+@rendermode InteractiveServer
+@using Frontend.Services
+@using MyShared.Models
+@inject JwtHelper JwtHelper
+
+<h3>@task?.Title</h3>
+
+@if (loading)
+{
+    <p>Loading...</p>
+}
+else 
+{
+    <div class="task-description">@task?.Description</div>
+    <div>@task?.DueDate</div>
+    <div>@task?.AssignedUserName</div>
+
+    if (comments != null)
+    {
+        foreach (var comment in comments)
+        {
+            <div>
+                <p>@comment.Text</p>
+            </div>
+        }
+    }
+}
+
+@code {
+    [Parameter] public int taskId { get; set; }
+    
+    private TaskItemDto? task;
+    private CommentDto[]? comments;
+    private string? userId;
+    private bool loading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        
+        await LoadTask();
+        await LoadComments();
+    }
+
+    private async Task LoadTask()
+    {
+        loading = true;
+
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            task = await client.GetFromJsonAsync<TaskItemDto?>($"api/Tasks/{taskId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error calling API: " + ex.Message);
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadComments()
+    {
+        loading = true;
+
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var token = await JwtHelper.GetAuthorizationTokenAsync();
+            userId = JwtHelper.GetUserId(token);
+
+            comments = await client.GetFromJsonAsync<CommentDto[]>($"api/Comments/task/{taskId}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error calling API: " + ex.Message);
+        }
+        finally
+        {
+            loading = false;
+            StateHasChanged();
+        }
+    }
+    
+}

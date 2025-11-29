@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using MyShared.Models;
 using TaskManagementAPI.Controllers;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services.NotificationServices;
 using Xunit;
 

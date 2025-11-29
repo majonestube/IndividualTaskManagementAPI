@@ -32,14 +32,13 @@ else
 <button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
 @code {
+    [Parameter] public int projectId { get; set; }
+    
     private TaskItemDto[]? tasks;
     private ProjectDto? project;
     private string? userId;
     private bool loading = true;
     
-    [Parameter]
-    public int projectId { get; set; }
-
     void GoToNewTask(int id) => Navigation.NavigateTo($"/Project/{project.Id}/NewTask");
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

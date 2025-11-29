@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyShared.Models;
 using TaskManagementAPI.Data;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services.NotificationServices;

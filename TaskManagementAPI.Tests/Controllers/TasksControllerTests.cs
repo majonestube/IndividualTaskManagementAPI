@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using MyShared.Models;
 using TaskManagementAPI.Controllers;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services.TaskServices;
 using TaskManagementAPI.Tests.Helpers;
 using Xunit;

@@ -39,7 +39,6 @@ else
     [Parameter] public bool ShowNewButton { get; set; } = false;
     [Parameter] public string EmptyMessage { get; set; } = "No projects found.";
     [Parameter] public string ErrorMessage { get; set; } = "There was an error retrieving projects.";
-
     [Parameter] public string? NewProjectRoute { get; set; }
 
     private ProjectDto[]? projects;

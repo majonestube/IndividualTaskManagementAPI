@@ -4,7 +4,7 @@
 @inject IJSRuntime JS
 @inject JwtHelper JwtHelper
 
-<div class="project-card" @onclick="() => GoToProject(Project.Id)">
+<div class="project-card" @onclick="GoToProject">
     <div class="project-card-header">
         <div class="project-card-title">
             @Project?.Name
@@ -36,7 +36,7 @@
     [Parameter] public EventCallback OnDeleted { get; set; }
     [Parameter] public bool AllowDelete { get; set; } = false;
 
-    void GoToProject(int id) => Navigation.NavigateTo($"/Project/{Project.Id}");
+    void GoToProject() => Navigation.NavigateTo($"/Project/{Project.Id}");
 
     private async Task DeleteProject()
     {

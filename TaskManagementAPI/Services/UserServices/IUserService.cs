@@ -1,5 +1,4 @@
 ﻿using MyShared.Models;
-using TaskManagementAPI.Models.DTO;
 
 namespace TaskManagementAPI.Services.UserServices;
 

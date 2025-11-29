@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace TaskManagementAPI.Models.DTO;
+namespace MyShared.Models;
 
 public class NotificationCreateDto
 {

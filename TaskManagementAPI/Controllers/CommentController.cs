@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using TaskManagementAPI.Models.DTO;
+using MyShared.Models;
 using TaskManagementAPI.Services.CommentServices;
 
 namespace TaskManagementAPI.Controllers;
