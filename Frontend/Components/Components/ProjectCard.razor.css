@@ -65,6 +65,10 @@
     display: flex;
 }
 
+.project-card-dash {
+    margin: 0 5px;
+}
+
 .project-card-body div {
     margin-bottom: 5px;
 }
