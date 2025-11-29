@@ -1,0 +1,74 @@
+﻿.project-card {
+    width: 300px; /* fixed width per card */
+    min-height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.project-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.project-card-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #3a0647, #05163d); /* top gradient */
+    color: white;
+}
+
+.project-card-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+}
+
+.notifications-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    margin-left: 8px;
+    width: 22px;
+    height: 22px;
+    background-color: #a50000;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    border-radius: 50%;
+}
+
+.delete-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+}
+
+.project-card-body {
+    padding: 15px;
+    flex: 1; /* fill remaining space */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.project-card-body-header {
+    font-style: italic;
+    font-size: 0.8rem;
+    display: flex;
+}
+
+.project-card-dash {
+    margin: 0 5px;
+}
+
+.project-card-body div {
+    margin-bottom: 5px;
+}

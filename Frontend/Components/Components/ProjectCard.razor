@@ -1,0 +1,67 @@
+﻿@using Frontend.Services
+@using MyShared.Models
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject JwtHelper JwtHelper
+
+<div class="project-card" @onclick="() => GoToProject(Project.Id)">
+    <div class="project-card-header">
+        <div class="project-card-title">
+            @Project?.Name
+            @if (Project?.UnreadNotificationsCount > 0)
+            {
+                <span class="notifications-badge">@Project.UnreadNotificationsCount</span>
+            }
+        </div>
+        @if (AllowDelete)
+        {
+            <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
+                <i class="bi bi-trash"></i>
+            </button>
+        }
+    </div>
+    <div class="project-card-body">
+        <div class="project-card-body-header">
+            <div class="project-card-owner">@Project?.Username</div>
+            <div class="project-card-dash"> - </div>
+            <div class="project-card-created">@Project?.Created</div>
+        </div>
+        <div class="project-card-description">@Project?.Description</div>
+        <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public ProjectDto Project { get; set; }
+    [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public bool AllowDelete { get; set; } = false;
+
+    void GoToProject(int id) => Navigation.NavigateTo($"/Project/{Project.Id}");
+
+    private async Task DeleteProject()
+    {
+        if (!AllowDelete) return;
+        if (!await JsConfirm("Are you sure you want to delete this project?")) return;
+
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var response = await client.DeleteAsync($"api/Project/{Project.Id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error deleting project: " + response.StatusCode);
+                return;
+            }
+
+            if (OnDeleted.HasDelegate)
+                await OnDeleted.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception deleting project: " + ex.Message);
+        }
+    }
+    
+    private async Task<bool> JsConfirm(string message) => await JS.InvokeAsync<bool>("confirm", message);
+}

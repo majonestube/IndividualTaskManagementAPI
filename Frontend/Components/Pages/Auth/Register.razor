@@ -4,41 +4,55 @@
 @inject IHttpClientFactory Http
 @inject NavigationManager Navigation
 
-<h3>Register</h3>
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%;">
+        <h3 class="card-title text-center mb-4">Register</h3>
 
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-danger">@errorMessage</div>
+        }
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <p style="color:red">@errorMessage</p>
-}
+        <div class="mb-3">
+            <label for="username" class="form-label">Username</label>
+            <input id="username" class="form-control rounded-pill" @bind="register.Username" placeholder="Enter your username" />
+        </div>
 
-<input @bind="login.Username" placeholder="Username"/>
-<br/>
-<input type="password" @bind="login.Password" placeholder="Password"/>
-<br/>
-<input type="password" @bind="confirmPassword" placeholder="Confirm password"/>
-<br/>
-<button @onclick="HandleRegister">Register</button>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input id="password" type="password" class="form-control rounded-pill" @bind="register.Password" placeholder="Enter your password" />
+        </div>
 
-<p>Already have a user?</p>
-<NavLink href="/Login">Log in instead</NavLink>
+        <div class="mb-3">
+            <label for="confirmPassword" class="form-label">Confirm Password</label>
+            <input id="confirmPassword" type="password" class="form-control rounded-pill" @bind="confirmPassword" placeholder="Confirm your password" />
+        </div>
+
+        <button class="btn btn-alt" @onclick="HandleRegister">Register</button>
+
+        <div class="text-center mt-4">
+            <p class="mb-0">Already have an account?</p>
+            <NavLink class="text-decoration-none fw-bold" href="/Login">Log in instead</NavLink>
+        </div>
+    </div>
+</div>
 
 @code {
-    private LoginDto login = new();
+    private LoginDto register = new();
     private string confirmPassword;
     private string? errorMessage;
 
     private async Task HandleRegister()
     {
         // check that the passwords match
-        if (login.Password != confirmPassword)
+        if (register.Password != confirmPassword)
         {
             errorMessage = "Passwords must match";
             return;
         }
         
         var client = Http.CreateClient("TaskManagementAPI");
-        var response = await client.PostAsJsonAsync("api/auth/register", login);
+        var response = await client.PostAsJsonAsync("api/auth/register", register);
 
         if (!response.IsSuccessStatusCode)
         {

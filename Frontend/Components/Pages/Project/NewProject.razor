@@ -1,24 +1,32 @@
 ﻿@page "/NewProject"
 @using Frontend.Components.Layout
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Frontend.Services
 @using MyShared.Models
 @rendermode InteractiveServer
-@inject IHttpClientFactory Http
 @inject NavigationManager Navigation
-@inject ProtectedSessionStorage sessionStorage
+@inject JwtHelper JwtHelper
 @layout AfterLoginLayout
 
-<h3>New Project</h3>
+<h3 class="mb-4">Create New Project</h3>
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p style="color:red">@errorMessage</p>
+    <div class="alert alert-danger">@errorMessage</div>
 }
-<input @bind="project.Name" placeholder="Project Name"/>
-<br/>
-<textarea @bind="project.Description" placeholder="Project Description"></textarea>
-<br/>
-<button @onclick="CreateProject">Create Project</button>
+
+<div class="new-project-form">
+    <div class="mb-3">
+        <label for="projectName" class="form-label fw-bold">Project Name</label>
+        <input id="projectName" type="text" class="form-control rounded-pill" @bind="project.Name" placeholder="Enter project name" />
+    </div>
+    
+    <div class="mb-3">
+        <label for="projectDescription" class="form-label fw-bold">Project Description</label>
+        <textarea id="projectDescription" class="form-control rounded" rows="4" @bind="project.Description" placeholder="Enter project description"></textarea>
+    </div>
+    
+    <button class="btn btn-main" @onclick="CreateProject">Create Project</button>
+</div>
 
 @code {
     private ProjectCreateDto project = new();
@@ -26,18 +34,19 @@
 
     private async Task CreateProject()
     {
+        // check that requried fields are not empty
+        errorMessage = string.Empty;
+
+        if (string.IsNullOrWhiteSpace(project.Name))
+        {
+            errorMessage = "Project name is required";
+            return;
+        }
+        
+        // create the project 
         try
         {
-            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
-            var token = tokenResult.Value;
-
-            var client = Http.CreateClient("TaskManagementAPI");
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
             var response = await client.PostAsJsonAsync("api/project", project);
 
             if (!response.IsSuccessStatusCode)

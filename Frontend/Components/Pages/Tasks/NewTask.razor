@@ -1,46 +1,64 @@
 ﻿@page "/Project/{projectId:int}/NewTask"
 @using Frontend.Components.Layout
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Frontend.Services
 @using MyShared.Models
 @rendermode InteractiveServer
-@inject IHttpClientFactory Http
 @inject NavigationManager Navigation
-@inject ProtectedSessionStorage sessionStorage
+@inject JwtHelper JwtHelper
 @layout AfterLoginLayout
 
-<h3>New Task - @project?.Name</h3>
+<h3 class="mb-4">New Task - @project?.Name</h3>
 
 @if (!string.IsNullOrEmpty(errorMessage))
 {
-    <p style="color:red">@errorMessage</p>
+    <div class="alert alert-danger">@errorMessage</div>
 }
-<input @bind="taskItem.Title" placeholder="Task Title"/>
-<br/>
-<textarea @bind="taskItem.Description"></textarea>
-<br/>
-<input type="date" @bind="taskItem.DueDate"/>
-<br/>
-<select @bind="taskItem.AssignedUserId">
-    <option value="">--Assign a user to the task--</option>
-    @if (users != null)
-    {
-        @foreach (var user in users)
-        {
-            <option value="@user.Id">@user.Username</option>
-        }
-    }
-</select>
-<br/>
-<select @bind="taskItem.StatusId">
-    @if (statuses != null)
-    {
-        @foreach (var status in statuses)
-        {
-            <option value="@status.Id">@status.Name</option>
-        }
-    }
-</select>
-<button @onclick="CreateTask">Create Task</button>
+
+<div class="new-task-form">
+    <div class="mb-3">
+        <label for="taskTitle" class="form-label fw-bold">Title</label>
+        <input id="taskTitle" type="text" class="form-control rounded-pill" @bind="taskItem.Title" placeholder="Task title" />
+    </div>
+
+    <div class="mb-3">
+        <label for="taskDescription" class="form-label fw-bold">Description</label>
+        <textarea id="taskDescription" class="form-control rounded" rows="4" @bind="taskItem.Description" placeholder="Task description"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="dueDate" class="form-label fw-bold">Due Date</label>
+        <input id="dueDate" type="date" class="form-control rounded-pill" @bind="taskItem.DueDate" min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+    </div>
+
+    <div class="mb-3">
+        <label for="assignedUser" class="form-label fw-bold">Assign To</label>
+        <select id="assignedUser" class="form-select rounded-pill" @bind="taskItem.AssignedUserId">
+            <option value="">-- Assign a user --</option>
+            @if (users != null)
+            {
+                @foreach (var user in users)
+                {
+                    <option value="@user.Id">@user.Username</option>
+                }
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="status" class="form-label fw-bold">Status</label>
+        <select id="status" class="form-select rounded-pill" @bind="taskItem.StatusId">
+            @if (statuses != null)
+            {
+                @foreach (var status in statuses)
+                {
+                    <option value="@status.Id">@status.Name</option>
+                }
+            }
+        </select>
+    </div>
+
+    <button class="btn btn-main" @onclick="CreateTask">Create Task</button>
+</div>
 
 @code {
     [Parameter]
@@ -60,19 +78,11 @@
         if (!firstRender) return;
         try
         {
-            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
-            var token = tokenResult.Value;
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
 
-            var http = Http.CreateClient("TaskManagementAPI");
-            if (!string.IsNullOrEmpty(token))
-            {
-                http.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            users = await http.GetFromJsonAsync<UserDto[]>("api/User");
-            statuses = await http.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
-            project = await http.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");
+            users = await client.GetFromJsonAsync<UserDto[]>("api/User");
+            statuses = await client.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
+            project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");
             taskItem.ProjectId = projectId;
         }
         catch (Exception ex)
@@ -87,24 +97,36 @@
 
     private async Task CreateTask()
     {
+        errorMessage = string.Empty;
+
+        // check if any required fields are empty
+        if (string.IsNullOrWhiteSpace(taskItem.Title))
+        {
+            errorMessage = "Task title is required";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(taskItem.Description))
+        {
+            errorMessage = "Task description is required";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(taskItem.AssignedUserId))
+        {
+            errorMessage = "You must assign the task to a user";
+            return;
+        }
+        
+        // create the task
         try
         {
-            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
-            var token = tokenResult.Value;
-
-            var client = Http.CreateClient("TaskManagementAPI");
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
             var response = await client.PostAsJsonAsync("api/Tasks/", taskItem);
             
             if (!response.IsSuccessStatusCode)
             {
-                errorMessage = "Error creating project.";
-                Console.WriteLine(response);
+                errorMessage = "Error creating project." ;
                 return;
             }
 
