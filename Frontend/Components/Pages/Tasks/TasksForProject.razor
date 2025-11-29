@@ -22,10 +22,12 @@
 }
 else
 {
-    @foreach (var task in tasks)
-    {
-        <TaskCard Task="task" userId="@userId" OnDeleted="LoadTasks" />
-    }
+    <div class="task-card-grid">
+        @foreach (var task in tasks)
+        {
+            <TaskCard Task="task" userId="@userId" OnDeleted="LoadTasks" />
+        }
+    </div>
 }
 <button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 

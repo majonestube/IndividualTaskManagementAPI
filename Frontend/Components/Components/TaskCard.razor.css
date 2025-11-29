@@ -1,24 +1,85 @@
 ﻿.task-card {
-    background: rgba(5, 22, 61, 0.2);
-    border: 1px solid rgba(5, 22, 61, 1);
-    border-radius: 8px;
-    margin: 30px 10px;
-    padding: 10px;
+    width: 300px;
+    min-height: 180px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.task-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.task-card-header {
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.task-card.task-done .task-card-header {
+    background: linear-gradient(90deg, #0b6e11, #0a8c0c);
+}
+
+.task-card.task-progress .task-card-header {
+    background: linear-gradient(90deg, #b64600, #0053c7);  
+}
+
+.task-card.task-todo .task-card-header {
+    background: linear-gradient(90deg, #112a87, #8a8a8a);  
 }
 
 .task-card-title {
-    font-size: 18px;
     font-weight: bold;
-    margin-bottom: 6px;
+    font-size: 1.1rem;
+}
+
+.task-card-body {
+    padding: 15px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .task-card-description {
-    font-size: 16px;
-    margin-bottom: 6px;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
 }
 
-.task-card-due-date {
-    font-style: italic;
-    font-size: 14px;
-    margin-bottom: 12px;
+.task-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #666;             
+    font-size: 0.85rem;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
 }
+
+.task-card-date i {
+    margin-right: 6px;
+}
+
+.task-card-status-select {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #ccc;
+    padding: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    background-color: #f7f7f7;
+}
+
+.task-card-status-select:hover {
+    background-color: #eee;
+}
+
