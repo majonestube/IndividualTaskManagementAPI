@@ -75,7 +75,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
             Description = task.Description,
             DueDate = task.DueDate,
             StatusId = task.StatusId,
-            ProjectId = task.ProjectId,
+            ProjectId = projectId,
             AssignedUserId = task.AssignedUserId
         };
 
@@ -220,6 +220,20 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return await _db.ProjectVisibility
             .AsNoTracking()
             .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == userId);
+    }
+
+    public async Task<List<StatusDto>> GetStatuses()
+    {
+        var statuses = await _db.Status
+            .AsNoTracking()
+            .Select(s => new StatusDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+            })
+            .ToListAsync();
+        
+        return statuses;
     }
 
     private static TaskItemDto TaskToDto(TaskItem task)

@@ -2,10 +2,12 @@
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using MyShared.Models
 @rendermode InteractiveServer
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
+@inject NavigationManager Navigation
 @layout AfterLoginLayout
 
 <h3>@project?.Name</h3>
@@ -27,6 +29,7 @@ else
         <TaskCard Task="task" />
     }
 }
+<button @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
 @code {
     private TaskItemDto[]? tasks;
@@ -35,6 +38,8 @@ else
     
     [Parameter]
     public int projectId { get; set; }
+
+    void GoToNewTask(int id) => Navigation.NavigateTo($"/Project/{project.Id}/NewTask");
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
