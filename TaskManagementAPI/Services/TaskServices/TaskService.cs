@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MyShared.Models;
 using TaskManagementAPI.Data;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services.TaskServices;
@@ -13,7 +13,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
 
     public async Task<List<TaskItemDto>> GetTasksForProject(int projectId, string userId)
     {
-        var canAccess = await CanAccessProject(projectId, userId);
+        var canAccess = await CanAccessProjectByProjectId(projectId, userId);
         if (!canAccess)
         {
             throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
@@ -60,7 +60,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
         if (!projectExists) throw new BadHttpRequestException("Ugyldig prosjekt-id.");
         
-        var canAccess = await CanAccessProject(projectId, userId);
+        var canAccess = await CanAccessProjectByProjectId(projectId, userId);
         if (!canAccess)
         {
             throw new UnauthorizedAccessException("Bruker har ikke tilgang til prosjektet");
@@ -75,7 +75,7 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
             Description = task.Description,
             DueDate = task.DueDate,
             StatusId = task.StatusId,
-            ProjectId = task.ProjectId,
+            ProjectId = projectId,
             AssignedUserId = task.AssignedUserId
         };
 
@@ -199,9 +199,17 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         if (task == null) return false;
         return task.AssignedUserId == userId;
     }
+    
+    // Sjekker om bruker har tilgang til prosjektet via prosjektId
+    public async Task<bool> CanAccessProjectByProjectId(int projectId, string userId)
+    {
+        return await _db.ProjectVisibility
+            .AsNoTracking()
+            .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == userId);
+    }
 
-    // Sjekker om bruker har tilgang til prosjektet
-    public async Task<bool> CanAccessProject(int taskId, string userId)
+    // Sjekker om bruker har tilgang til prosjektet via taskId
+    public async Task<bool> CanAccessProjectByTaskId(int taskId, string userId)
     {
         var projectId = await _db.Tasks
             .Where(t => t.Id == taskId)
@@ -212,6 +220,20 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
         return await _db.ProjectVisibility
             .AsNoTracking()
             .AnyAsync(pv => pv.ProjectId == projectId && pv.UserId == userId);
+    }
+
+    public async Task<List<StatusDto>> GetStatuses()
+    {
+        var statuses = await _db.Status
+            .AsNoTracking()
+            .Select(s => new StatusDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+            })
+            .ToListAsync();
+        
+        return statuses;
     }
 
     private static TaskItemDto TaskToDto(TaskItem task)

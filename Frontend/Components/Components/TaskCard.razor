@@ -1,0 +1,13 @@
+﻿@using MyShared.Models
+<div class="task-card">
+    <div class="task-card-title">@Task.Title</div>
+    <div class="task-card-due-date">Due date: @Task.DueDate</div>
+    <div class="task-card-description">@Task.Description</div>
+    <div>Assigned to: @Task.AssignedUserName</div>
+    <div>Status: @Task.Status</div>
+</div>
+
+@code {
+    [Parameter]
+    public TaskItemDto Task { get; set; }
+}

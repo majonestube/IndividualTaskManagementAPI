@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using MyShared.Models;
 using TaskManagementAPI.Controllers;
-using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services.ProjectServices;
 using TaskManagementAPI.Tests.Helpers;
 using Xunit;
@@ -260,10 +259,11 @@ public class ProjectControllerTests
     public async Task Create_ShouldReturnOk_WhenProjectCreated()
     {
         // Arrange
+        const string userId = "user1";
         var project = new ProjectCreateDto { Name = "New Project", Description = "Description" };
         var createdProject = new ProjectDto { Name = "New Project", Description = "Description", Username = "user1" };
 
-        _projectServiceMock.Setup(x => x.Create(project))
+        _projectServiceMock.Setup(x => x.Create(project, userId))
             .ReturnsAsync(createdProject);
 
         // Act
@@ -279,9 +279,10 @@ public class ProjectControllerTests
     public async Task Create_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
+        const string userId = "user1";
         var project = new ProjectCreateDto { Name = "New Project", Description = "Description" };
 
-        _projectServiceMock.Setup(x => x.Create(project))
+        _projectServiceMock.Setup(x => x.Create(project, userId))
             .ThrowsAsync(new Exception("Test exception"));
 
         // Act

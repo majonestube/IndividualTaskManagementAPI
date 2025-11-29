@@ -1,4 +1,4 @@
-﻿namespace TaskManagementAPI.Models.DTO;
+﻿namespace MyShared.Models;
 
 public class ProjectShareDto
 {

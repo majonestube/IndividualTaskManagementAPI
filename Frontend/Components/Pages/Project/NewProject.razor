@@ -1,0 +1,58 @@
+﻿@page "/NewProject"
+@using Frontend.Components.Layout
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using MyShared.Models
+@rendermode InteractiveServer
+@inject IHttpClientFactory Http
+@inject NavigationManager Navigation
+@inject ProtectedSessionStorage sessionStorage
+@layout AfterLoginLayout
+
+<h3>New Project</h3>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <p style="color:red">@errorMessage</p>
+}
+<input @bind="project.Name" placeholder="Project Name"/>
+<br/>
+<textarea @bind="project.Description" placeholder="Project Description"></textarea>
+<br/>
+<button @onclick="CreateProject">Create Project</button>
+
+@code {
+    private ProjectCreateDto project = new();
+    private string? errorMessage;
+
+    private async Task CreateProject()
+    {
+        try
+        {
+            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
+            var token = tokenResult.Value;
+
+            var client = Http.CreateClient("TaskManagementAPI");
+            if (!string.IsNullOrEmpty(token))
+            {
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+
+            var response = await client.PostAsJsonAsync("api/project", project);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "Error creating project.";
+                Console.WriteLine(response);
+                return;
+            }
+
+            Navigation.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Exception: " + ex.Message;
+        }
+        
+    } 
+}

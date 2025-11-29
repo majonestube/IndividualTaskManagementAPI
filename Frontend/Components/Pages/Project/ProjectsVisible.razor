@@ -1,5 +1,6 @@
-﻿@page "/Temp"
+﻿@page "/ProjectsVisible"
 @rendermode InteractiveServer
+@using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
@@ -7,24 +8,26 @@
 @inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
-<h3>Projects</h3>
+<h3>Available projects</h3>
 
 @if (loading)
 {
     <p>Loading...</p>
 }
-else if (projects == null || projects.Length == 0)
+else if (projects == null)
 {
-    <p>No projects found.</p>
+    <p>There was an error retrieving available projects</p>
+} 
+else if (projects.Length == 0)
+{
+    <p>You do not have access to any projects.</p>
 }
 else
 {
-    <ul>
-        @foreach (var project in projects)
-        {
-            <li>@project.Name (@project.TaskCount tasks)</li>
-        }
-    </ul>
+    @foreach (var project in projects)
+    {
+        <ProjectVisibleCard Project="project" />
+    }
 }
 
 @code {
@@ -35,6 +38,12 @@ else
     {
         if (!firstRender) return;
 
+        await LoadProjects();
+    }
+
+    private async Task LoadProjects()
+    {
+        loading = true;
         try
         {
             var tokenResult = await sessionStorage.GetAsync<string>("authToken");
@@ -47,8 +56,7 @@ else
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
 
-            // TODO fix path?
-            projects = await http.GetFromJsonAsync<ProjectDto[]>("owner");
+            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
         }
         catch (Exception ex)
         {

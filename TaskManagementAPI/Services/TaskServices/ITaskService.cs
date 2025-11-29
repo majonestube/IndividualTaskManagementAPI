@@ -1,4 +1,6 @@
+using MyShared.Models;
 using TaskManagementAPI.Models.DTO;
+using TaskManagementAPI.Models.Entities;
 
 namespace TaskManagementAPI.Services.TaskServices;
 
@@ -20,6 +22,8 @@ public interface ITaskService
     Task<List<UserDto>> GetUsers(int projectId);
     // Tildel oppgave til bruker
     Task<bool> AssignUser(int taskId, string userId);
+    // Get all statuses
+    Task<List<StatusDto>> GetStatuses();
 }
 
 

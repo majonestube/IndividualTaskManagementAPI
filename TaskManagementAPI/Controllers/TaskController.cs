@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MyShared.Models;
 using TaskManagementAPI.Models.DTO;
 using TaskManagementAPI.Services.TaskServices;
 
@@ -124,6 +125,28 @@ public class TasksController(ITaskService taskService) : ControllerBase
             }
 
             return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        
+    }
+
+    [Authorize]
+    [HttpGet("status")]
+    public async Task<IActionResult> GetStatuses()
+    {
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        
+        try
+        {
+            var result = await taskService.GetStatuses();
+            return Ok(result); 
         }
         catch (Exception ex)
         {
