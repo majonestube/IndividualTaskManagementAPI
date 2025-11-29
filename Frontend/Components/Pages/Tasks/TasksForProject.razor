@@ -27,7 +27,7 @@ else
 {
     @foreach (var task in tasks)
     {
-        <TaskCard Task="task" userId="@userId"/>
+        <TaskCard Task="task" userId="@userId" OnDeleted="LoadTasks" />
     }
 }
 <button @onclick="() => GoToNewTask(project.Id)">New Task</button>
@@ -46,6 +46,13 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+
+        LoadTasks();
+    }
+
+    private async Task LoadTasks()
+    {
+        loading = true;
         
         try
         {

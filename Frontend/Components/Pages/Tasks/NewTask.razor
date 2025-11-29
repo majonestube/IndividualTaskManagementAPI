@@ -1,4 +1,5 @@
 ﻿@page "/Project/{projectId:int}/NewTask"
+@using System.Runtime.InteropServices.JavaScript
 @using Frontend.Components.Layout
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
@@ -14,11 +15,11 @@
 {
     <p style="color:red">@errorMessage</p>
 }
-<input @bind="taskItem.Title" placeholder="Task Title"/>
+<input @bind="taskItem.Title" placeholder="Task title"/>
 <br/>
-<textarea @bind="taskItem.Description"></textarea>
+<textarea @bind="taskItem.Description" placeholder="Task description"></textarea>
 <br/>
-<input type="date" @bind="taskItem.DueDate"/>
+<input type="date" @bind="taskItem.DueDate" min="@DateTime.Today.ToString("yyy-MM-dd")" />
 <br/>
 <select @bind="taskItem.AssignedUserId">
     <option value="">--Assign a user to the task--</option>
@@ -87,6 +88,28 @@
 
     private async Task CreateTask()
     {
+        errorMessage = string.Empty;
+
+        // check if any required fields are empty
+        if (string.IsNullOrWhiteSpace(taskItem.Title))
+        {
+            errorMessage = "Task title is required";
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(taskItem.Description))
+        {
+            errorMessage = "Task description is required";
+            return;
+        }
+        
+        if (string.IsNullOrWhiteSpace(taskItem.AssignedUserId))
+        {
+            errorMessage = "You must assign the task to a user";
+            return;
+        }
+        
+        
         try
         {
             var tokenResult = await sessionStorage.GetAsync<string>("authToken");

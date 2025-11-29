@@ -18,7 +18,7 @@
             </button>
         }
     </div>
-    <div class="task-card-due-date">Due date: @Task?.DueDate</div>
+    <div class="task-card-due-date">Due date: @Task?.DueDate.ToShortDateString()</div>
     <div class="task-card-description">@Task?.Description</div>
     <div>Assigned to: @Task?.AssignedUserName</div>
     <div>Status: @Task?.Status</div>
@@ -27,6 +27,7 @@
 @code {
     [Parameter] public TaskItemDto Task { get; set; }
     [Parameter] public string? userId { get; set; }
+    [Parameter] public EventCallback OnDeleted { get; set; }
     private bool isClient;
 
     protected override void OnAfterRender(bool firstRender)
@@ -63,6 +64,9 @@
                 Console.WriteLine("Error deleting task: " + response.StatusCode);
                 return;
             }
+
+            if (OnDeleted.HasDelegate)
+                await OnDeleted.InvokeAsync();
         }
         catch (Exception ex)
         {
