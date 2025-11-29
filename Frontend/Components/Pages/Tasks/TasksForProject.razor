@@ -27,7 +27,7 @@ else
         <TaskCard Task="task" userId="@userId" OnDeleted="LoadTasks" />
     }
 }
-<button @onclick="() => GoToNewTask(project.Id)">New Task</button>
+<button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
 @code {
     private TaskItemDto[]? tasks;
