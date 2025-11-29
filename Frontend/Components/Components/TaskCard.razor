@@ -6,6 +6,7 @@
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
 @inject IJSRuntime JS
+@inject JwtHelper JwtHelper
 
 
 <div class="task-card">
@@ -47,16 +48,7 @@
 
         try
         {
-            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
-            var token = tokenResult.Value;
-
-            var client = Http.CreateClient("TaskManagementAPI");
-            if (!string.IsNullOrEmpty(token))
-            {
-                client.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", token);
-            }
-
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
             var response = await client.DeleteAsync($"api/Tasks/{Task.Id}");
 
             if (!response.IsSuccessStatusCode)

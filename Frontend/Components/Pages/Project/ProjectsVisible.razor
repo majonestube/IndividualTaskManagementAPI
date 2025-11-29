@@ -2,10 +2,9 @@
 @rendermode InteractiveServer
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Frontend.Services
 @using MyShared.Models
-@inject IHttpClientFactory Http
-@inject ProtectedSessionStorage sessionStorage
+@inject JwtHelper JwtHelper
 @layout AfterLoginLayout
 
 <h3>Available projects</h3>
@@ -46,17 +45,8 @@ else
         loading = true;
         try
         {
-            var tokenResult = await sessionStorage.GetAsync<string>("authToken");
-            var token = tokenResult.Value;
-
-            var http = Http.CreateClient("TaskManagementAPI");
-            if (!string.IsNullOrEmpty(token))
-            {
-                http.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
-
-            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            projects = await client.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
         }
         catch (Exception ex)
         {

@@ -10,10 +10,15 @@ public class JwtHelper(IHttpClientFactory httpFactory, ProtectedSessionStorage s
     private readonly IHttpClientFactory _httpFactory = httpFactory;
     private readonly ProtectedSessionStorage _sessionStorage = sessionStorage;
 
-    public async Task<HttpClient> GetAuthenticatedClientAsync(string clientName = "TaskManagementAPI")
+    public async Task<string> GetAuthorizationTokenAsync()
     {
         var tokenResult = await _sessionStorage.GetAsync<string>("authToken");
         var token = tokenResult.Value;
+        return token;
+    }
+    public async Task<HttpClient> GetAuthenticatedClientAsync(string clientName = "TaskManagementAPI")
+    {
+        var token = await GetAuthorizationTokenAsync();
 
         var http = _httpFactory.CreateClient(clientName);
         
@@ -25,6 +30,7 @@ public class JwtHelper(IHttpClientFactory httpFactory, ProtectedSessionStorage s
 
         return http;
     }
+    
     public static string? GetUserId(string token)
     {
         var handler = new JwtSecurityTokenHandler();

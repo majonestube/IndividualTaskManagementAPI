@@ -3,12 +3,9 @@
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Frontend.Services
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using MyShared.Models
-@inject IHttpClientFactory Http
 @inject NavigationManager Navigation
 @inject JwtHelper JwtHelper
-@inject ProtectedSessionStorage sessionStorage
 @layout AfterLoginLayout
 
 <h3>Your projects</h3>
@@ -51,9 +48,8 @@ else
         loading = true;
         try
         {
-            var http = await JwtHelper.GetAuthenticatedClientAsync();
-
-            projects = await http.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            projects = await client.GetFromJsonAsync<ProjectDto[]>("api/project/visible");
         }
         catch (Exception ex)
         {
