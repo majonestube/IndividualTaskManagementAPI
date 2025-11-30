@@ -50,3 +50,24 @@
     margin-bottom: 10px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
+
+.new-comment-box {
+    margin-top: 1rem;
+    background: #f8f8f8;
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.comment-input {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+}
+
+.new-comment-actions {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 10px;
+}

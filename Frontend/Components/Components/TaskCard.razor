@@ -1,5 +1,4 @@
 ﻿@using Frontend.Services
-@using Microsoft.EntityFrameworkCore.Metadata.Internal
 @using MyShared.Models
 @inject IJSRuntime JS
 @inject JwtHelper JwtHelper
@@ -8,10 +7,10 @@
 
 <div class="task-card @GetStatusClass()" @onclick="GoToTask">
     <div class="task-card-header">
-        <div class="task-card-title">@Task?.Title</div>
+        <div class="task-card-title">@task?.Title</div>
         
         <div class="task-card-actions">
-            @if (Task?.AssignedUserId == userId)
+            @if (task?.AssignedUserId == userId)
             {
                 <button class="btn btn-sm btn-outline-danger" @onclick="DeleteTask" @onclick:stopPropagation="true" title="Delete task">
                     <i class="bi bi-trash"></i>
@@ -20,12 +19,12 @@
         </div>
     </div>
     <div class="task-card-body">
-        <div class="task-card-description">@Task?.Description</div>
+        <div class="task-card-description">@task?.Description</div>
         <div class="task-card-footer">
             <div class="task-card-date @(IsOverdue() ? "overdue" : "")">
-                <i class="bi bi-calendar"></i>@Task?.DueDate.ToShortDateString()
+                <i class="bi bi-calendar"></i>@task?.DueDate.ToShortDateString()
             </div>
-            <div class="task-card-username">@Task?.AssignedUserName</div>
+            <div class="task-card-username">@task?.AssignedUserName</div>
         </div>
     </div>
     <select class="task-card-status-select"
@@ -35,7 +34,7 @@
         {
             @foreach (var status in statuses)
             {
-                <option value="@status.Id" selected="@(status.Id == Task.StatusId)">
+                <option value="@status.Id" selected="@(status.Id == task.StatusId)">
                     @status.Name
                 </option>
             }
@@ -44,12 +43,12 @@
 </div>
 
 @code {
-    [Parameter] public TaskItemDto? Task { get; set; }
+    [Parameter] public TaskItemDto? task { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
     private StatusDto[]? statuses;
 
-    void GoToTask() => Navigation.NavigateTo($"/Task/{Task.Id}");
+    void GoToTask() => Navigation.NavigateTo($"/Task/{task.Id}");
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -58,17 +57,17 @@
         var client = await JwtHelper.GetAuthenticatedClientAsync();
         statuses = await client.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
 
-        if (Task.StatusId == 0 && statuses != null)
+        if (task.StatusId == 0 && statuses != null)
         {
-            var match = statuses.FirstOrDefault(s => s.Name == Task.Status);
+            var match = statuses.FirstOrDefault(s => s.Name == task.Status);
             if (match != null)
-                Task.StatusId = match.Id;
+                task.StatusId = match.Id;
         }
         
         StateHasChanged();
     }
 
-    private string GetStatusClass() => Task?.StatusId switch
+    private string GetStatusClass() => task?.StatusId switch
     {
         3 => "task-done",
         2 => "task-progress",
@@ -77,8 +76,8 @@
 
     private bool IsOverdue()
     {
-        if (Task?.DueDate == null) return false;
-        return Task.DueDate.Date < DateTime.Today;
+        if (task?.DueDate == null) return false;
+        return task.DueDate.Date < DateTime.Today;
     }
 
     private async Task UpdateStatus(ChangeEventArgs e)
@@ -87,14 +86,14 @@
 
         if (!int.TryParse(e.Value.ToString(), out int newStatusId)) return;
 
-        if (Task.StatusId == newStatusId) return;
+        if (task.StatusId == newStatusId) return;
 
-        Task.StatusId = newStatusId;
+        task.StatusId = newStatusId;
         
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            await client.PutAsJsonAsync($"api/Tasks/{Task.Id}/status/{Task.StatusId}", new { StatusId = Task.StatusId });
+            await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
         }
         catch (Exception ex)
         {
@@ -109,7 +108,7 @@
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var response = await client.DeleteAsync($"api/Tasks/{Task.Id}");
+            var response = await client.DeleteAsync($"api/Tasks/{task.Id}");
 
             if (!response.IsSuccessStatusCode)
             {

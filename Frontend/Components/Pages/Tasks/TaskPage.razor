@@ -1,5 +1,6 @@
 ﻿@page "/Task/{taskId:int}"
 @rendermode InteractiveServer
+@using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Frontend.Services
 @using MyShared.Models
@@ -34,12 +35,28 @@ else if (task != null)
             <div class="comments-list">
                 @foreach (var comment in comments)
                 {
-                    <div class="comment">
-                        <p>@comment.Text</p>
-                    </div>
+                    <CommentCard Comment="@comment" userId="@userId" OnDeleted="LoadComments" />
                 }
             </div>
         }
+        @if (!showNewComment)
+        {
+            <button class="btn-main" @onclick="() => showNewComment = true">New Comment</button>
+        }
+        else
+        {
+            <div class="new-comment-box">
+                <textarea class="comment-input"
+                  @bind="newCommentText"
+                  placeholder="Write your comment..."></textarea>
+
+                <div class="new-comment-actions">
+                    <button class="btn-main" @onclick="SubmitComment">Submit</button>
+                    <button class="btn-alt" @onclick="CancelNewComment">Cancel</button>
+                </div>
+            </div>
+        }
+       
     </div>
 }
 
@@ -50,6 +67,8 @@ else if (task != null)
     private CommentDto[]? comments;
     private string? userId;
     private bool loading = true;
+    private bool showNewComment = false;
+    private string newCommentText = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -112,5 +131,43 @@ else if (task != null)
     {
         if (task?.AssignedUserId == null) return false;
         return task.AssignedUserId == userId;
+    }
+
+    private async Task SubmitComment()
+    {
+        if (string.IsNullOrWhiteSpace(newCommentText)) return;
+
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+
+            var newComment = new CommentCreateDto
+            {
+                Text = newCommentText
+            };
+
+            var response = await client.PostAsJsonAsync($"api/Comments/{taskId}", newComment);
+
+            if (response.IsSuccessStatusCode)
+            {
+                newCommentText = "";
+                showNewComment = false;
+                await LoadComments();
+            }
+            else
+            {
+                Console.WriteLine("Error creating comment: " + response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception submitting comment: " + ex.Message);
+        }
+    }
+
+    private void CancelNewComment()
+    {
+        showNewComment = false;
+        newCommentText = "";
     }
 }
