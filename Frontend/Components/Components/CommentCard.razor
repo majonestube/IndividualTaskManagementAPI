@@ -89,8 +89,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                comment.Text = editedText;
                 isEditing = false;
+                if (OnDeleted.HasDelegate)
+                    await OnDeleted.InvokeAsync();
             }
             else
             {

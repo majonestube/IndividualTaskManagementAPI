@@ -94,6 +94,7 @@ public class CommentService(TaskManagementDbContext db) : ICommentService
         }
 
         existing.Text = comment.Text;
+        existing.CreatedDate = comment.CreatedDate;
         await _db.SaveChangesAsync();
         return true;
     }
