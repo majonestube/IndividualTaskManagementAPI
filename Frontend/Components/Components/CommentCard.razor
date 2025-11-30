@@ -11,11 +11,22 @@
         <div class="comment-card-date">@comment?.CreatedDate</div>
     </div>
     <div class="comment-card-body">
-        <div class="comment-card-content">@comment?.Text</div>
+        @if (!isEditing)
+        {
+            <div class="comment-card-content">@comment?.Text</div> 
+        }
+        else
+        {
+            <textarea class="comment-edit-textarea" @bind="editedText"></textarea>
+            <div class="comment-edit-actions">
+                <button class="btn-main" @onclick="SaveEdit">Save</button>
+                <button class="btn-alt" @onclick="CancelEdit">Cancel</button>
+            </div>
+        }
         <div class="comment-card-actions">
-            @if (user != null && @comment?.Username == user?.UserName)
+            @if (user != null && @comment?.Username == user?.UserName && !isEditing)
             {
-                <div class="comment-card-edit">
+                <div class="comment-card-edit" @onclick="StartEdit">
                     <i class="bi bi-pen"></i>
                 </div>
                 <div class="comment-card-delete" @onclick="DeleteComment">
@@ -24,14 +35,16 @@
             }
         </div>
     </div>
-    
 </div>
 
 @code {
     [Parameter] public CommentDto? comment { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+    
     private IdentityUser? user;
+    private bool isEditing = false;
+    private string editedText = "";
     
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -39,8 +52,55 @@
 
         var client = await JwtHelper.GetAuthenticatedClientAsync();
         user = await client.GetFromJsonAsync<IdentityUser?>($"api/User/{userId}");
-        
         StateHasChanged();
+    }
+
+    private void StartEdit()
+    {
+        isEditing = true;
+        editedText = comment?.Text ?? "";
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+        editedText = "";
+    }
+
+    private async Task SaveEdit()
+    {
+        if (comment == null || string.IsNullOrWhiteSpace(editedText)) return;
+
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+
+            var updatedComment = new CommentDto
+            {
+                Id = comment.Id,
+                Text = editedText,
+                TaskItemId = comment.TaskItemId,
+                TaskItemName = comment.TaskItemName,
+                Username = comment.Username,
+                CreatedDate = DateTime.Now
+            };
+            
+            var response = await client.PutAsJsonAsync($"api/Comments/{comment.Id}", updatedComment);
+
+            if (response.IsSuccessStatusCode)
+            {
+                comment.Text = editedText;
+                isEditing = false;
+            }
+            else
+            {
+                Console.WriteLine("Error updating comment: " + response.StatusCode);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Exception updating comment: " + ex.Message);
+        }
     }
 
     private async Task DeleteComment()
