@@ -1,4 +1,5 @@
 ﻿@using Frontend.Services
+@using Microsoft.AspNetCore.Identity
 @using MyShared.Models
 
 @inject JwtHelper JwtHelper
@@ -12,7 +13,7 @@
     <div class="comment-card-body">
         <div class="comment-card-content">@comment?.Text</div>
         <div class="comment-card-actions">
-            @if (@comment?.Username == userId)
+            @if (user != null && @comment?.Username == user?.UserName)
             {
                 <div class="comment-card-edit">
                     <i class="bi bi-pen"></i>
@@ -30,6 +31,17 @@
     [Parameter] public CommentDto? comment { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+    private IdentityUser? user;
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        user = await client.GetFromJsonAsync<IdentityUser?>($"api/User/{userId}");
+        
+        StateHasChanged();
+    }
 
     private async Task DeleteComment()
     {
@@ -38,7 +50,7 @@
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var response = await client.DeleteAsync($"api/Comments/{comment.Id}");
+            var response = await client.DeleteAsync($"api/Comments/{comment?.Id}");
 
             if (!response.IsSuccessStatusCode)
             {

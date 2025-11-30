@@ -43,14 +43,6 @@
     margin-bottom: 10px;
 }
 
-.comments-list .comment {
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-}
-
 .new-comment-box {
     margin-top: 1rem;
     background: #f8f8f8;
