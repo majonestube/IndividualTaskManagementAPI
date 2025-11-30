@@ -37,14 +37,8 @@
 </div>
 
 @code {
-    [CascadingParameter] public Routes Router { get; set; }
     private LoginDto login = new();
     private string? errorMessage;
-    
-    protected override void OnInitialized()
-    {
-        Router?.SetLayout(typeof(BeforeLoginLayout));
-    }
 
     private async Task HandleLogin()
     {

@@ -30,6 +30,13 @@ public class JwtHelper(IHttpClientFactory httpFactory, ProtectedSessionStorage s
 
         return http;
     }
+
+    public IEnumerable<Claim> GetClaimsFromToken(string token)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(token);
+        return jwt.Claims;
+    }
     
     public static string? GetUserId(string token)
     {

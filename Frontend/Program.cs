@@ -1,5 +1,6 @@
 using Frontend.Components;
 using Frontend.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped <ProtectedSessionStorage>();
 builder.Services.AddScoped<JwtHelper>();
+builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+builder.Services.AddAuthenticationCore();
+builder.Services.AddAuthorizationCore();
 
 builder.Services.AddHttpClient("TaskManagementAPI", client =>
 {
