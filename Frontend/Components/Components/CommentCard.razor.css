@@ -26,20 +26,20 @@
 
 .comment-card-body {
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
+    flex-direction: column;
+    position: relative;
 }
 
 .comment-card-content {
     white-space: pre-wrap;
-    flex-grow: 1;
     color: #333;
+    margin-bottom: 8px;
 }
 
 .comment-card-actions {
     display: flex;
     gap: 10px;
-    margin-left: 10px;
+    align-self: flex-end;
 }
 
 .comment-card-actions i {
@@ -50,9 +50,29 @@
 }
 
 .comment-card-actions i:hover {
-    color: #b33a3a; /* red-ish for delete */
+    color: #b33a3a;
 }
 
 .comment-card-edit i:hover {
-    color: #2d7dd2; /* blue for edit */
+    color: #2d7dd2; 
 }
+
+.comment-edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #fff8e1;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    margin-bottom: 6px;
+}
+
+.comment-edit-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
