@@ -35,15 +35,19 @@ else if (task != null)
             <div class="comments-list">
                 @foreach (var comment in comments)
                 {
-                    <CommentCard Comment="@comment" userId="@userId" OnDeleted="LoadComments" />
+                    <CommentCard 
+                        Comment="@comment" 
+                        userId="@userId" 
+                        OnDeleted="LoadComments" 
+                        OnEditingChanged="SetEditingComment"/>
                 }
             </div>
         }
-        @if (!showNewComment)
+        @if (!showNewComment && !isEditingComment)
         {
             <button class="btn-main" @onclick="() => showNewComment = true">New Comment</button>
         }
-        else
+        else if (!isEditingComment)
         {
             <div class="new-comment-box">
                 <textarea class="comment-input"
@@ -68,6 +72,7 @@ else if (task != null)
     private string? userId;
     private bool loading = true;
     private bool showNewComment = false;
+    private bool isEditingComment = false;
     private string newCommentText = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -169,5 +174,11 @@ else if (task != null)
     {
         showNewComment = false;
         newCommentText = "";
+    }
+
+    private void SetEditingComment(bool editing)
+    {
+        isEditingComment = editing;
+        StateHasChanged();
     }
 }

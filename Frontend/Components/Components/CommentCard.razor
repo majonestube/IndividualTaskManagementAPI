@@ -41,6 +41,7 @@
     [Parameter] public CommentDto? comment { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public EventCallback<bool> OnEditingChanged { get; set; }
     
     private IdentityUser? user;
     private bool isEditing = false;
@@ -55,16 +56,22 @@
         StateHasChanged();
     }
 
-    private void StartEdit()
+    private async Task StartEdit()
     {
         isEditing = true;
         editedText = comment?.Text ?? "";
+        
+        if (OnEditingChanged.HasDelegate)
+            await OnEditingChanged.InvokeAsync(true);
     }
 
-    private void CancelEdit()
+    private async Task CancelEdit()
     {
         isEditing = false;
         editedText = "";
+
+        if (OnEditingChanged.HasDelegate)
+            await OnEditingChanged.InvokeAsync();
     }
 
     private async Task SaveEdit()
@@ -90,6 +97,10 @@
             if (response.IsSuccessStatusCode)
             {
                 isEditing = false;
+
+                if (OnEditingChanged.HasDelegate)
+                    await OnEditingChanged.InvokeAsync(false);
+                
                 if (OnDeleted.HasDelegate)
                     await OnDeleted.InvokeAsync();
             }
