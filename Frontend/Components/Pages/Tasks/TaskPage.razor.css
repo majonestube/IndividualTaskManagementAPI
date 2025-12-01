@@ -7,10 +7,56 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
+.task-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
 .task-page-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     font-size: 2rem;
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.edit-icon {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #0d6efd;
+}
+
+.edit-icon:hover {
+    color: #084298;
+}
+
+.edit-title-input {
+    font-size: 1.5rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    width: 100%;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.edit-description-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: vertical;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
 }
 
 .task-page-meta {
@@ -31,10 +77,21 @@
     font-weight: bold;
 }
 
+.task-page-description-section {
+    position: relative;
+}
+
 .task-page-description {
     font-size: 1rem;
     line-height: 1.6;
     margin-bottom: 30px;
+    padding-right: 30px;
+}
+
+.task-page-description-section .edit-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 
 .comments-header {
@@ -62,4 +119,10 @@
     margin-top: 0.5rem;
     display: flex;
     gap: 10px;
+}
+
+.edit-actions .btn-main,
+.edit-actions .btn-alt {
+    padding: 4px 10px;
+    font-size: 0.85rem;
 }

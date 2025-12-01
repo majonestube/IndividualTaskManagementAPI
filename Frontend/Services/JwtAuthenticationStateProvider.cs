@@ -23,7 +23,17 @@ public class JwtAuthenticationStateProvider(JwtHelper jwtHelper) : Authenticatio
         if (string.IsNullOrWhiteSpace(token))
             return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
         
-        var claims = jwtHelper.GetClaimsFromToken(token);
+        var claims = jwtHelper.GetClaimsFromToken(token).ToList();
+         var nameClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
+         if (nameClaim == null)
+         {
+             var usernameClaim = claims.FirstOrDefault(c => c.Type == "username");
+             if (usernameClaim != null)
+             {
+                 claims.Add(new Claim(ClaimTypes.Name, usernameClaim.Value));
+             }
+         } 
+        
         var identity = new ClaimsIdentity(claims, "jwt");
         var user = new ClaimsPrincipal(identity);
 

@@ -4,6 +4,8 @@
 @inject ProtectedSessionStorage sessionStorage
 @inject NavigationManager Navigation
 @using Frontend.Components.Layout
+@using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.AspNetCore.Mvc.ApplicationModels
 @using MyShared.Models
@@ -73,7 +75,7 @@
         
         // store token in local storage
         await sessionStorage.SetAsync("authToken", token);
-
+        
         Navigation.NavigateTo("/");
     }
 }

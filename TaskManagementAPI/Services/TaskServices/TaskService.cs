@@ -82,6 +82,18 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
 
         await _db.Tasks.AddAsync(newTaskItem);
         await _db.SaveChangesAsync();
+        
+        canAccess = await CanAccessProjectByProjectId(projectId, task.AssignedUserId);
+        
+        if (!canAccess)
+        {
+            await _db.ProjectVisibility.AddAsync(new ProjectVisibility
+            {
+                ProjectId = projectId,
+                UserId = task.AssignedUserId
+            });
+            await _db.SaveChangesAsync();
+        }
     }
 
     public async Task<bool> Update(int id, TaskItemCreateDto task, string userId)

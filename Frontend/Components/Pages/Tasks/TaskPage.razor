@@ -14,8 +14,31 @@
 else if (task != null)
 {
     <div class="task-page">
-        <h2 class="task-page-title">@task.Title</h2>
+        <div class="task-page-header">
+            @if (isEditingTitle)
+            {
+                <input class="edit-title-input"
+                       @bind="editTitle"
+                       @bind:event="oninput" />
+                
+                <div class="edit-actions">
+                    <button class="btn-main" @onclick="SaveTitle">Save</button>
+                    <button class="btn-alt" @onclick="CancelTitle">Cancel</button>
+                </div>
+            }
+            else
+            {
+                <h2 class="task-page-title">@task.Title</h2>
+                @if (IsOwnerOfTask())
+                {
+                    <i class="bi-pen edit-icon"
+                       title="Edit title"
+                       @onclick="StartTitleEdit"></i>
+                }
+            }
+        </div>
         
+
         <div class="task-page-meta">
             <span class="task-page-due @(IsOverdue() ? "overdue" : "")">
                 <i class="bi bi-calendar"></i> @task.DueDate.ToShortDateString()
@@ -25,9 +48,33 @@ else if (task != null)
             </span>
         </div>
 
-        <div class="task-page-description">
-            @task.Description
+        <div class="task-page-description-section">
+            @if (isEditingDescription)
+            {
+                <textarea class="edit-description-input"
+                            rows="6"
+                            @bind="editDescription"
+                            @bind:event="oninput"></textarea>
+                
+                <div class="edit-actions">
+                    <button class="btn-main" @onclick="SaveDescription">Save</button>
+                    <button class="btn-alt" @onclick="CancelDescription">Cancel</button>
+                </div>
+            }
+            else
+            {
+                <div class="task-page-description">
+                    @task.Description
+                </div>
+                @if (IsOwnerOfTask())
+                {
+                    <i class="bi-pen edit-icon"
+                       title="Edit description"
+                       @onclick="StartDescriptionEdit"></i>
+                }
+            }
         </div>
+        
 
         @if (comments != null && comments.Length > 0)
         {
@@ -35,10 +82,10 @@ else if (task != null)
             <div class="comments-list">
                 @foreach (var comment in comments)
                 {
-                    <CommentCard 
-                        Comment="@comment" 
-                        userId="@userId" 
-                        OnDeleted="LoadComments" 
+                    <CommentCard
+                        Comment="@comment"
+                        userId="@userId"
+                        OnDeleted="LoadComments"
                         OnEditingChanged="SetEditingComment"/>
                 }
             </div>
@@ -60,7 +107,7 @@ else if (task != null)
                 </div>
             </div>
         }
-       
+
     </div>
 }
 
@@ -69,10 +116,16 @@ else if (task != null)
     
     private TaskItemDto? task;
     private CommentDto[]? comments;
-    private string? userId;
+    
     private bool loading = true;
     private bool showNewComment = false;
     private bool isEditingComment = false;
+    private bool isEditingTitle = false;
+    private bool isEditingDescription = false;
+
+    private string? userId;
+    private string editTitle = "";
+    private string editDescription = "";
     private string newCommentText = "";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -91,6 +144,9 @@ else if (task != null)
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
             task = await client.GetFromJsonAsync<TaskItemDto?>($"api/Tasks/{taskId}");
+            
+            var token = await JwtHelper.GetAuthorizationTokenAsync();
+            userId = JwtHelper.GetUserId(token);
         }
         catch (Exception ex)
         {
@@ -110,9 +166,7 @@ else if (task != null)
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
-
+            
             comments = await client.GetFromJsonAsync<CommentDto[]>($"api/Comments/task/{taskId}");
         }
         catch (Exception ex)
@@ -136,6 +190,27 @@ else if (task != null)
     {
         if (task?.AssignedUserId == null) return false;
         return task.AssignedUserId == userId;
+    }
+
+    private async Task SaveTaskToApi()
+    {
+        var client = await JwtHelper.GetAuthenticatedClientAsync();
+
+        var dto = new TaskItemCreateDto
+        {
+            Title = task!.Title,
+            Description = task.Description,
+            DueDate = task.DueDate,
+            StatusId = task.StatusId,
+            AssignedUserId = task.AssignedUserId,
+            ProjectId = task.ProjectId
+        };
+
+        var result = await client.PutAsJsonAsync($"api/Tasks/{task.Id}", dto);
+        
+        if (!result.IsSuccessStatusCode) 
+            Console.WriteLine("Failed updating task: " + result.StatusCode);
+
     }
 
     private async Task SubmitComment()
@@ -168,6 +243,44 @@ else if (task != null)
         {
             Console.WriteLine("Exception submitting comment: " + ex.Message);
         }
+    }
+
+    private void StartTitleEdit()
+    {
+        editTitle = task!.Title;
+        isEditingTitle = true;
+    }
+
+    private void CancelTitle()
+    {
+        editTitle = "";
+        isEditingTitle = false;
+    }
+
+    private async Task SaveTitle()
+    {
+        task!.Title = editTitle;
+        await SaveTaskToApi();
+        isEditingTitle = false;
+    }
+
+    private void StartDescriptionEdit()
+    {
+        editDescription = task!.Description;
+        isEditingDescription = true;
+    }
+
+    private void CancelDescription()
+    {
+        editDescription = "";
+        isEditingDescription = false;
+    }
+
+    private async Task SaveDescription()
+    {
+        task!.Description = editDescription;
+        await SaveTaskToApi();
+        isEditingDescription = false;
     }
 
     private void CancelNewComment()

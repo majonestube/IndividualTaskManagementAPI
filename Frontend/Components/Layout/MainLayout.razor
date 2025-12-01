@@ -11,13 +11,13 @@
     </div>
 
     <main>
-        <div>
+        <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <p>@context.User.Identity?.Name</p>
+                    <p>@context.User?.Identity?.Name</p>
                 </Authorized>
                 <NotAuthorized>
-                    <p>LOG OUT!!!</p>
+                    <NavLink href="/Login">Log in / Register</NavLink>
                 </NotAuthorized>
             </AuthorizeView>
         </div>
