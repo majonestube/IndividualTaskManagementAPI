@@ -25,12 +25,14 @@
             </div>
             @if (IsOwner)
             {
-                <button class="btn btn-sm btn-outline" @onclick="StartEdit" @onclick:stopPropagation="true" title="Edit project">
-                    <i class="bi bi-pen"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
-                    <i class="bi bi-trash"></i>
-                </button>
+                <div class="project-options">
+                    <button class="btn btn-sm btn-outline-info" @onclick="StartEdit" @onclick:stopPropagation="true" title="Edit project">
+                        <i class="bi bi-pen"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
             }
         }
     </div>
