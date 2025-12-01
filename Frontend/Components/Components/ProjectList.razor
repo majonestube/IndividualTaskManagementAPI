@@ -22,7 +22,7 @@ else
     <div class="project-card-grid">
         @foreach (var project in projects)
         {
-            <ProjectCard Project="project" AllowDelete="@AllowDelete" OnDeleted="LoadProjects" />
+            <ProjectCard Project="project" IsOwner="@IsOwner" OnDeleted="LoadProjects" userId="@userId" />
         }
     </div>
 }
@@ -35,7 +35,7 @@ else
 @code {
     [Parameter] public string VisibleOrOwner { get; set; } = "visible";
     [Parameter] public string Heading { get; set; } = "Projects";
-    [Parameter] public bool AllowDelete { get; set; } = false;
+    [Parameter] public bool IsOwner { get; set; } = false;
     [Parameter] public bool ShowNewButton { get; set; } = false;
     [Parameter] public string EmptyMessage { get; set; } = "No projects found.";
     [Parameter] public string ErrorMessage { get; set; } = "There was an error retrieving projects.";
@@ -43,6 +43,7 @@ else
 
     private ProjectDto[]? projects;
     private bool loading = true;
+    public string? userId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -57,6 +58,9 @@ else
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
             projects = await client.GetFromJsonAsync<ProjectDto[]>($"api/project/{VisibleOrOwner}");
+            
+            var token = await JwtHelper.GetAuthorizationTokenAsync();
+            userId = JwtHelper.GetUserId(token);
         }
         catch (Exception ex)
         {

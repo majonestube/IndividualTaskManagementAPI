@@ -27,28 +27,41 @@
             <div class="task-card-username">@task?.AssignedUserName</div>
         </div>
     </div>
-    <select class="task-card-status-select"
-            @onchange="UpdateStatus"
-            @onclick:stopPropagation="true">
-        @if (statuses != null)
+    <div class="task-page-status">
+        @if (IsOwnerOfTask)
         {
-            @foreach (var status in statuses)
-            {
-                <option value="@status.Id" selected="@(status.Id == task.StatusId)">
-                    @status.Name
-                </option>
-            }
+            <select class="task-card-status-select"
+                    @onchange="UpdateStatus"
+                    @onclick:stopPropagation="true">
+                @if (statuses != null)
+                {
+                    @foreach (var status in statuses)
+                    {
+                        <option value="@status.Id" selected="@(status.Id == task.StatusId)">
+                            @status.Name
+                        </option>
+                    }
+                }
+            </select>
         }
-    </select>
+        else
+        {
+            <div class="task-card-status-display">@task?.Status</div>
+        }
+    </div>
+    
 </div>
 
 @code {
     [Parameter] public TaskItemDto? task { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+    
     private StatusDto[]? statuses;
 
     void GoToTask() => Navigation.NavigateTo($"/Task/{task.Id}");
+
+    private bool IsOwnerOfTask => task?.AssignedUserId == userId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

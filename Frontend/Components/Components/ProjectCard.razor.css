@@ -1,5 +1,5 @@
 ﻿.project-card {
-    width: 300px; /* fixed width per card */
+    width: 300px; 
     min-height: 200px;
     border-radius: 12px;
     overflow: hidden;
@@ -21,7 +21,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(90deg, #3a0647, #05163d); /* top gradient */
+    background: linear-gradient(90deg, #3a0647, #05163d); 
     color: white;
 }
 
@@ -71,4 +71,10 @@
 
 .project-card-body div {
     margin-bottom: 5px;
+}
+
+.edit-actions .btn-main,
+.edit-actions .btn-alt {
+    padding: 4px 10px;
+    font-size: 0.85rem;
 }

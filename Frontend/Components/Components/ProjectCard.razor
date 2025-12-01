@@ -6,18 +6,32 @@
 
 <div class="project-card" @onclick="GoToProject">
     <div class="project-card-header">
-        <div class="project-card-title">
-            @Project?.Name
-            @if (Project?.UnreadNotificationsCount > 0)
-            {
-                <span class="notifications-badge">@Project.UnreadNotificationsCount</span>
-            }
-        </div>
-        @if (AllowDelete)
+        @if (isEditing)
         {
-            <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
-                <i class="bi bi-trash"></i>
-            </button>
+            <input class="edit-name-input" 
+                   @bind="editName"
+                   @bind:event="oninput"
+                   @onclick:stopPropagation="true"/>
+            
+        }
+        else
+        {
+            <div class="project-card-title">
+                @Project?.Name
+                @if (Project?.UnreadNotificationsCount > 0)
+                {
+                    <span class="notifications-badge">@Project.UnreadNotificationsCount</span>
+                }
+            </div>
+            @if (IsOwner)
+            {
+                <button class="btn btn-sm btn-outline" @onclick="StartEdit" @onclick:stopPropagation="true" title="Edit project">
+                    <i class="bi bi-pen"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" @onclick="DeleteProject" @onclick:stopPropagation="true" title="Delete project">
+                    <i class="bi bi-trash"></i>
+                </button>
+            }
         }
     </div>
     <div class="project-card-body">
@@ -26,21 +40,85 @@
             <div class="project-card-dash"> - </div>
             <div class="project-card-created">@Project?.Created</div>
         </div>
-        <div class="project-card-description">@Project?.Description</div>
+        @if (isEditing)
+        {
+            <textarea class="edit-description-input"
+                        rows="6"
+                        @bind="editDescription"
+                        @bind:event="oninput"
+                        @onclick:stopPropagation="true"></textarea>
+        }
+        else
+        {
+            <div class="project-card-description">@Project?.Description</div>
+        }
         <div class="project-card-task-count"><span class="fw-bold">@Project?.TaskCount </span> tasks in this project</div>
     </div>
+    @if (isEditing)
+    {
+        <div class="edit-actions" @onclick:stopPropagation="true">
+            <button class="btn-main" @onclick="SaveProject">Save</button>
+            <button class="btn-alt" @onclick="CancelEdit">Cancel</button>
+        </div>
+    }
 </div>
 
 @code {
     [Parameter] public ProjectDto Project { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
-    [Parameter] public bool AllowDelete { get; set; } = false;
+    [Parameter] public string userId { get; set; }
+    [Parameter] public bool IsOwner { get; set; } = false;
+    
+    private bool isEditing = false;
+
+    private string editName = "";
+    private string editDescription = "";
 
     void GoToProject() => Navigation.NavigateTo($"/Project/{Project.Id}");
 
+    private void StartEdit()
+    {
+        editName = Project!.Name;
+        editDescription = Project!.Description;
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        editDescription = "";
+        editName = "";
+        isEditing = false;
+    }
+
+    private async Task SaveProject()
+    {
+        var client = await JwtHelper.GetAuthenticatedClientAsync();
+
+        var dto = new ProjectCreateDto
+        {
+            Name = editName,
+            Description = editDescription,
+            UserId = userId
+        };
+
+        var response = await client.PutAsJsonAsync($"api/Project/{Project.Id}", dto);
+
+        if (response.IsSuccessStatusCode)
+        {
+            editDescription = "";
+            editName = "";
+            if (OnDeleted.HasDelegate)
+                await OnDeleted.InvokeAsync();
+        }
+        else
+        {
+            Console.WriteLine("Error editing project: " + response.StatusCode);
+        }
+    }
+
     private async Task DeleteProject()
     {
-        if (!AllowDelete) return;
+        if (!IsOwner) return;
         if (!await JsConfirm("Are you sure you want to delete this project?")) return;
 
         try
