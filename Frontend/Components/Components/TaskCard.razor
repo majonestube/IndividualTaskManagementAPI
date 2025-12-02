@@ -107,6 +107,8 @@
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
             await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
+            if (OnDeleted.HasDelegate)
+                await OnDeleted.InvokeAsync();
         }
         catch (Exception ex)
         {
