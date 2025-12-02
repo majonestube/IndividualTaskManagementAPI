@@ -1,0 +1,106 @@
+﻿@using Frontend.Services
+@using MyShared.Models
+@inject JwtHelper JwtHelper
+
+@if (Visible)
+{
+    <div class="overlay" @onclick="Close">
+        <div class="dialog" @onclick:stopPropagation="true">
+            <h3>Share Project</h3>
+
+            <div class="mb-3">
+                <select id="assignedUser" class="form-select rounded-pill" @bind="sharedUserId">
+                    <option value="">-- Select a user --</option>
+                    @if (users != null)
+                    {
+                        @foreach (var user in users)
+                        {
+                            <option value="@user.Id">@user.Username</option>
+                        }
+                    }
+                </select>
+
+                @if (!string.IsNullOrWhiteSpace(errorMessage))
+                {
+                    <div class="text-danger mt-2">@errorMessage</div>
+                }
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-main" @onclick="Share">Share</button>
+                <button class="btn-alt" @onclick="Close">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<bool> VisibleChanged { get; set; }
+    [Parameter] public int ProjectId { get; set; }
+
+    private string errorMessage = "";
+    private UserDto[]? users;
+    private string? sharedUserId;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Visible)
+        {
+            await LoadUsers();
+        }
+    }
+
+    private async Task LoadUsers()
+    {
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            users = await client.GetFromJsonAsync<UserDto[]>("api/User");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error loading users: " + ex.Message);
+        }
+    }
+
+    private async Task Share()
+    {
+        try
+        {
+            var client = await JwtHelper.GetAuthenticatedClientAsync();
+
+            var dto = new ProjectShareDto
+            {
+                sharedUserId = sharedUserId
+            };
+
+            var response = await client.PostAsJsonAsync($"api/Project/{ProjectId}/share", dto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "Error sharing project: " + response.StatusCode;
+                return;
+            }
+            else
+            {
+                await Close();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error sharing project: " + ex.Message);
+        }
+        
+
+    }
+
+    private async Task Close()
+    {
+        await VisibleChanged.InvokeAsync(false);
+    }
+    
+}

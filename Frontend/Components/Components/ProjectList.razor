@@ -1,4 +1,5 @@
-﻿@using Frontend.Services
+﻿@using Frontend.Components.Layout
+@using Frontend.Services
 @using MyShared.Models
 @inject JwtHelper JwtHelper
 @inject NavigationManager Navigation
@@ -22,9 +23,18 @@ else
     <div class="project-card-grid">
         @foreach (var project in projects)
         {
-            <ProjectCard Project="project" IsOwner="@IsOwner" OnDeleted="LoadProjects" userId="@userId" />
+            <ProjectCard 
+                Project="project" 
+                IsOwner="@IsOwner" 
+                OnShare="OpenShareDialog"
+                OnDeleted="LoadProjects" 
+                userId="@userId" />
         }
     </div>
+    
+    <ShareProjectDialog Visible="@showShareDialog"
+                        VisibleChanged="@(v => showShareDialog = v)"
+                        ProjectId="@selectedProjectId" />
 }
 
 @if (ShowNewButton)
@@ -43,6 +53,8 @@ else
 
     private ProjectDto[]? projects;
     private bool loading = true;
+    private bool showShareDialog = false;
+    private int selectedProjectId;
     public string? userId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -71,6 +83,12 @@ else
             loading = false;
             StateHasChanged();
         }
+    }
+
+    private void OpenShareDialog(int projectId)
+    {
+        selectedProjectId = projectId;
+        showShareDialog = true;
     }
 
     private void GoToNewProject()

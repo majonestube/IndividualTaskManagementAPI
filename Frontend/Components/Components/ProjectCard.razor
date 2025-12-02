@@ -26,6 +26,9 @@
             @if (IsOwner)
             {
                 <div class="project-options">
+                    <button class="btn btn-sm btn-outline-primary" @onclick="StartShare" @onclick:stopPropagation="true" title="Share project">
+                        <i class="bi bi-share"></i>
+                    </button>
                     <button class="btn btn-sm btn-outline-info" @onclick="StartEdit" @onclick:stopPropagation="true" title="Edit project">
                         <i class="bi bi-pen"></i>
                     </button>
@@ -68,6 +71,7 @@
 @code {
     [Parameter] public ProjectDto Project { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+    [Parameter] public EventCallback<int> OnShare { get; set; }
     [Parameter] public string userId { get; set; }
     [Parameter] public bool IsOwner { get; set; } = false;
     
@@ -116,6 +120,12 @@
         {
             Console.WriteLine("Error editing project: " + response.StatusCode);
         }
+    }
+
+    private void StartShare()
+    {
+        if (OnShare.HasDelegate)
+            OnShare.InvokeAsync(Project.Id);
     }
 
     private async Task DeleteProject()
