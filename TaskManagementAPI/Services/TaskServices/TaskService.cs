@@ -25,6 +25,8 @@ public class TaskService(TaskManagementDbContext db, UserManager<IdentityUser> u
             .Include(t => t.Project)
             .Include(t => t.AssignedUser)
             .Where(t => t.ProjectId == projectId)
+            .OrderBy(t => t.StatusId)
+            .ThenBy(t => t.DueDate)
             .Select(t => new TaskItemDto
             {
                 Id  = t.Id,
