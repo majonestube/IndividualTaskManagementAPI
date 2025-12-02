@@ -1,8 +1,10 @@
-﻿@using Frontend.Components.Components
+﻿@inherits MainLayout
+@using Frontend.Services
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
-@inherits MainLayout
+@using MyShared.Models
 @inject ProtectedSessionStorage sessionStorage
 @inject NavigationManager Navigation
+@inject JwtHelper JwtHelper
 
 
 <div class="page">

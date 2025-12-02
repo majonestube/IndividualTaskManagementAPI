@@ -3,6 +3,7 @@
 @inject IHttpClientFactory Http
 @inject ProtectedSessionStorage sessionStorage
 @inject NavigationManager Navigation
+@inject UiStateService Ui
 @using Frontend.Components.Layout
 @using Frontend.Services
 @using Microsoft.AspNetCore.Components.Authorization
@@ -75,6 +76,7 @@
         
         // store token in local storage
         await sessionStorage.SetAsync("authToken", token);
+        Ui.NotifyStateChanged();
         
         Navigation.NavigateTo("/");
     }

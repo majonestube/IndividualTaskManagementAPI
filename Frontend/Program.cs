@@ -11,9 +11,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped <ProtectedSessionStorage>();
 builder.Services.AddScoped<JwtHelper>();
-builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
-builder.Services.AddAuthenticationCore();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddSingleton<UiStateService>();
+
+//builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
+//builder.Services.AddAuthenticationCore();
+//builder.Services.AddAuthorizationCore();
 
 builder.Services.AddHttpClient("TaskManagementAPI", client =>
 {
