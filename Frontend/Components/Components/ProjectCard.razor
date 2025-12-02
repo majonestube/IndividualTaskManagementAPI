@@ -1,8 +1,8 @@
 ﻿@using Frontend.Services
 @using MyShared.Models
 @inject NavigationManager Navigation
+@inject ApiClientFactory ClientFactory
 @inject IJSRuntime JS
-@inject JwtHelper JwtHelper
 
 <div class="project-card" @onclick="GoToProject">
     <div class="project-card-header">
@@ -45,7 +45,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.DeleteAsync($"api/Project/{Project.Id}");
 
             if (!response.IsSuccessStatusCode)

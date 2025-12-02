@@ -1,8 +1,8 @@
 ﻿@using Frontend.Services
 @using Microsoft.AspNetCore.Identity
 @using MyShared.Models
+@inject ApiClientFactory ClientFactory
 
-@inject JwtHelper JwtHelper
 @inject IJSRuntime JS
 
 <div class="comment-card">
@@ -42,7 +42,7 @@
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
     [Parameter] public EventCallback<bool> OnEditingChanged { get; set; }
-    
+
     private IdentityUser? user;
     private bool isEditing = false;
     private string editedText = "";
@@ -51,7 +51,7 @@
     {
         if (!firstRender) return;
 
-        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        var client = await ClientFactory.CreateClient();
         user = await client.GetFromJsonAsync<IdentityUser?>($"api/User/{userId}");
         StateHasChanged();
     }
@@ -80,8 +80,6 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-
             var updatedComment = new CommentDto
             {
                 Id = comment.Id,
@@ -92,6 +90,7 @@
                 CreatedDate = DateTime.Now
             };
             
+            var client = await ClientFactory.CreateClient();
             var response = await client.PutAsJsonAsync($"api/Comments/{comment.Id}", updatedComment);
 
             if (response.IsSuccessStatusCode)
@@ -121,7 +120,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.DeleteAsync($"api/Comments/{comment?.Id}");
 
             if (!response.IsSuccessStatusCode)

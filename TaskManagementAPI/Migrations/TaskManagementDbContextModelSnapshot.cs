@@ -15,7 +15,7 @@ namespace TaskManagementAPI.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.20");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -41,14 +41,6 @@ namespace TaskManagementAPI.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "role-admin",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -136,56 +128,6 @@ namespace TaskManagementAPI.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "user-admin",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "22fda0ab-c728-4e9a-b21a-a0474def29af",
-                            Email = "admin@example.com",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@EXAMPLE.COM",
-                            NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMAkm94DhmXg8clyv7zBH9pqOxUlFcXsWPP3IT5aqt+hqcU361UrsFk2eZSzlmXTNA==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "Admin"
-                        },
-                        new
-                        {
-                            Id = "user-marty",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "8a13641c-2d24-42a0-a085-76fc1ef15fad",
-                            Email = "marty@example.com",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "MARTY@EXAMPLE.COM",
-                            NormalizedUserName = "MARTY",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMVXFQGyje7evD90GQgEdUAj6OXtd6NBwmnxn98rJ50GaJTG2XUSMBtIuF3gCocc+w==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "Marty"
-                        },
-                        new
-                        {
-                            Id = "user-random",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "d65586d9-fcfa-471b-8c85-574277000e10",
-                            Email = "randomuser@example.com",
-                            EmailConfirmed = true,
-                            LockoutEnabled = false,
-                            NormalizedEmail = "RANDOMUSER@EXAMPLE.COM",
-                            NormalizedUserName = "RANDOMUSER",
-                            PasswordHash = "AQAAAAIAAYagAAAAENkzzPEK4mljRyJeDWeSg6n7esYYvoaqu797tgjUa12QgN1UXf9PWhb7NLXyV2uRQg==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "",
-                            TwoFactorEnabled = false,
-                            UserName = "RandomUser"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -246,13 +188,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "user-admin",
-                            RoleId = "role-admin"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -301,16 +236,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedDate = new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(2124),
-                            TaskItemId = 5,
-                            Text = "This is stupid",
-                            UserId = "user-admin"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagementAPI.Models.Entities.Notification", b =>
@@ -348,18 +273,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Created = new DateTime(2025, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            IsRead = false,
-                            Message = "A new person has commented",
-                            ProjectId = 1,
-                            TaskItemId = 2,
-                            UserId = "user-marty"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagementAPI.Models.Entities.Project", b =>
@@ -388,32 +301,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Projects", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Created = new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1852),
-                            Description = "Plan for bachelor-project spring 26.",
-                            Name = "Bachelor project",
-                            UserId = "user-marty"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Created = new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1921),
-                            Description = "Plan for house remodel",
-                            Name = "Fix up house",
-                            UserId = "user-random"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Created = new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1923),
-                            Description = "Plan to become the Dark Knight",
-                            Name = "Turn into Batman",
-                            UserId = "user-random"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagementAPI.Models.Entities.ProjectVisibility", b =>
@@ -436,44 +323,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("ProjectVisibility", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            ProjectId = 1,
-                            UserId = "user-admin"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            ProjectId = 2,
-                            UserId = "user-admin"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            ProjectId = 3,
-                            UserId = "user-admin"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            ProjectId = 1,
-                            UserId = "user-marty"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            ProjectId = 2,
-                            UserId = "user-random"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            ProjectId = 3,
-                            UserId = "user-random"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagementAPI.Models.Entities.Status", b =>
@@ -489,23 +338,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Status", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Name = "To Do"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Name = "In Progress"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Name = "Done"
-                        });
                 });
 
             modelBuilder.Entity("TaskManagementAPI.Models.Entities.TaskItem", b =>
@@ -542,68 +374,6 @@ namespace TaskManagementAPI.Migrations
                     b.HasIndex("StatusId");
 
                     b.ToTable("Tasks", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AssignedUserId = "user-marty",
-                            Description = "Before starting the project, define task parameters and expectations with the client.",
-                            DueDate = new DateTime(2025, 11, 7, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 1,
-                            StatusId = 2,
-                            Title = "Have meeting with client"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AssignedUserId = "user-marty",
-                            Description = "A meeting between all students working on the project, to define roles and a plan of action.",
-                            DueDate = new DateTime(2026, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 1,
-                            StatusId = 1,
-                            Title = "Planning meeting with student"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AssignedUserId = "user-random",
-                            Description = "Finish closing the doorframe in the guest bedroom.",
-                            DueDate = new DateTime(2026, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 2,
-                            StatusId = 2,
-                            Title = "Close doorframe"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AssignedUserId = "user-random",
-                            Description = "Paint the walls in the guest bedroom.",
-                            DueDate = new DateTime(2026, 1, 20, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 2,
-                            StatusId = 1,
-                            Title = "Paint wall"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AssignedUserId = "user-random",
-                            Description = "Become drop dead gorgeous",
-                            DueDate = new DateTime(2025, 12, 31, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 3,
-                            StatusId = 3,
-                            Title = "Become handsome"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AssignedUserId = "user-random",
-                            Description = "Somehow, become very rich. Maybe rob a bank?",
-                            DueDate = new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            ProjectId = 3,
-                            StatusId = 1,
-                            Title = "Become rich"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -1,0 +1,13 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="AppHost/AppHost.csproj" />
+  <Project Path="Frontend/Frontend.csproj" />
+  <Project Path="MyShared/MyShared.csproj" />
+  <Project Path="ServiceDefaults/ServiceDefaults.csproj" />
+  <Project Path="TaskManagementAPI.Tests/TaskManagementAPI.Tests.csproj" />
+  <Project Path="TaskManagementAPI/TaskManagementAPI.csproj" />
+</Solution>

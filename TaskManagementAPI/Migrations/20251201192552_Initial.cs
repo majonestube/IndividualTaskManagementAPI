@@ -3,12 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace TaskManagementAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -316,82 +314,6 @@ namespace TaskManagementAPI.Migrations
                         principalTable: "Tasks",
                         principalColumn: "Id");
                 });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "role-admin", null, "Admin", "ADMIN" });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUsers",
-                columns: new[] { "Id", "AccessFailedCount", "ConcurrencyStamp", "Email", "EmailConfirmed", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
-                values: new object[,]
-                {
-                    { "user-admin", 0, "22fda0ab-c728-4e9a-b21a-a0474def29af", "admin@example.com", true, false, null, "ADMIN@EXAMPLE.COM", "ADMIN", "AQAAAAIAAYagAAAAEMAkm94DhmXg8clyv7zBH9pqOxUlFcXsWPP3IT5aqt+hqcU361UrsFk2eZSzlmXTNA==", null, false, "", false, "Admin" },
-                    { "user-marty", 0, "8a13641c-2d24-42a0-a085-76fc1ef15fad", "marty@example.com", true, false, null, "MARTY@EXAMPLE.COM", "MARTY", "AQAAAAIAAYagAAAAEMVXFQGyje7evD90GQgEdUAj6OXtd6NBwmnxn98rJ50GaJTG2XUSMBtIuF3gCocc+w==", null, false, "", false, "Marty" },
-                    { "user-random", 0, "d65586d9-fcfa-471b-8c85-574277000e10", "randomuser@example.com", true, false, null, "RANDOMUSER@EXAMPLE.COM", "RANDOMUSER", "AQAAAAIAAYagAAAAENkzzPEK4mljRyJeDWeSg6n7esYYvoaqu797tgjUa12QgN1UXf9PWhb7NLXyV2uRQg==", null, false, "", false, "RandomUser" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Status",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { 1, "To Do" },
-                    { 2, "In Progress" },
-                    { 3, "Done" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetUserRoles",
-                columns: new[] { "RoleId", "UserId" },
-                values: new object[] { "role-admin", "user-admin" });
-
-            migrationBuilder.InsertData(
-                table: "Projects",
-                columns: new[] { "Id", "Created", "Description", "Name", "UserId" },
-                values: new object[,]
-                {
-                    { 1, new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1852), "Plan for bachelor-project spring 26.", "Bachelor project", "user-marty" },
-                    { 2, new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1921), "Plan for house remodel", "Fix up house", "user-random" },
-                    { 3, new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(1923), "Plan to become the Dark Knight", "Turn into Batman", "user-random" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "ProjectVisibility",
-                columns: new[] { "Id", "ProjectId", "UserId" },
-                values: new object[,]
-                {
-                    { 1, 1, "user-admin" },
-                    { 2, 2, "user-admin" },
-                    { 3, 3, "user-admin" },
-                    { 4, 1, "user-marty" },
-                    { 5, 2, "user-random" },
-                    { 6, 3, "user-random" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Tasks",
-                columns: new[] { "Id", "AssignedUserId", "Description", "DueDate", "ProjectId", "StatusId", "Title" },
-                values: new object[,]
-                {
-                    { 1, "user-marty", "Before starting the project, define task parameters and expectations with the client.", new DateTime(2025, 11, 7, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 2, "Have meeting with client" },
-                    { 2, "user-marty", "A meeting between all students working on the project, to define roles and a plan of action.", new DateTime(2026, 1, 10, 0, 0, 0, 0, DateTimeKind.Unspecified), 1, 1, "Planning meeting with student" },
-                    { 3, "user-random", "Finish closing the doorframe in the guest bedroom.", new DateTime(2026, 1, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 2, "Close doorframe" },
-                    { 4, "user-random", "Paint the walls in the guest bedroom.", new DateTime(2026, 1, 20, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, 1, "Paint wall" },
-                    { 5, "user-random", "Become drop dead gorgeous", new DateTime(2025, 12, 31, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, 3, "Become handsome" },
-                    { 6, "user-random", "Somehow, become very rich. Maybe rob a bank?", new DateTime(2026, 3, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, 1, "Become rich" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Comments",
-                columns: new[] { "Id", "CreatedDate", "TaskItemId", "Text", "UserId" },
-                values: new object[] { 1, new DateTime(2025, 11, 12, 19, 30, 48, 643, DateTimeKind.Local).AddTicks(2124), 5, "This is stupid", "user-admin" });
-
-            migrationBuilder.InsertData(
-                table: "Notifications",
-                columns: new[] { "Id", "Created", "IsRead", "Message", "ProjectId", "TaskItemId", "UserId" },
-                values: new object[] { 1, new DateTime(2025, 11, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), false, "A new person has commented", 1, 2, "user-marty" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

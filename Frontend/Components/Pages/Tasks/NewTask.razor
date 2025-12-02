@@ -4,7 +4,7 @@
 @using MyShared.Models
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @layout AfterLoginLayout
 
 <h3 class="mb-4">New Task - @project?.Name</h3>
@@ -61,8 +61,8 @@
 </div>
 
 @code {
-    [Parameter]
-    public int projectId { get; set; }
+    [Parameter] public int projectId { get; set; }
+
     private TaskItemCreateDto taskItem = new()
     {
         DueDate = DateTime.Today,
@@ -78,8 +78,7 @@
         if (!firstRender) return;
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-
+            var client = await ClientFactory.CreateClient();
             users = await client.GetFromJsonAsync<UserDto[]>("api/User");
             statuses = await client.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
             project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");
@@ -121,7 +120,7 @@
         // create the task
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.PostAsJsonAsync("api/Tasks/", taskItem);
             
             if (!response.IsSuccessStatusCode)

@@ -1,7 +1,8 @@
 ﻿@page "/Register"
+@using Frontend.Services
 @using MyShared.Models
 @rendermode InteractiveServer
-@inject IHttpClientFactory Http
+@inject ApiClientFactory ClientFactory
 @inject NavigationManager Navigation
 
 <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -51,7 +52,7 @@
             return;
         }
         
-        var client = Http.CreateClient("TaskManagementAPI");
+            var client = await ClientFactory.CreateClient();
         var response = await client.PostAsJsonAsync("api/auth/register", register);
 
         if (!response.IsSuccessStatusCode)

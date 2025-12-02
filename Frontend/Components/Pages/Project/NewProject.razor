@@ -4,7 +4,7 @@
 @using MyShared.Models
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @layout AfterLoginLayout
 
 <h3 class="mb-4">Create New Project</h3>
@@ -46,7 +46,7 @@
         // create the project 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.PostAsJsonAsync("api/project", project);
 
             if (!response.IsSuccessStatusCode)

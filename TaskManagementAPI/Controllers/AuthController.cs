@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyShared.Models;
 using TaskManagementAPI.Services.AuthServices;
@@ -11,6 +12,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
     : ControllerBase
 {
     [HttpPost("Register")]
+    [AllowAnonymous()]
     public async Task<IActionResult> RegisterUser(LoginDto user)
     {
         var identityUser = await userManager.FindByNameAsync(user.Username);
@@ -40,6 +42,7 @@ public class AuthController(IAuthService authService, UserManager<IdentityUser> 
     }
 
     [HttpPost("Login")]
+    [AllowAnonymous()]
     public async Task<IActionResult> LoginUser(LoginDto user)
     {
         var identityUser = await userManager.FindByNameAsync(user.Username);

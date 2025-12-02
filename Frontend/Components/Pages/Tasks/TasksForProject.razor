@@ -2,10 +2,13 @@
 @using Frontend.Components.Components
 @using Frontend.Components.Layout
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
+@using System.Security.Claims
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @layout AfterLoginLayout
 
 <h3>@project?.Name</h3>
@@ -33,7 +36,6 @@ else
 
 @code {
     [Parameter] public int projectId { get; set; }
-    
     private TaskItemDto[]? tasks;
     private ProjectDto? project;
     private string? userId;
@@ -53,10 +55,14 @@ else
         
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
+            var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            userId = state.User.Claims.FirstOrDefault(c =>
+                c.Type == ClaimTypes.NameIdentifier ||
+                c.Type == "sub" ||
+                c.Type == "id"
+            )?.Value;
             
+            var client = await ClientFactory.CreateClient();
             tasks = await client.GetFromJsonAsync<TaskItemDto[]>($"api/Tasks/project/{projectId}");
             project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");
         }

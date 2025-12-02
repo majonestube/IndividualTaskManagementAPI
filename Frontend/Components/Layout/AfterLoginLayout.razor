@@ -1,7 +1,8 @@
-﻿@using Frontend.Components.Components
+@using Frontend.Components.Components
+@using Frontend.Services
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inherits MainLayout
-@inject ProtectedSessionStorage sessionStorage
+@inject JwtStore JwtStore
 @inject NavigationManager Navigation
 
 
@@ -30,7 +31,7 @@
 @code {
     private async Task Logout()
     {
-        await sessionStorage.DeleteAsync("authToken");
+        await JwtStore.ClearToken();
         Navigation.NavigateTo("/Login", true);
     }
 }

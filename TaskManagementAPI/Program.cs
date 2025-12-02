@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using TaskManagementAPI;
 using TaskManagementAPI.Data;
-using TaskManagementAPI.Services;
 using TaskManagementAPI.Services.AuthServices;
 using TaskManagementAPI.Services.CommentServices;
 using TaskManagementAPI.Services.NotificationServices;
@@ -14,6 +14,7 @@ using TaskManagementAPI.Services.TaskServices;
 using TaskManagementAPI.Services.UserServices;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddServiceDefaults();
 
 // Controllers
 builder.Services.AddControllers();
@@ -35,9 +36,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //db
-builder.Services.AddDbContext<TaskManagementDbContext>(options => 
-    options.UseSqlite("Data Source=TaskManagement.db"));
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddDbContext<TaskManagementDbContext>(options => options
+    .UseSqlite("Data Source=TaskManagement.db")
+    .UseAsyncSeeding(async (dbContext, _, cancellationToken) => await TaskManagementDataSeeder.SeedDataAsync(dbContext, cancellationToken))
+    .UseSeeding((dbContext, _) => TaskManagementDataSeeder.SeedData(dbContext))
+);
+
+builder.Services
+    .AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<TaskManagementDbContext>()
     .AddDefaultTokenProviders();
 
@@ -51,7 +57,7 @@ builder.Services.AddAuthentication(options =>
     .AddJwtBearer(options =>
     {
         options.RequireHttpsMetadata = false;
-        var byteKey = Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key").Value);
+        var byteKey = Encoding.UTF8.GetBytes(builder.Configuration.GetSection("Jwt:Key")!.Value!);
 
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -94,19 +100,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     // Apply the Bearer authentication scheme globally
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
+        [new OpenApiSecuritySchemeReference("OAuth2", document)] = []
     });
 });
 
@@ -127,5 +123,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<TaskManagementDbContext>();
+    await dbContext.Database.EnsureDeletedAsync();
+    await dbContext.Database.MigrateAsync();
+}
 
 app.Run();

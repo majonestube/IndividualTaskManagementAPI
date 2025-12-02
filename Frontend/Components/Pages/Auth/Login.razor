@@ -1,12 +1,18 @@
 ﻿@page "/Login"
 @rendermode InteractiveServer
-@inject IHttpClientFactory Http
-@inject ProtectedSessionStorage sessionStorage
+@inject ApiClientFactory ClientFactory
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @using Frontend.Components.Layout
+@using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @using Microsoft.AspNetCore.Mvc.ApplicationModels
 @using MyShared.Models
+@using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
+@using System.Diagnostics
 
 <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
     <div class="card shadow-sm p-4" style="max-width: 400px; width: 100%">
@@ -42,7 +48,7 @@
 
     private async Task HandleLogin()
     {
-        var client = Http.CreateClient("TaskManagementAPI");
+            var client = await ClientFactory.CreateClient();
         var response = await client.PostAsJsonAsync("api/auth/login", login);
 
         if (!response.IsSuccessStatusCode)
@@ -71,9 +77,8 @@
             return;
         }
         
-        // store token in local storage
-        await sessionStorage.SetAsync("authToken", token);
+        await ((JwtAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
 
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/", false);
     }
 }

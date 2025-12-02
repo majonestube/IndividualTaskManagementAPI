@@ -1,8 +1,8 @@
 ﻿@using Frontend.Services
 @using MyShared.Models
 @inject IJSRuntime JS
-@inject JwtHelper JwtHelper
 @inject NavigationManager Navigation
+@inject ApiClientFactory ClientFactory
 
 
 <div class="task-card @GetStatusClass()" @onclick="GoToTask">
@@ -46,6 +46,7 @@
     [Parameter] public TaskItemDto? task { get; set; }
     [Parameter] public string? userId { get; set; }
     [Parameter] public EventCallback OnDeleted { get; set; }
+
     private StatusDto[]? statuses;
 
     void GoToTask() => Navigation.NavigateTo($"/Task/{task.Id}");
@@ -54,7 +55,7 @@
     {
         if (!firstRender) return;
         
-        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        var client = await ClientFactory.CreateClient();
         statuses = await client.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
 
         if (task.StatusId == 0 && statuses != null)
@@ -92,7 +93,7 @@
         
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
         }
         catch (Exception ex)
@@ -107,7 +108,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.DeleteAsync($"api/Tasks/{task.Id}");
 
             if (!response.IsSuccessStatusCode)
