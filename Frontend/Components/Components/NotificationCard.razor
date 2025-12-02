@@ -1,0 +1,26 @@
+﻿@using MyShared.Models
+
+<div class="notification-card">
+    <div class="notification-header">
+        <div class="notification-project-name">
+            @notification?.ProjectName
+        </div>
+        @if (notification?.TaskName != null)
+        {
+            <div class="notification-task-name"> - @notification?.TaskName</div>
+        }
+    </div>
+    <div class="notification-created">@notification?.Created.ToShortDateString()</div>
+    <div class="notification-card-content">@notification?.Message</div>
+    @if (notification is { IsRead: false })
+    {
+        <div class="notification-card-unread">
+            <i class="bi bi-exclamation-circle"></i>
+        </div>
+    }
+</div>
+
+@code {
+
+    [Parameter] public NotificationDto? notification { get; set; }
+}
