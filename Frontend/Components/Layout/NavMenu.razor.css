@@ -148,15 +148,17 @@
 
 .notifications-list {
     position: absolute;
-    top: 2rem; /* below the bell icon */
+    top: 2rem; 
     right: 0;
-    width: 12rem; /* adjust width as needed */
-    max-height: 300px; /* limit height */
-    overflow-y: auto; /* scroll if content exceeds max-height */
-    background-color: rgba(0, 0, 0, 0.9);
+    width: 13rem; 
+    max-height: 300px; 
+    overflow-y: auto; 
+    background-color: rgba(30, 30, 30, 0.9);
     color: white;
     border-radius: 0.5rem;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     z-index: 1000;
     padding: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
 }

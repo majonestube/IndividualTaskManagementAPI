@@ -5,9 +5,9 @@
         <div class="notification-project-name">
             @notification?.ProjectName
         </div>
-        @if (notification?.TaskName != null)
+        @if (!string.IsNullOrWhiteSpace(notification?.TaskName))
         {
-            <div class="notification-task-name"> - @notification?.TaskName</div>
+            <div class="notification-task-name">@notification?.TaskName</div>
         }
     </div>
     <div class="notification-created">@notification?.Created.ToShortDateString()</div>

@@ -1,0 +1,51 @@
+.notification-card {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(50, 50, 50, 0.9);
+    padding: 0.5rem 0.75rem;
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.notification-card:hover {
+    background-color: rgba(70, 70, 70, 0.95);
+}
+
+.notification-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+.notification-project-name {
+    color: #fff;
+}
+
+
+.notification-task-name {
+    color: #ccc;
+    font-weight: normal;
+}
+
+.notification-created {
+    font-size: 0.75rem;
+    color: #aaa;
+    margin-bottom: 0.25rem;
+}
+
+.notification-card-content {
+    font-size: 0.85rem;
+    color: #ddd;
+    line-height: 1.2rem;
+}
+
+.notification-card-unread {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: #ff4d4d;
+    font-size: 1rem;
+}
