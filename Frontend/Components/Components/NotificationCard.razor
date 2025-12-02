@@ -1,6 +1,7 @@
 ﻿@using MyShared.Models
+@inject NavigationManager Navigation
 
-<div class="notification-card">
+<div class="notification-card" @onclick="Navigate">
     <div class="notification-header">
         <div class="notification-project-name">
             @notification?.ProjectName
@@ -23,4 +24,11 @@
 @code {
 
     [Parameter] public NotificationDto? notification { get; set; }
+
+    private void Navigate()
+    {
+        Navigation.NavigateTo(string.IsNullOrWhiteSpace(notification!.TaskName) 
+            ? $"/Project/{notification!.ProjectId}" 
+            : $"/Task/{notification!.TaskId}");
+    }
 }
