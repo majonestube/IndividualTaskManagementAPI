@@ -22,11 +22,14 @@
 </div>
 
 @code {
-
     [Parameter] public NotificationDto? notification { get; set; }
+    [Parameter] public EventCallback<bool> OnClicked { get; set; }
 
     private void Navigate()
     {
+        if (OnClicked.HasDelegate)
+            OnClicked.InvokeAsync();
+        
         Navigation.NavigateTo(string.IsNullOrWhiteSpace(notification!.TaskName) 
             ? $"/Project/{notification!.ProjectId}" 
             : $"/Task/{notification!.TaskItemId}");

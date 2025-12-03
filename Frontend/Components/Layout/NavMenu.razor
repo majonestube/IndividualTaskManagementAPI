@@ -24,7 +24,11 @@
                 <div class="notifications-list">
                     @foreach (var notification in notifications)
                     {
-                        <NotificationCard Notification="@notification"></NotificationCard>
+                        <NotificationCard
+                            Notification="@notification"
+                            OnClicked="ToggleNotifications">
+                            
+                        </NotificationCard>
                     }
                 </div>
             }
@@ -63,7 +67,6 @@
     private bool showNotifications;
     private bool loggedIn = false;
     private bool initialized;
-    private string userId;
 
     protected override void OnInitialized()
     {
@@ -77,7 +80,6 @@
         var token = await JwtHelper.GetAuthorizationTokenAsync();
         if (string.IsNullOrEmpty(token)) return;
         
-        userId = JwtHelper.GetUserId(token);
         await LoadNotifications();
         await InvokeAsync(StateHasChanged);
     }
