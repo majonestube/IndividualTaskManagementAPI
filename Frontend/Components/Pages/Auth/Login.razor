@@ -75,6 +75,6 @@
         await ((JwtAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
         Ui.NotifyStateChanged();
         
-        Navigation.NavigateTo("/", false);
+        Navigation.NavigateTo("/AvailableProjects", false);
     }
 }

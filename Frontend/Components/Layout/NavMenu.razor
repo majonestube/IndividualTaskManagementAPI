@@ -10,31 +10,37 @@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">LifeOrganizer!</a>
-        
-        <div class="nav-notification-container">
-            <button class="notification-button" @onclick="ToggleNotifications">
-                <i class="bi bi-bell"></i>
-            </button>
-            @if (unreadNotificationsCount > 0)
-            {
-                <div class="unread-notifications-count">@unreadNotificationsCount</div>
-            }
-            
-            @if (showNotifications && notifications?.Any() == true)
-            {
-                <div class="notifications-list">
-                    @foreach (var notification in notifications)
+        <AuthorizeView>
+            <Authorized>
+                <NavLink class="navbar-brand" href="/AvailableProjects">LifeOrganizer!</NavLink>
+                <div class="nav-notification-container">
+                    <button class="notification-button" @onclick="ToggleNotifications">
+                        <i class="bi bi-bell"></i>
+                    </button>
+                    @if (unreadNotificationsCount > 0)
                     {
-                        <NotificationCard
-                            Notification="@notification"
-                            OnClicked="ToggleNotifications">
-                            
-                        </NotificationCard>
+                        <div class="unread-notifications-count">@unreadNotificationsCount</div>
+                    }
+
+                    @if (showNotifications && notifications?.Any() == true)
+                    {
+                        <div class="notifications-list">
+                            @foreach (var notification in notifications)
+                            {
+                                <NotificationCard
+                                    Notification="@notification"
+                                    OnClicked="ToggleNotifications">
+
+                                </NotificationCard>
+                            }
+                        </div>
                     }
                 </div>
-            }
-        </div>
+            </Authorized>
+            <NotAuthorized>
+                <a class="navbar-brand" href="">LifeOrganizer!</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 </div>
 
@@ -42,22 +48,27 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="AvailableProjects">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Available Projects
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="YourProjects">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Your Projects
-            </NavLink>
-        </div>
-        
+        <AuthorizeView>
+            <NotAuthorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="AvailableProjects">
+                        <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Available Projects
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="YourProjects">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Your Projects
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
     </nav>
 </div>
 
