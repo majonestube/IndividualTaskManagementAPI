@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @inject JwtHelper JwtHelper
 @inject UiStateService Ui
+@inject NotificationService NotificationService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -13,9 +14,9 @@
             <button class="notification-button" @onclick="ToggleNotifications">
                 <i class="bi bi-bell"></i>
             </button>
-            @if (unreadNotifications > 0)
+            @if (unreadNotificationsCount > 0)
             {
-                <div class="unread-notifications-count">@unreadNotifications</div>
+                <div class="unread-notifications-count">@unreadNotificationsCount</div>
             }
             
             @if (showNotifications && notifications?.Any() == true)
@@ -56,10 +57,13 @@
 
 @code {
     private NotificationDto[]? notifications;
-    private int unreadNotifications = 0;
-    private bool showNotifications = false;
+    private NotificationDto[]? unreadNotifications;
+    
+    private int unreadNotificationsCount;
+    private bool showNotifications;
     private bool loggedIn = false;
     private bool initialized;
+    private string userId;
 
     protected override void OnInitialized()
     {
@@ -73,6 +77,7 @@
         var token = await JwtHelper.GetAuthorizationTokenAsync();
         if (string.IsNullOrEmpty(token)) return;
         
+        userId = JwtHelper.GetUserId(token);
         await LoadNotifications();
         await InvokeAsync(StateHasChanged);
     }
@@ -90,8 +95,9 @@
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            notifications = await client.GetFromJsonAsync<NotificationDto[]>($"api/Notification/notifications/user");
-            unreadNotifications = notifications.Count(n => !n.IsRead);
+            notifications = await client.GetFromJsonAsync<NotificationDto[]>($"api/Notification/user");
+            unreadNotifications = notifications?.Where(n => !n.IsRead).ToArray();
+            unreadNotificationsCount = unreadNotifications?.Length ?? 0;
             StateHasChanged();
         }
         catch (Exception ex)
@@ -100,8 +106,12 @@
         }
     }
     
-    private void ToggleNotifications()
+    private async void ToggleNotifications()
     {
         showNotifications = !showNotifications;
+
+        if (!showNotifications) return;
+        await NotificationService.MarkNotificationsAsRead(unreadNotifications);
+        HandleUiChange();
     }
 }

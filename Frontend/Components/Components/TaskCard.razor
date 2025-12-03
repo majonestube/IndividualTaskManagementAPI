@@ -106,7 +106,27 @@
         try
         {
             var client = await JwtHelper.GetAuthenticatedClientAsync();
-            await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
+            var response = await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error updating status: " + response.StatusCode);
+            }
+            
+            var notification = new NotificationCreateDto
+            {
+                ProjectId = task.ProjectId,
+                TaskItemId = task.Id,
+                Message = $"The status of a task has been set to {task.Status}"
+            };
+
+            response = await client.PostAsJsonAsync($"api/Notification", notification);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error creating notification: " + response.StatusCode);
+            }
+            
             if (OnDeleted.HasDelegate)
                 await OnDeleted.InvokeAsync();
         }
@@ -129,6 +149,19 @@
             {
                 Console.WriteLine("Error deleting task: " + response.StatusCode);
                 return;
+            }
+            
+            var notification = new NotificationCreateDto
+            {
+                ProjectId = task.ProjectId,
+                Message = "A task has been deleted"
+            };
+            
+            response = await client.PostAsJsonAsync($"api/Notification/", notification);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error creating notification: " + response.StatusCode);
             }
 
             if (OnDeleted.HasDelegate)

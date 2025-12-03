@@ -29,6 +29,6 @@
     {
         Navigation.NavigateTo(string.IsNullOrWhiteSpace(notification!.TaskName) 
             ? $"/Project/{notification!.ProjectId}" 
-            : $"/Task/{notification!.TaskId}");
+            : $"/Task/{notification!.TaskItemId}");
     }
 }

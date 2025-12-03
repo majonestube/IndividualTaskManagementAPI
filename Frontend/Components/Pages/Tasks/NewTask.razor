@@ -130,8 +130,23 @@
                 return;
             }
 
+            var notification = new NotificationCreateDto
+            {
+                ProjectId = projectId,
+                Message = "A new task has been created."
+            };
+
+            response = await client.PostAsJsonAsync($"api/Notification", notification);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                errorMessage = "Error creating notification." ;
+                return;
+            }
+
             Navigation.NavigateTo($"/Project/{projectId}");
-        } catch (Exception ex)
+        } 
+        catch (Exception ex)
         {
             errorMessage = "Exception: " + ex.Message;
         }

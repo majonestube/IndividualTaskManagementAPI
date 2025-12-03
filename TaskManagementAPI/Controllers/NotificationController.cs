@@ -11,7 +11,7 @@ public class NotificationController(INotificationService notificationService) : 
 {
     // Hent varsler for innlogget bruker
     [Authorize]
-    [HttpGet("notifications/user/")]
+    [HttpGet("user")]
     public async Task<IActionResult> GetNotificationsForUser()
     {
         var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

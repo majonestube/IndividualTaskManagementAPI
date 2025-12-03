@@ -85,10 +85,21 @@
                 errorMessage = "Error sharing project: " + response.StatusCode;
                 return;
             }
-            else
+
+            var notification = new NotificationCreateDto
             {
-                await Close();
+                ProjectId = ProjectId,
+                Message = "A project has been shared with you"
+            };
+
+            response = await client.PostAsJsonAsync($"api/Notification", notification);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Error creating notification: " + notification);
             }
+            
+            await Close();
         }
         catch (Exception ex)
         {

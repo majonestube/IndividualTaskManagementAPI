@@ -206,10 +206,22 @@ else if (task != null)
             ProjectId = task.ProjectId
         };
 
-        var result = await client.PutAsJsonAsync($"api/Tasks/{task.Id}", dto);
+        var response = await client.PutAsJsonAsync($"api/Tasks/{task.Id}", dto);
         
-        if (!result.IsSuccessStatusCode) 
-            Console.WriteLine("Failed updating task: " + result.StatusCode);
+        if (!response.IsSuccessStatusCode) 
+            Console.WriteLine("Failed updating task: " + response.StatusCode);
+
+        var notification = new NotificationCreateDto
+        {
+            ProjectId = task.ProjectId,
+            TaskItemId = taskId,
+            Message = "A task has been edited"
+        };
+
+        response = await client.PostAsJsonAsync($"api/Notification", notification);
+        
+        if (!response.IsSuccessStatusCode) 
+            Console.WriteLine("Failed creating notification: " + response.StatusCode);
 
     }
 
@@ -228,16 +240,26 @@ else if (task != null)
 
             var response = await client.PostAsJsonAsync($"api/Comments/{taskId}", newComment);
 
-            if (response.IsSuccessStatusCode)
-            {
-                newCommentText = "";
-                showNewComment = false;
-                await LoadComments();
-            }
-            else
-            {
+            if (!response.IsSuccessStatusCode)
                 Console.WriteLine("Error creating comment: " + response.StatusCode);
-            }
+            
+            newCommentText = "";
+            showNewComment = false;
+
+            var notification = new NotificationCreateDto
+            {
+                ProjectId = task.ProjectId,
+                TaskItemId = taskId,
+                Message = "New comment"
+            };
+
+            response = await client.PostAsJsonAsync($"api/Notification", notification);
+            
+            if (!response.IsSuccessStatusCode)
+                Console.WriteLine("Error creating notification: " + response.StatusCode);
+            
+            await LoadComments();
+
         }
         catch (Exception ex)
         {

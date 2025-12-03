@@ -15,11 +15,15 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
         var notifications = await _db.Notifications
             .AsNoTracking()
             .Include(n => n.Project)
+            .Include(n => n.Task)
             .Where(n => n.UserId == userId)
             .OrderByDescending(n => n.Created)
             .Select(n => new NotificationDto
             {
+                Id = n.Id,
+                ProjectId = n.ProjectId,
                 ProjectName = n.Project.Name,
+                TaskItemId = n.TaskItemId,
                 TaskName = n.Task != null ? n.Task.Title : "",
                 Message = n.Message,
                 Created = n.Created,
@@ -51,17 +55,16 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
                 return false; 
         }
 
-        foreach (var userId in userIds)
+        foreach (var newNotification in userIds.Select(userId => new Notification
+                 {
+                     ProjectId = projectId,
+                     TaskItemId = taskId,
+                     UserId = userId,
+                     Message = message,
+                     Created = DateTime.UtcNow,
+                     IsRead = false
+                 }))
         {
-            var newNotification = new Notification
-            {
-                ProjectId = projectId,
-                TaskItemId = taskId,
-                UserId = userId,
-                Message = message,
-                Created = DateTime.UtcNow,
-                IsRead = false
-            };
             await _db.Notifications.AddAsync(newNotification);
         }
         

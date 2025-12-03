@@ -3,6 +3,8 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 @inject JwtHelper JwtHelper
+@inject UiStateService Ui
+@inject NotificationService NotificationService
 
 <div class="project-card" @onclick="GoToProject">
     <div class="project-card-header">
@@ -75,12 +77,17 @@
     [Parameter] public string userId { get; set; }
     [Parameter] public bool IsOwner { get; set; } = false;
     
-    private bool isEditing = false;
+    private bool isEditing;
 
     private string editName = "";
     private string editDescription = "";
 
-    void GoToProject() => Navigation.NavigateTo($"/Project/{Project.Id}");
+    private async void GoToProject()
+    {
+        await NotificationService.MarkProjectNotificationsAsRead(Project.Id);
+        Ui.NotifyStateChanged();
+        Navigation.NavigateTo($"/Project/{Project.Id}");
+    } 
 
     private void StartEdit()
     {
@@ -109,17 +116,31 @@
 
         var response = await client.PutAsJsonAsync($"api/Project/{Project.Id}", dto);
 
-        if (response.IsSuccessStatusCode)
-        {
-            editDescription = "";
-            editName = "";
-            if (OnDeleted.HasDelegate)
-                await OnDeleted.InvokeAsync();
-        }
-        else
+        if (!response.IsSuccessStatusCode)
         {
             Console.WriteLine("Error editing project: " + response.StatusCode);
+            return;
         }
+        
+        editDescription = "";
+        editName = "";
+
+        var notification = new NotificationCreateDto
+        {
+            ProjectId = Project.Id,
+            Message = "Project has been edited"
+        };
+
+        response = await client.PostAsJsonAsync($"api/Notification", notification);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Error creating notification: " + response.StatusCode);
+            return;
+        }
+
+        if (OnDeleted.HasDelegate)
+            await OnDeleted.InvokeAsync();
     }
 
     private void StartShare()
@@ -143,6 +164,8 @@
                 Console.WriteLine("Error deleting project: " + response.StatusCode);
                 return;
             }
+            
+            
 
             if (OnDeleted.HasDelegate)
                 await OnDeleted.InvokeAsync();

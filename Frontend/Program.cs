@@ -11,7 +11,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddScoped <ProtectedSessionStorage>();
 builder.Services.AddScoped<JwtHelper>();
+builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<UiStateService>();
+
 
 //builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStateProvider>();
 //builder.Services.AddAuthenticationCore();
