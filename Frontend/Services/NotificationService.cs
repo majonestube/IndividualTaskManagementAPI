@@ -2,15 +2,15 @@
 
 namespace Frontend.Services;
 
-public class NotificationService(JwtHelper jwtHelper)
+public class NotificationService(ApiClientFactory clientFactory)
 {
-    private readonly JwtHelper _jwtHelper = jwtHelper;
+    private readonly ApiClientFactory clientFactory = clientFactory;
 
     public async Task MarkNotificationsAsRead(NotificationDto[]? unreadNotifications)
     {
         if (unreadNotifications == null) return;
         
-        var client = await _jwtHelper.GetAuthenticatedClientAsync();
+        var client = await clientFactory.CreateClient();
 
         foreach (var notification in unreadNotifications)
         {
@@ -24,7 +24,7 @@ public class NotificationService(JwtHelper jwtHelper)
 
     public async Task MarkProjectNotificationsAsRead(int projectId)
     {
-        var client = await _jwtHelper.GetAuthenticatedClientAsync();
+        var client = await clientFactory.CreateClient();
         var notifications = await client.GetFromJsonAsync<NotificationDto[]?>($"api/Notification/user");
         
         if (notifications == null) return;

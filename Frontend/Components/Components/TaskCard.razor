@@ -1,7 +1,7 @@
 ﻿@using Frontend.Services
 @using MyShared.Models
 @inject IJSRuntime JS
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @inject NavigationManager Navigation
 
 
@@ -67,7 +67,7 @@
     {
         if (!firstRender) return;
         
-        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        var client = await ClientFactory.CreateClient();
         statuses = await client.GetFromJsonAsync<StatusDto[]>("api/Tasks/status");
 
         if (task.StatusId == 0 && statuses != null)
@@ -113,7 +113,7 @@
         
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.PutAsJsonAsync($"api/Tasks/{task.Id}/status/{task.StatusId}", new { StatusId = task.StatusId });
 
             if (!response.IsSuccessStatusCode)
@@ -150,7 +150,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.DeleteAsync($"api/Tasks/{task.Id}");
 
             if (!response.IsSuccessStatusCode)

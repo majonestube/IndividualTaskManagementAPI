@@ -1,11 +1,11 @@
 ﻿@page "/Login"
 @rendermode InteractiveServer
 @inject IHttpClientFactory Http
-@inject ProtectedSessionStorage sessionStorage
 @inject NavigationManager Navigation
 @inject UiStateService Ui
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @using Frontend.Services
-@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
 
 <div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
@@ -72,9 +72,9 @@
         }
         
         // store token in local storage
-        await sessionStorage.SetAsync("authToken", token);
+        await ((JwtAuthenticationStateProvider)AuthenticationStateProvider).MarkUserAsAuthenticated(token);
         Ui.NotifyStateChanged();
         
-        Navigation.NavigateTo("/");
+        Navigation.NavigateTo("/", false);
     }
 }

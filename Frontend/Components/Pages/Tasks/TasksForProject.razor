@@ -1,12 +1,12 @@
 ﻿@page "/Project/{projectId:int}"
 @using Frontend.Components.Components
-@using Frontend.Components.Layout
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject JwtHelper JwtHelper
-@layout AfterLoginLayout
+@inject ApiClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>@project?.Name</h3>
 
@@ -32,6 +32,8 @@ else
 <button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+    
     [Parameter] public int projectId { get; set; }
     
     private TaskItemDto[]? tasks;
@@ -53,9 +55,10 @@ else
         
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
+            var client = await ClientFactory.CreateClient();
+
+            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            userId = authenticationState.User.Identity?.Name;
             
             tasks = await client.GetFromJsonAsync<TaskItemDto[]>($"api/Tasks/project/{projectId}");
             project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");

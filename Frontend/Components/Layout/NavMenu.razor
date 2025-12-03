@@ -1,10 +1,12 @@
 ﻿@using Frontend.Components.Components
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
 @rendermode InteractiveServer
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @inject UiStateService Ui
 @inject NotificationService NotificationService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -76,9 +78,10 @@
     private async void HandleUiChange()
     {
         if (!initialized) return;
-        
-        var token = await JwtHelper.GetAuthorizationTokenAsync();
-        if (string.IsNullOrEmpty(token)) return;
+
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authenticationState.User;
+        if (user.Identity?.IsAuthenticated == false) return;
         
         await LoadNotifications();
         await InvokeAsync(StateHasChanged);
@@ -96,7 +99,7 @@
     {
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             notifications = await client.GetFromJsonAsync<NotificationDto[]>($"api/Notification/user");
             unreadNotifications = notifications?.Where(n => !n.IsRead).ToArray();
             unreadNotificationsCount = unreadNotifications?.Length ?? 0;

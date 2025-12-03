@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Identity
 @using MyShared.Models
 
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @inject IJSRuntime JS
 
 <div class="comment-card">
@@ -51,7 +51,7 @@
     {
         if (!firstRender) return;
 
-        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        var client = await ClientFactory.CreateClient();
         user = await client.GetFromJsonAsync<IdentityUser?>($"api/User/{userId}");
         StateHasChanged();
     }
@@ -80,7 +80,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
 
             var updatedComment = new CommentDto
             {
@@ -121,7 +121,7 @@
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             var response = await client.DeleteAsync($"api/Comments/{comment?.Id}");
 
             if (!response.IsSuccessStatusCode)
