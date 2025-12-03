@@ -1,4 +1,5 @@
 ﻿@using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
 @inject IJSRuntime JS
 @inject ApiClientFactory ClientFactory
@@ -79,6 +80,7 @@
         
         StateHasChanged();
     }
+    
 
     private string GetStatusClass() => task?.StatusId switch
     {

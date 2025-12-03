@@ -94,3 +94,56 @@ main {
     right: 0.75rem;
     top: 0.5rem;
 }
+
+.auth-dropdown {
+    position: relative;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+}
+
+.auth-trigger {
+    background: transparent;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    color: #333;
+}
+
+.auth-trigger:hover {
+    background: #ececec;
+    cursor: pointer;
+}
+
+.auth-menu {
+    position: absolute;
+    top: 110%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    min-width: 160px;
+    padding: 6px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    z-index: 100;
+}
+
+.auth-menu-item {
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.auth-menu-item:hover {
+    background: #f2f2f2;
+}

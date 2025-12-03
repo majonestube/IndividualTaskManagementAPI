@@ -59,5 +59,4 @@ public class JwtAuthenticationStateProvider(JwtStore jwtStore) : AuthenticationS
         
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
     }
-    
 }

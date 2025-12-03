@@ -70,8 +70,9 @@ else
     public async Task LoadProjects()
     {
         loading = true;
-        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        userId = authenticationState.User.Identity?.Name;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         try
         {
             var client = await ClientFactory.CreateClient();

@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace Frontend.Services;
 
 public class JwtStore(ProtectedSessionStorage sessionStorage)
 {
     private const string JwtKey = "authToken";
-    private readonly ProtectedSessionStorage _sessionStorage = sessionStorage;
+    private readonly ProtectedSessionStorage sessionStorage = sessionStorage;
 
     public async Task<string> GetAuthorizationTokenAsync()
     {
@@ -36,4 +37,5 @@ public class JwtStore(ProtectedSessionStorage sessionStorage)
     {
         await sessionStorage.DeleteAsync("authToken");  
     }
+
 }

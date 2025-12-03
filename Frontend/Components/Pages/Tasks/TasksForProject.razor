@@ -32,8 +32,6 @@ else
 <button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
 @code {
-    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
-    
     [Parameter] public int projectId { get; set; }
     
     private TaskItemDto[]? tasks;
@@ -46,6 +44,12 @@ else
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        
         await LoadTasks();
     }
 
@@ -56,9 +60,6 @@ else
         try
         {
             var client = await ClientFactory.CreateClient();
-
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            userId = authenticationState.User.Identity?.Name;
             
             tasks = await client.GetFromJsonAsync<TaskItemDto[]>($"api/Tasks/project/{projectId}");
             project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");

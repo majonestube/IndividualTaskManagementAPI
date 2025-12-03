@@ -147,8 +147,9 @@ else if (task != null)
             var client = await ClientFactory.CreateClient();
             task = await client.GetFromJsonAsync<TaskItemDto?>($"api/Tasks/{taskId}");
 
-            var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            userId = authenticationState.User.Identity?.Name;
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         }
         catch (Exception ex)
         {

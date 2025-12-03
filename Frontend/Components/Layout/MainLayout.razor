@@ -5,7 +5,6 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
-
 <div class="page">
     <div class="sidebar">
         <NavMenu/>
@@ -15,8 +14,20 @@
         <div class="top-row px-4">
             <AuthorizeView>
                 <Authorized>
-                    <p>@context.User?.Identity?.Name</p>
-                    <a @onclick="Logout" style="cursor: pointer">Log out</a>
+                    <div class="auth-dropdown">
+                        <button class="auth-trigger" @onclick="ToggleUserMenu">
+                            @context.User?.Identity?.Name
+                            <i class="bi bi-caret-down-fill"></i>
+                        </button>
+                        @if (showUserMenu)
+                        {
+                            <div class="auth-menu">
+                                <a class="auth-menu-item" @onclick="Logout">
+                                    <i class="bi bi-arrow-right"></i> Log out
+                                </a>
+                            </div>
+                        }
+                    </div>
                 </Authorized>
                 <NotAuthorized>
                     <NavLink href="/Login">Log in / Register</NavLink>
@@ -37,6 +48,12 @@
 </div>
 
 @code {
+    private bool showUserMenu = false;
+
+    private void ToggleUserMenu()
+    {
+        showUserMenu = !showUserMenu;
+    }
 
     private async Task Logout()
     {
