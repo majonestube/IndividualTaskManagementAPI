@@ -153,6 +153,7 @@
         try
         {
             var client = await ClientFactory.CreateClient();
+            
             var response = await client.DeleteAsync($"api/Tasks/{task.Id}");
 
             if (!response.IsSuccessStatusCode)

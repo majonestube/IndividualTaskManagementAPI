@@ -126,8 +126,17 @@
     {
         showNotifications = !showNotifications;
 
-        if (!showNotifications) return;
-        await NotificationService.MarkNotificationsAsRead(unreadNotifications);
-        HandleUiChange();
+        if (!showNotifications)
+        {
+            await NotificationService.MarkNotificationsAsRead(unreadNotifications);
+        }
+        unreadNotificationsCount = 0;
+
+        if (showNotifications)
+        {
+            await LoadNotifications();
+        }
+        
+        StateHasChanged();
     }
 }
