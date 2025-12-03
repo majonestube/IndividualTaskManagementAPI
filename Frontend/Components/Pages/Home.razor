@@ -1,10 +1,23 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
-<p>STUFF</p>
+<div class="home-page">
+    <div class="page-headline">Are you ready to organize your life?</div>
+    <div class="page-content">
+        <p>Here, you can create projects to keep track of everything you have going on.</p>
+        <p>Create different tasks for everything in each project, with deadlines, assigned users, 
+            and a status you can change as you progress.
+        </p>
+        <p>You can even share the projects with your friends, so they also can add tasks.</p>
+        <p>Want to comment on their tasks, letting them know your ideas?</p>
+        <p>Well wouldn't you know, there is functionality for that as well!</p>
+        <p style="font-weight: bold">What else do you need?</p>
+        <p>It's easy, free, and you have nothing to lose.</p>
+        <Button @onclick="GoToRegister" class="btn-main">Register Now!</Button>
+    </div>
+</div>
 
 @code {
-
-
-
+    void GoToRegister() => Navigation.NavigateTo("/Register");
 }
