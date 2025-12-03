@@ -23,6 +23,7 @@ public class NotificationControllerTests
     public async Task AddNotification_ShouldReturnOk_WhenNotificationCreated()
     {
         // Arrange
+        var userId = "user";
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
@@ -33,7 +34,8 @@ public class NotificationControllerTests
         _notificationServiceMock.Setup(x => x.AddNotification(
                 createDto.ProjectId,
                 createDto.TaskItemId,
-                createDto.Message))
+                createDto.Message,
+                userId))
             .ReturnsAsync(true);
 
         // Act
@@ -47,6 +49,7 @@ public class NotificationControllerTests
     public async Task AddNotification_ShouldReturnBadRequest_WhenExceptionThrown()
     {
         // Arrange
+        var userId = "user";
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
@@ -57,7 +60,8 @@ public class NotificationControllerTests
         _notificationServiceMock.Setup(x => x.AddNotification(
                 createDto.ProjectId,
                 createDto.TaskItemId,
-                createDto.Message))
+                createDto.Message,
+                userId))
             .ReturnsAsync(false);
 
         // Act

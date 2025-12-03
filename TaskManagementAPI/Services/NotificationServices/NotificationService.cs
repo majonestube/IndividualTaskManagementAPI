@@ -35,16 +35,18 @@ public class NotificationService(TaskManagementDbContext db) : INotificationServ
     }
     
     // Legger til varsler til alle med tilgang til prosjektet
-    public async Task<bool> AddNotification(int projectId, int? taskId, string message)
+    public async Task<bool> AddNotification(int projectId, int? taskId, string message, string currentUserId)
     {
         var projectExists = await _db.Projects.AnyAsync(p => p.Id == projectId);
         if (!projectExists) return false;
-
+        
         var userIds = await _db.ProjectVisibility
             .AsNoTracking()
             .Where(pv => pv.ProjectId == projectId)
             .Select(pv => pv.UserId)
             .ToListAsync();
+
+        userIds.Remove(currentUserId);
         
         if (taskId.HasValue)
         {

@@ -5,7 +5,7 @@ namespace TaskManagementAPI.Services.NotificationServices;
 public interface INotificationService
 {
     Task<List<NotificationDto>> GetNotificationsForUser(string userId);
-    Task<bool> AddNotification(int projectId, int? taskId, string message);
+    Task<bool> AddNotification(int projectId, int? taskId, string message, string currentUserId);
 
     Task<bool> MarkAsRead(int notificationId);
 

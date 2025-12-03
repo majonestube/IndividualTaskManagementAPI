@@ -32,10 +32,16 @@ public class NotificationController(INotificationService notificationService) : 
     }
     
     // Legger til varsler for alle med tilgang til prosjektet
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> AddNotification([FromBody] NotificationCreateDto dto)
     {
-        var success = await notificationService.AddNotification(dto.ProjectId, dto.TaskItemId, dto.Message);
+        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+        {
+            return Unauthorized();
+        }
+        var success = await notificationService.AddNotification(dto.ProjectId, dto.TaskItemId, dto.Message, userId);
         return success ? NoContent() : BadRequest();
     }
     

@@ -87,6 +87,13 @@
         _ => "task-todo"
     };
 
+    private string GetStatusString() => task?.StatusId switch 
+    {
+        3 => "Done",
+        2 => "In Progess",
+        _ => "To Do"
+    };
+
     private bool IsOverdue()
     {
         if (task?.DueDate == null) return false;
@@ -102,6 +109,7 @@
         if (task.StatusId == newStatusId) return;
 
         task.StatusId = newStatusId;
+        task.Status = GetStatusString();
         
         try
         {
