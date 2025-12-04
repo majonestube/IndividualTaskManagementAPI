@@ -36,5 +36,13 @@ public static class ControllerTestHelpers
             HttpContext = new DefaultHttpContext { User = principal }
         };
     }
+
+    public static void ClearUser(ControllerBase controller)
+    {
+        controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+    }
 }
 

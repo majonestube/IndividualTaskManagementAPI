@@ -241,6 +241,21 @@ public class ProjectControllerTests
     }
 
     [Fact]
+    public async Task Create_ShouldReturnUnauthorized_WhenUserIsNull()
+    {
+        // arrange
+        ControllerTestHelpers.ClearUser(_controller);
+        var project = new ProjectCreateDto { Name = "" };
+        
+        //act
+        var result = await _controller.Create(project);
+        
+        // assert
+        result.Should().BeOfType<UnauthorizedResult>();
+        
+    }
+
+    [Fact]
     public async Task Create_ShouldReturnBadRequest_WhenModelStateInvalid()
     {
         // Arrange

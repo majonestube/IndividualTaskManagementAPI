@@ -370,7 +370,60 @@ public class TasksControllerTests
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.Value.Should().Be("Test exception");
     }
+    
+    [Fact]
+    public async Task GetStatuses_ShouldReturnUnauthorized_IfUserIsNull()
+    {
+        // arrange
+        ControllerTestHelpers.ClearUser(_controller);
+        
+        // act
+        var result = await _controller.GetStatuses();
+        
+        //assert
+        result.Should().BeOfType<UnauthorizedResult>();
+    }
 
+    [Fact]
+    public async Task GetStatuses_ShouldReturnOk_IfUserIsNotNull()
+    {
+        // arrange
+        var userId = "user1";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+
+        var statuses = new List<StatusDto>
+        {
+            new StatusDto { Id = 1, Name = "Success" },
+        };
+        
+        _taskServiceMock.Setup(x => x.GetStatuses())
+            .ReturnsAsync(statuses);
+        
+        // act
+        var result = await _controller.GetStatuses();
+        
+        // assert
+        result.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Fact]
+    public async Task GetStatuses_ShouldReturnBadRequest_IfExceptionThrown()
+    {
+        // arrange
+        var userId = "user1";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
+        
+        _taskServiceMock.Setup(x => x.GetStatuses())
+            .ThrowsAsync(new Exception("Test exception"));
+        
+        // act
+        var result = await _controller.GetStatuses();
+        
+        // assert
+        result.Should().BeOfType<BadRequestObjectResult>();
+    }
+    
+    
     [Fact]
     public async Task UpdateStatus_ShouldReturnNoContent_WhenUpdateSucceeds()
     {
