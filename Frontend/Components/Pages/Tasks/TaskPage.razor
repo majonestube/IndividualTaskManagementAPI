@@ -1,11 +1,11 @@
 ﻿@page "/Task/{taskId:int}"
 @rendermode InteractiveServer
 @using Frontend.Components.Components
-@using Frontend.Components.Layout
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
-@inject JwtHelper JwtHelper
-@layout AfterLoginLayout
+@inject ApiClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @if (loading)
 {
@@ -112,6 +112,8 @@ else if (task != null)
 }
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; } = default!;
+    
     [Parameter] public int taskId { get; set; }
     
     private TaskItemDto? task;
@@ -142,11 +144,12 @@ else if (task != null)
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             task = await client.GetFromJsonAsync<TaskItemDto?>($"api/Tasks/{taskId}");
-            
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
+
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         }
         catch (Exception ex)
         {
@@ -165,8 +168,7 @@ else if (task != null)
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-            
+            var client = await ClientFactory.CreateClient();
             comments = await client.GetFromJsonAsync<CommentDto[]>($"api/Comments/task/{taskId}");
         }
         catch (Exception ex)
@@ -194,7 +196,7 @@ else if (task != null)
 
     private async Task SaveTaskToApi()
     {
-        var client = await JwtHelper.GetAuthenticatedClientAsync();
+        var client = await ClientFactory.CreateClient();
 
         var dto = new TaskItemCreateDto
         {
@@ -231,7 +233,7 @@ else if (task != null)
 
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
 
             var newComment = new CommentCreateDto
             {

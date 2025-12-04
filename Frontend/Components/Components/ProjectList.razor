@@ -1,8 +1,11 @@
 ﻿@using Frontend.Components.Layout
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Identity
 @using MyShared.Models
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>@Heading</h3>
 
@@ -55,7 +58,8 @@ else
     private bool loading = true;
     private bool showShareDialog = false;
     private int selectedProjectId;
-    public string? userId;
+    private string? userId;
+    private IdentityUser? user;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -66,13 +70,13 @@ else
     public async Task LoadProjects()
     {
         loading = true;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             projects = await client.GetFromJsonAsync<ProjectDto[]>($"api/project/{VisibleOrOwner}");
-            
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
         }
         catch (Exception ex)
         {

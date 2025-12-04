@@ -1,48 +1,62 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace Frontend.Services;
 
-public class JwtAuthenticationStateProvider(JwtHelper jwtHelper) : AuthenticationStateProvider
+public class JwtAuthenticationStateProvider(JwtStore jwtStore) : AuthenticationStateProvider
 {
-    private readonly JwtHelper jwtHelper = jwtHelper;
+    private readonly JwtStore jwtStore = jwtStore;
+    private readonly ClaimsPrincipal anonymous = new(new ClaimsIdentity());
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        string? token = null;
         try
         {
-            token = await jwtHelper.GetAuthorizationTokenAsync();
+            var token = await jwtStore.GetAuthorizationTokenAsync();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return new AuthenticationState(anonymous);
+            }
+
+            var claims = ParseClaimsFromJwt(token);
+            var identity = new ClaimsIdentity(claims, "JwtAuth");
+            
+            return new AuthenticationState(new ClaimsPrincipal(identity));
         }
-        catch (InvalidOperationException)
+        catch (Exception)
         {
-            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
             return new AuthenticationState(anonymous);
         }
-        
-        if (string.IsNullOrWhiteSpace(token))
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        
-        var claims = jwtHelper.GetClaimsFromToken(token).ToList();
-         var nameClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
-         if (nameClaim == null)
-         {
-             var usernameClaim = claims.FirstOrDefault(c => c.Type == "username");
-             if (usernameClaim != null)
-             {
-                 claims.Add(new Claim(ClaimTypes.Name, usernameClaim.Value));
-             }
-         } 
-        
-        var identity = new ClaimsIdentity(claims, "jwt");
-        var user = new ClaimsPrincipal(identity);
-
-        return new AuthenticationState(user);
     }
 
-    public void NotifyAuthChanged()
+    private IEnumerable<Claim>? ParseClaimsFromJwt(string token)
     {
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken(token);
+        
+        var claims = jwtToken.Claims;
+        var tokenClaim = new Claim("raw-token", token);
+
+        return [..claims, tokenClaim];
     }
-    
+
+    public async Task MarkUserAsAuthenticated(string token)
+    {
+        await jwtStore.SetToken(token);
+
+        var claims = ParseClaimsFromJwt(token);
+        var identity = new ClaimsIdentity(claims, "JwtAuth");
+        var claimsPrincipal = new ClaimsPrincipal(identity);
+        
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
+    }
+
+    public async Task MarkUserAsLoggedOut()
+    {
+        await jwtStore.ClearToken();
+        
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+    }
 }

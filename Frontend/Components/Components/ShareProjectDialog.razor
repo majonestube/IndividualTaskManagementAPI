@@ -1,6 +1,6 @@
 ﻿@using Frontend.Services
 @using MyShared.Models
-@inject JwtHelper JwtHelper
+@inject ApiClientFactory ClientFactory
 
 @if (Visible)
 {
@@ -58,7 +58,7 @@
     {
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
             users = await client.GetFromJsonAsync<UserDto[]>("api/User");
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@
     {
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
+            var client = await ClientFactory.CreateClient();
 
             var dto = new ProjectShareDto
             {

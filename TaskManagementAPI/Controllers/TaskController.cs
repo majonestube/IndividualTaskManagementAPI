@@ -127,7 +127,7 @@ public class TasksController(ITaskService taskService) : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            return BadRequest($"{ex.Message}");
         }
         
     }

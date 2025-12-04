@@ -1,12 +1,12 @@
 ﻿@page "/Project/{projectId:int}"
 @using Frontend.Components.Components
-@using Frontend.Components.Layout
 @using Frontend.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using MyShared.Models
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
-@inject JwtHelper JwtHelper
-@layout AfterLoginLayout
+@inject ApiClientFactory ClientFactory
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>@project?.Name</h3>
 
@@ -22,12 +22,41 @@
 }
 else
 {
+    <div class="task-filter mb-3 d-flex gap-3 align-items-center">
+        <label>
+            <input type="checkbox" @bind="showOnlyMyTasks"/>
+            Show only my tasks
+        </label>
+        
+        <label>
+            <input type="checkbox" @bind="sortByDueDate"/>
+            Sort by due date:
+        </label>
+        
+        <label>
+            Status:
+            <select @bind="selectedStatusId">
+                <option value="">--Select--</option>
+                @if (statuses != null)
+                {
+                    @foreach (var status in statuses)
+                    {
+                        <option value="@status.Id">@status.Name</option>
+                    }
+                }
+
+            </select>
+        </label>
+        
+    </div>
     <div class="task-card-grid">
-        @foreach (var task in tasks)
+        @foreach (var task in FilteredTasks)
         {
             <TaskCard Task="@task" userId="@userId" OnDeleted="LoadTasks" />
         }
     </div>
+    
+    
 }
 <button class="btn-alt" @onclick="() => GoToNewTask(project.Id)">New Task</button>
 
@@ -38,12 +67,22 @@ else
     private ProjectDto? project;
     private string? userId;
     private bool loading = true;
+    private bool showOnlyMyTasks = false;
+    private bool sortByDueDate = false;
+    private string? selectedStatusId;
+    private StatusDto[]? statuses;
     
     void GoToNewTask(int id) => Navigation.NavigateTo($"/Project/{project.Id}/NewTask");
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+        
         await LoadTasks();
     }
 
@@ -53,12 +92,11 @@ else
         
         try
         {
-            var client = await JwtHelper.GetAuthenticatedClientAsync();
-            var token = await JwtHelper.GetAuthorizationTokenAsync();
-            userId = JwtHelper.GetUserId(token);
+            var client = await ClientFactory.CreateClient();
             
             tasks = await client.GetFromJsonAsync<TaskItemDto[]>($"api/Tasks/project/{projectId}");
             project = await client.GetFromJsonAsync<ProjectDto>($"api/Project/{projectId}");
+            statuses = await client.GetFromJsonAsync<StatusDto[]>($"api/Tasks/status");
         }
         catch (Exception ex)
         {
@@ -70,4 +108,26 @@ else
             StateHasChanged();
         }
     }
+
+    private IEnumerable<TaskItemDto> FilteredTasks
+    {
+        get
+        {
+            if (tasks == null) return Array.Empty<TaskItemDto>();
+
+            IEnumerable<TaskItemDto> filtered = tasks;
+
+            if (showOnlyMyTasks)
+                filtered = filtered.Where(t => t.AssignedUserId == userId);
+
+            if (!string.IsNullOrEmpty(selectedStatusId) && int.TryParse(selectedStatusId, out int statusId))
+                filtered = filtered.Where(t => t.StatusId == statusId);
+
+            if (sortByDueDate)
+                filtered = filtered.OrderBy(t => t.DueDate);
+
+            return filtered;
+        }
+    }
+
 }
