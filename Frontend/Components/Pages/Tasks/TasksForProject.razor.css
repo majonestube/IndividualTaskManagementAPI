@@ -4,3 +4,64 @@
     gap: 20px;
     justify-content: flex-start;
 }
+
+.task-filter {
+    padding: 12px 16px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.gradient-toggle input[type="checkbox"] {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    position: relative;
+    transition: 0.2s;
+}
+
+.gradient-toggle input[type="checkbox"]:checked {
+    border: none;
+    background: linear-gradient(90deg, #0c1f61, #5e73ca);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.gradient-toggle input[type="checkbox"]:checked::after {
+    content: "✓";
+    color: white;
+    position: absolute;
+    font-size: 14px;
+    left: 4px;
+    top: -1px;
+}
+
+.styled-select {
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background: linear-gradient(90deg, #f7f7f7, #ffffff);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.styled-select:hover {
+    background: linear-gradient(90deg, #ececec, #ffffff);
+}
+
+.styled-select:focus {
+    outline: none;
+    border: 1px solid #5e73ca;
+    box-shadow: 0 0 6px rgba(94, 115, 202, 0.4);
+}

@@ -23,19 +23,19 @@
 else
 {
     <div class="task-filter mb-3 d-flex gap-3 align-items-center">
-        <label>
+        <label class="filter-option gradient-toggle">
             <input type="checkbox" @bind="showOnlyMyTasks"/>
             Show only my tasks
         </label>
         
-        <label>
+        <label class="filter-option gradient-toggle">
             <input type="checkbox" @bind="sortByDueDate"/>
-            Sort by due date:
+            Sort by due date
         </label>
         
-        <label>
+        <label class="filter-option">
             Status:
-            <select @bind="selectedStatusId">
+            <select class="styled-select" @bind="selectedStatusId">
                 <option value="">--Select--</option>
                 @if (statuses != null)
                 {
