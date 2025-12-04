@@ -260,6 +260,7 @@ public class ProjectControllerTests
     {
         // Arrange
         const string userId = "user1";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         var project = new ProjectCreateDto { Name = "New Project", Description = "Description" };
         var createdProject = new ProjectDto { Name = "New Project", Description = "Description", Username = "user1" };
 
@@ -280,6 +281,7 @@ public class ProjectControllerTests
     {
         // Arrange
         const string userId = "user1";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         var project = new ProjectCreateDto { Name = "New Project", Description = "Description" };
 
         _projectServiceMock.Setup(x => x.Create(project, userId))

@@ -4,6 +4,7 @@ using Moq;
 using MyShared.Models;
 using TaskManagementAPI.Controllers;
 using TaskManagementAPI.Services.NotificationServices;
+using TaskManagementAPI.Tests.Helpers;
 using Xunit;
 
 namespace TaskManagementAPI.Tests.Controllers;
@@ -24,6 +25,7 @@ public class NotificationControllerTests
     {
         // Arrange
         var userId = "user";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
@@ -50,6 +52,7 @@ public class NotificationControllerTests
     {
         // Arrange
         var userId = "user";
+        ControllerTestHelpers.SetUserClaims(_controller, userId);
         var createDto = new NotificationCreateDto
         {
             ProjectId = 1,
