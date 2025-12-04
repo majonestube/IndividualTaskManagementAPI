@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace Frontend.Services;
 
