@@ -15,11 +15,8 @@ builder.Services.AddScoped<AuthenticationStateProvider, JwtAuthenticationStatePr
 builder.Services.AddScoped<ApiAuthenticator>();
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
-
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddSingleton<UiStateService>();
-
-
 
 builder.Services.AddHttpClient("TaskManagementAPI", client =>
 {
